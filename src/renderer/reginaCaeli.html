@@ -135,6 +135,32 @@
             line-height: 1.6;
         }
 
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+        }
+
+        .control-button {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .control-button:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -221,6 +247,11 @@
     <div class="prayer-card">
         <div class="image-container">
             <img id="regina-caeli-image" src="/placeholder.svg" alt="Regina Caeli">
+            <div class="close-button">
+                <button class="control-button" id="close-button">
+                    X
+                </button>
+            </div>
         </div>
         <div class="prayer-container">
             <h1 class="title" id="prayer-title"></h1>

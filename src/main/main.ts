@@ -153,15 +153,16 @@ class IaculaApp {
 
     private showPopup() {
         if (this.mainWindow) {
-            this.mainWindow.close();
+            this.mainWindow.destroy();
+            this.mainWindow = null;
         }
 
         const { width, height } = screen.getPrimaryDisplay().workAreaSize;
         this.mainWindow = new BrowserWindow({
             width: 300,
             height: 400,
-            x: width - 320,
-            y: height - 420,
+            x: width - 310,
+            y: height - 410,
             frame: false,
             transparent: true,
             alwaysOnTop: true,
@@ -173,10 +174,14 @@ class IaculaApp {
 
         this.mainWindow.loadFile(path.join(__dirname, '../renderer/popup.html'));
 
+        // Handle window close event
+        this.mainWindow.on('closed', () => {
+            this.mainWindow = null;
+        });
+
         setTimeout(() => {
             if (this.mainWindow) {
-                this.mainWindow.close();
-                this.mainWindow = null;
+                this.mainWindow.destroy();
             }
         }, this.config.duration * 1000);
     }
@@ -186,7 +191,8 @@ class IaculaApp {
         const prayerType = isEasterTime ? 'reginaCaeli' : 'angelus';
 
         if (this.mainWindow) {
-            this.mainWindow.close();
+            this.mainWindow.destroy();
+            this.mainWindow = null;
         }
 
         const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -206,10 +212,14 @@ class IaculaApp {
 
         this.mainWindow.loadFile(path.join(__dirname, `../renderer/${prayerType}.html`));
 
+        // Handle window close event
+        this.mainWindow.on('closed', () => {
+            this.mainWindow = null;
+        });
+
         setTimeout(() => {
             if (this.mainWindow) {
-                this.mainWindow.close();
-                this.mainWindow = null;
+                this.mainWindow.destroy();
             }
         }, this.config.duration * 1000);
     }

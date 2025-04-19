@@ -7,7 +7,6 @@ function loadPrayers() {
     return JSON.parse(fs.readFileSync(prayersPath, 'utf-8'));
 }
 
-// Função para obter a imagem do Angelus
 function getAngelusImage() {
     const imagePath = path.join(__dirname, '../../assets/images/angelus/J.jpg');
     return imagePath;
@@ -51,4 +50,8 @@ function updatePrayerContent() {
 }
 
 // Atualizar o conteúdo quando a página carregar
-window.addEventListener('load', updatePrayerContent); 
+window.addEventListener('load', updatePrayerContent);
+
+document.getElementById('close-button').addEventListener('click', () => {
+    window.close();
+});
