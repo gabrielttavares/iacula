@@ -31,12 +31,9 @@
             color: #FFFFFF;
         }
 
-        /* Main container with significantly reduced size */
         .quote-card {
             width: 240px;
-            /* Approximately 2x smaller than previous 480px */
             height: 320px;
-            /* Maintain aspect ratio */
             position: relative;
             overflow: hidden;
             border-radius: 12px;
@@ -132,6 +129,32 @@
                 padding-top: 1.8rem;
             }
         }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+        }
+
+        .control-button {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .control-button:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
     </style>
 </head>
 
@@ -141,6 +164,11 @@
             <img id="daily-image" src="/placeholder.svg" alt="Imagem do dia">
             <div class="quote-container">
                 <p id="daily-quote"></p>
+            </div>
+            <div class="close-button">
+                <button class="control-button" id="close-button">
+                    X
+                </button>
             </div>
         </div>
     </div>

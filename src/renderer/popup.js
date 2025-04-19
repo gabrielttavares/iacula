@@ -42,5 +42,11 @@ function updatePopupContent() {
     }
 }
 
+function closePopup() {
+    window.close();
+}
+
 // Atualizar o conteúdo quando a página carregar
-window.addEventListener('load', updatePopupContent); 
+window.addEventListener('load', updatePopupContent);
+
+document.getElementById('close-button').addEventListener('click', closePopup);
