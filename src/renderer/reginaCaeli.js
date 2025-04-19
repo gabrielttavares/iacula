@@ -50,5 +50,9 @@ function updatePrayerContent() {
     document.body.classList.add('fade-in');
 }
 
+document.getElementById('close-button').addEventListener('click', () => {
+    window.close();
+});
+
 // Atualizar o conteúdo quando a página carregar
 window.addEventListener('load', updatePrayerContent); 
