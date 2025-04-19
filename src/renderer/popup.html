@@ -1,44 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iacula</title>
     <style>
-        body {
+        @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            font-family: 'Arial', sans-serif;
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: calc(100vh - 40px);
+        }
+
+        body {
+            font-family: 'EB Garamond', serif;
+            color: #FFFFFF;
+        }
+
+        /* Main container with significantly reduced size */
+        .quote-card {
+            width: 240px;
+            /* Approximately 2x smaller than previous 480px */
+            height: 320px;
+            /* Maintain aspect ratio */
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            /* Rounded borders */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .image-container {
-            width: 200px;
-            height: 200px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            position: relative;
         }
 
         .image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
 
         .quote-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem 0.8rem 1.2rem;
+            /* Adjusted padding for smaller container */
+            /* Smooth gradient transition */
+            background: linear-gradient(to top,
+                    rgba(0, 0, 0, 0.95) 0%,
+                    rgba(0, 0, 0, 0.9) 20%,
+                    rgba(0, 0, 0, 0.8) 40%,
+                    rgba(0, 0, 0, 0.6) 60%,
+                    rgba(0, 0, 0, 0.4) 75%,
+                    rgba(0, 0, 0, 0.2) 85%,
+                    rgba(0, 0, 0, 0.1) 92%,
+                    rgba(0, 0, 0, 0) 100%);
             text-align: center;
-            padding: 15px;
-            font-size: 16px;
-            line-height: 1.5;
-            color: #333;
+        }
+
+        #daily-quote {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.8rem;
+            /* Smaller font for smaller container */
+            line-height: 1.4;
+            color: #FFFFFF;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            position: relative;
+            z-index: 1;
+            padding: 0.2rem;
         }
 
         @keyframes fadeIn {
@@ -62,21 +110,39 @@
         }
 
         .fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.7s ease forwards;
         }
 
         .fade-out {
-            animation: fadeOut 0.5s ease-out;
+            animation: fadeOut 0.7s ease forwards;
+        }
+
+        /* Media queries for even smaller screens */
+        @media (max-width: 320px) {
+            .quote-card {
+                width: 200px;
+                height: 280px;
+            }
+
+            #daily-quote {
+                font-size: 0.75rem;
+            }
+
+            .quote-container {
+                padding-top: 1.8rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="image-container">
-        <img id="daily-image" src="" alt="Imagem do dia">
-    </div>
-    <div class="quote-container">
-        <p id="daily-quote"></p>
+    <div class="quote-card">
+        <div class="image-container">
+            <img id="daily-image" src="/placeholder.svg" alt="Imagem do dia">
+            <div class="quote-container">
+                <p id="daily-quote"></p>
+            </div>
+        </div>
     </div>
     <script src="popup.js"></script>
 </body>

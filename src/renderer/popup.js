@@ -1,13 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-// Função para carregar as citações do arquivo JSON
 function loadQuotes() {
     const quotesPath = path.join(__dirname, '../../assets/quotes/quotes.json');
     return JSON.parse(fs.readFileSync(quotesPath, 'utf-8'));
 }
 
-// Função para obter uma citação aleatória do dia atual
 function getRandomQuote() {
     const quotes = loadQuotes();
     const dayOfWeek = new Date().getDay() + 1; // 1-7 (Domingo-Sábado)
@@ -16,7 +14,6 @@ function getRandomQuote() {
     return dayQuotes[randomIndex];
 }
 
-// Função para obter uma imagem aleatória do dia atual
 function getRandomImage() {
     const dayOfWeek = new Date().getDay() + 1; // 1-7 (Domingo-Sábado)
     const imagesDir = path.join(__dirname, `../../assets/images/ordinary/${dayOfWeek}`);
@@ -25,7 +22,6 @@ function getRandomImage() {
     return path.join(imagesDir, randomImage);
 }
 
-// Função para atualizar o conteúdo do popup
 function updatePopupContent() {
     const quoteElement = document.getElementById('daily-quote');
     const imageElement = document.getElementById('daily-image');

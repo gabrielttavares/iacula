@@ -1,69 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Angelus</title>
     <style>
-        body {
+        @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+        :root {
+            --primary-color: #800020;
+            /* Burgundy */
+            --secondary-color: #2F4F4F;
+            /* Dark slate */
+            --accent-color: #D4AF37;
+            /* Gold */
+            --background-color: #FFFDF6;
+            /* Cream */
+            --text-color: #333333;
+            --light-text: #555555;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            font-family: 'Times New Roman', serif;
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 0;
+        }
+
+        body {
+            font-family: 'EB Garamond', serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: calc(100vh - 40px);
+            min-height: 100vh;
+            padding: 1.5rem;
+            line-height: 1.5;
         }
 
-        .prayer-container {
-            text-align: center;
-            max-width: 600px;
-            padding: 20px;
-        }
-
-        .title {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .verse {
-            margin: 15px 0;
-            font-size: 18px;
-            color: #444;
-        }
-
-        .response {
-            margin: 10px 0;
-            font-size: 16px;
-            color: #666;
-            font-style: italic;
-        }
-
-        .prayer {
-            margin-top: 30px;
-            font-size: 16px;
-            color: #444;
-            line-height: 1.6;
+        .prayer-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 550px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .image-container {
-            width: 200px;
-            height: 200px;
-            margin-bottom: 20px;
-            border-radius: 10px;
+            width: 100%;
+            height: 220px;
             overflow: hidden;
+            position: relative;
+        }
+
+        .image-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(to top, white, transparent);
         }
 
         .image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .prayer-container {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .title {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .verse {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.15rem;
+            color: var(--text-color);
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .response {
+            font-family: 'EB Garamond', serif;
+            font-size: 1rem;
+            color: var(--light-text);
+            font-style: italic;
+            margin: 0.7rem 0;
+        }
+
+        .prayer {
+            font-family: 'EB Garamond', serif;
+            margin-top: 1.5rem;
+            font-size: 1.05rem;
+            color: var(--secondary-color);
+            line-height: 1.6;
         }
 
         @keyframes fadeIn {
@@ -87,23 +132,77 @@
         }
 
         .fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.7s ease forwards;
         }
 
         .fade-out {
-            animation: fadeOut 0.5s ease-out;
+            animation: fadeOut 0.7s ease forwards;
+        }
+
+        @media (max-width: 768px) {
+            .prayer-card {
+                max-width: 100%;
+            }
+
+            .image-container {
+                height: 180px;
+            }
+
+            .title {
+                font-size: 1.6rem;
+            }
+
+            .verse {
+                font-size: 1.05rem;
+            }
+
+            .response {
+                font-size: 0.95rem;
+            }
+
+            .prayer {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+
+            .prayer-container {
+                padding: 1.2rem;
+            }
+
+            .title {
+                font-size: 1.4rem;
+            }
+
+            .verse {
+                font-size: 1rem;
+            }
+
+            .response {
+                font-size: 0.9rem;
+            }
+
+            .prayer {
+                font-size: 0.95rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="image-container">
-        <img id="prayer-image" src="" alt="Imagem da oração">
-    </div>
-    <div class="prayer-container">
-        <div class="title" id="prayer-title"></div>
-        <div id="verses-container"></div>
-        <div class="prayer" id="final-prayer"></div>
+    <div class="prayer-card">
+        <div class="image-container">
+            <img id="prayer-image" src="/placeholder.svg" alt="Imagem da oração">
+        </div>
+        <div class="prayer-container">
+            <h1 class="title" id="prayer-title"></h1>
+            <div id="verses-container"></div>
+            <div class="prayer" id="final-prayer"></div>
+        </div>
     </div>
     <script src="angelus.js"></script>
 </body>

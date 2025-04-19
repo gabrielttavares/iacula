@@ -9,7 +9,7 @@ function loadPrayers() {
 
 // Função para obter a imagem do Angelus
 function getAngelusImage() {
-    const imagePath = path.join(__dirname, '../../assets/images/angelus/angelus.jpg');
+    const imagePath = path.join(__dirname, '../../assets/images/angelus/J.jpg');
     return imagePath;
 }
 
