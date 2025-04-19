@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Regina Caeli</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Times New Roman', serif;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 40px);
+        }
+
+        .prayer-container {
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .verse {
+            margin: 15px 0;
+            font-size: 18px;
+            color: #444;
+        }
+
+        .response {
+            margin: 10px 0;
+            font-size: 16px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .prayer {
+            margin-top: 30px;
+            font-size: 16px;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .image-container {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="image-container">
+        <img id="regina-caeli-image" src="" alt="Regina Caeli">
+    </div>
+    <div class="prayer-container">
+        <h1 class="title" id="prayer-title"></h1>
+        <div id="verses-container"></div>
+        <p class="prayer" id="final-prayer"></p>
+    </div>
+    <script src="reginaCaeli.js"></script>
+</body>
+
+</html>

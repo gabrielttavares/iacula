@@ -30,14 +30,11 @@ class IaculaApp {
             this.loadConfig();
             this.setupTimers();
             this.setupIPC();
-            // Mostrar popup imediatamente após o app iniciar
             this.showPopup();
         });
 
         app.on('window-all-closed', () => {
-            if (process.platform !== 'darwin') {
-                app.quit();
-            }
+            // app in background
         });
     }
 
@@ -111,7 +108,6 @@ class IaculaApp {
             }
         } catch (error) {
             console.error('Erro ao carregar configurações:', error);
-            // Em caso de erro, usar as configurações padrão
             this.config = { ...DEFAULT_CONFIG };
         }
     }
@@ -224,7 +220,6 @@ class IaculaApp {
 
         // Implementar lógica para determinar se estamos no Tempo Pascal
         // (desde o Sábado Santo até Pentecostes)
-        // Esta é uma implementação simplificada
         const easterDate = this.calculateEasterDate(year);
         const pentecostDate = new Date(easterDate);
         pentecostDate.setDate(easterDate.getDate() + 49);
