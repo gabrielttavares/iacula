@@ -202,7 +202,7 @@ class IaculaApp {
     }
 
     private showAngelus(forceEasterTime: boolean = false) {
-        const isEasterTime = forceEasterTime || this.isEasterTime();
+        const isEasterTime = forceEasterTime !== undefined ? forceEasterTime : this.isEasterTime();
         const prayerType = isEasterTime ? 'reginaCaeli' : 'angelus';
 
         if (this.mainWindow) {
@@ -232,10 +232,12 @@ class IaculaApp {
             this.mainWindow = null;
         });
 
+        // Clear any existing popup timer
         if (this.popupTimer) {
             clearTimeout(this.popupTimer);
         }
 
+        // Set new timer for this popup with fixed 1-minute duration
         this.popupTimer = setTimeout(() => {
             if (this.mainWindow) {
                 this.mainWindow.destroy();
