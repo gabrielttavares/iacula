@@ -43,7 +43,7 @@
 
         .prayer-card {
             width: 100%;
-            max-width: 550px;
+            max-width: 450px;
             overflow: hidden;
             position: fixed;
             right: 0;
@@ -51,6 +51,9 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+            background-color: var(--background-color);
+            border-radius: 12px 0 0 12px;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .prayer-card::before {
@@ -61,13 +64,16 @@
             width: 100%;
             height: 4px;
             background: linear-gradient(to right, var(--accent-color), var(--primary-color));
+            z-index: 1;
         }
 
         .image-container {
             width: 100%;
-            height: 30vh;
+            max-height: 40vh;
             overflow: hidden;
             position: relative;
+            flex-shrink: 0;
+            border-radius: 12px 0 0 0;
         }
 
         .image-container::after {
@@ -77,23 +83,27 @@
             left: 0;
             width: 100%;
             height: 40px;
-            background: linear-gradient(to top, white, transparent);
+            background: linear-gradient(to top, var(--background-color), transparent);
         }
 
         .image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
 
         .prayer-container {
-            padding: 2rem;
+            padding: 1.5rem 2rem 2rem 2rem;
             text-align: center;
-            flex: 1;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             overflow-y: auto;
+            position: relative;
+            z-index: 0;
+            border-bottom-left-radius: 12px;
         }
 
         .title {
@@ -101,7 +111,7 @@
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--primary-color);
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             letter-spacing: 0.5px;
             position: relative;
             display: inline-block;
@@ -194,58 +204,6 @@
 
         .fade-out {
             animation: fadeOut 0.7s ease forwards;
-        }
-
-        @media (max-width: 768px) {
-            .prayer-card {
-                max-width: 100%;
-            }
-
-            .image-container {
-                height: 180px;
-            }
-
-            .title {
-                font-size: 1.6rem;
-            }
-
-            .verse {
-                font-size: 1.05rem;
-            }
-
-            .response {
-                font-size: 0.95rem;
-            }
-
-            .prayer {
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 1rem;
-            }
-
-            .prayer-container {
-                padding: 1.2rem;
-            }
-
-            .title {
-                font-size: 1.4rem;
-            }
-
-            .verse {
-                font-size: 1rem;
-            }
-
-            .response {
-                font-size: 0.9rem;
-            }
-
-            .prayer {
-                font-size: 0.95rem;
-            }
         }
     </style>
 </head>
