@@ -56,6 +56,15 @@ class IaculaApp {
             }
         });
 
+        // Handler para fechar janela de configurações e mostrar popup
+        ipcMain.on('close-settings-and-show-popup', () => {
+            if (this.settingsWindow) {
+                this.settingsWindow.close();
+                this.settingsWindow = null;
+            }
+            this.showPopup();
+        });
+
         // Handler para carregar configurações
         ipcMain.handle('get-config', () => {
             return this.config;
@@ -161,8 +170,8 @@ class IaculaApp {
         this.mainWindow = new BrowserWindow({
             width: 300,
             height: 400,
-            x: width - 310,
-            y: height - 410,
+            x: width - 305,
+            y: height - 405,
             frame: false,
             transparent: true,
             alwaysOnTop: true,
@@ -258,7 +267,7 @@ class IaculaApp {
     }
 
     private showSettings() {
-        const settingsWindow = new BrowserWindow({
+        this.settingsWindow = new BrowserWindow({
             width: 400,
             height: 300,
             webPreferences: {
@@ -267,7 +276,7 @@ class IaculaApp {
             }
         });
 
-        settingsWindow.loadFile(path.join(__dirname, '../renderer/settings.html'));
+        this.settingsWindow.loadFile(path.join(__dirname, '../renderer/settings.html'));
     }
 }
 
