@@ -68,7 +68,6 @@ document.getElementById('settings-form').addEventListener('submit', saveSettings
 ipcRenderer.on('settings-saved', (event, success) => {
     if (success) {
         showStatus('Configurações salvas com sucesso!', 'success');
-        // Close settings window and request new popup
         ipcRenderer.send('close-settings-and-show-popup');
     } else {
         showStatus('Erro ao salvar configurações', 'error');

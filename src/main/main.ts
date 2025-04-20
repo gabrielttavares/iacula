@@ -29,6 +29,7 @@ class IaculaApp {
             this.createTray();
             this.loadConfig();
             this.setupTimers();
+            this.setupAngelusTimer();
             this.setupIPC();
             this.showPopup();
         });
@@ -188,9 +189,14 @@ class IaculaApp {
             this.mainWindow = null;
         });
 
-        setTimeout(() => {
+        if (this.popupTimer) {
+            clearTimeout(this.popupTimer);
+        }
+
+        this.popupTimer = setTimeout(() => {
             if (this.mainWindow) {
                 this.mainWindow.destroy();
+                this.mainWindow = null;
             }
         }, this.config.duration * 1000);
     }
@@ -226,11 +232,16 @@ class IaculaApp {
             this.mainWindow = null;
         });
 
-        setTimeout(() => {
+        if (this.popupTimer) {
+            clearTimeout(this.popupTimer);
+        }
+
+        this.popupTimer = setTimeout(() => {
             if (this.mainWindow) {
                 this.mainWindow.destroy();
+                this.mainWindow = null;
             }
-        }, this.config.duration * 1000);
+        }, 60 * 1000); // 1 minute in milliseconds
     }
 
     private isEasterTime(): boolean {
