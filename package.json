@@ -17,7 +17,8 @@
     },
     "license": "ISC",
     "devDependencies": {
-        "@types/node": "^20.11.19",
+        "@types/electron-squirrel-startup": "^1.0.2",
+        "@types/node": "^20.17.30",
         "concurrently": "^8.2.2",
         "electron": "^28.2.0",
         "electron-builder": "^24.9.1",
@@ -62,5 +63,9 @@
                 ]
             }
         ]
+    },
+    "dependencies": {
+        "electron-squirrel-startup": "^1.0.1",
+        "electron-store": "^10.0.1"
     }
 }

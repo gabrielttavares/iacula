@@ -1,6 +1,7 @@
 import { app, BrowserWindow, Tray, Menu, nativeImage, screen, ipcMain } from 'electron';
 import path from 'path';
 import fs from 'fs';
+import { setupAutoStart } from './autostart';
 
 // Configurações padrão
 const DEFAULT_CONFIG = {
@@ -126,6 +127,8 @@ class IaculaApp {
         const configPath = path.join(app.getPath('userData'), 'config.json');
         try {
             fs.writeFileSync(configPath, JSON.stringify(this.config, null, 2));
+            // Update autostart setting
+            setupAutoStart(this.config.autostart);
         } catch (error) {
             console.error('Erro ao salvar configurações:', error);
         }
@@ -177,8 +180,8 @@ class IaculaApp {
         this.mainWindow = new BrowserWindow({
             width: 300,
             height: 400,
-            x: width - 305,
-            y: height - 405,
+            x: width - 290,
+            y: height - 390,
             frame: false,
             transparent: true,
             alwaysOnTop: true,
