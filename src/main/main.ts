@@ -152,7 +152,13 @@ class IaculaApp {
 
         const timeUntilNoon = nextNoon.getTime() - now.getTime();
 
-        setTimeout(() => {
+        // Clear any existing angelus timer
+        if (this.angelusTimer) {
+            clearTimeout(this.angelusTimer);
+        }
+
+        // Set initial timer for today's noon
+        this.angelusTimer = setTimeout(() => {
             this.showAngelus();
             // Configurar o próximo timer para amanhã
             this.angelusTimer = setInterval(() => {
