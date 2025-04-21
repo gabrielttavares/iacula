@@ -221,10 +221,10 @@ class IaculaApp {
 
         const { width, height } = screen.getPrimaryDisplay().workAreaSize;
         this.mainWindow = new BrowserWindow({
-            width: 400,
-            height: 800,
-            x: width - 270,
-            y: height - 600,
+            width: 320,
+            height: 700,
+            x: width - 340,
+            y: height - 720,
             frame: false,
             transparent: true,
             alwaysOnTop: true,
