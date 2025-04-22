@@ -6,11 +6,10 @@
     "scripts": {
         "start": "electron .",
         "dev": "concurrently \"npm run watch\" \"npm run copy-renderer\" \"npm run start\"",
-        "build": "npm run prebuild && npm run convert-icons && tsc && electron-builder",
+        "build": "npm run prebuild && tsc && electron-builder",
         "watch": "tsc -w",
         "prebuild": "npm run copy-renderer",
-        "copy-renderer": "node scripts/copy-assets.js",
-        "convert-icons": "node scripts/convert-icons.js"
+        "copy-renderer": "node scripts/copy-assets.js"
     },
     "author": {
         "name": "Gabriel Tavares",
@@ -30,7 +29,7 @@
         "productName": "Iacula",
         "directories": {
             "output": "release",
-            "buildResources": "build"
+            "buildResources": "assets"
         },
         "files": [
             "dist/**/*",
@@ -45,20 +44,20 @@
         "win": {
             "target": "nsis",
             "compression": "maximum",
-            "icon": "build/icons/icon.ico"
+            "icon": "assets/images/icon.png"
         },
         "linux": {
             "target": "deb",
             "category": "Utility",
             "maintainer": "Gabriel Tavares <gabrieltxtavares@gmail.com>",
             "compression": null,
-            "icon": "build/icons/icon.png"
+            "icon": "assets/images/icon.png"
         },
         "mac": {
             "target": "dmg",
             "category": "public.app-category.utilities",
             "compression": "maximum",
-            "icon": "build/icons/icon.icns"
+            "icon": "assets/images/icon.png"
         },
         "publish": {
             "provider": "github",
