@@ -28,11 +28,18 @@
         "appId": "com.iacula.app",
         "productName": "Iacula",
         "directories": {
-            "output": "release"
+            "output": "release",
+            "buildResources": "assets"
         },
         "files": [
             "dist/**/*",
             "assets/**/*"
+        ],
+        "extraResources": [
+            {
+                "from": "assets",
+                "to": "assets"
+            }
         ],
         "win": {
             "target": "nsis",
@@ -56,16 +63,7 @@
         "compression": "maximum",
         "asar": true,
         "asarUnpack": [
-            "assets/images/**/*"
-        ],
-        "extraResources": [
-            {
-                "from": "assets",
-                "to": "assets",
-                "filter": [
-                    "**/*"
-                ]
-            }
+            "assets/**/*"
         ]
     },
     "dependencies": {
