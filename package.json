@@ -46,16 +46,7 @@
         "win": {
             "target": "nsis",
             "compression": "maximum",
-            "icon": "assets/images/icon.ico",
-            "extraResources": [
-                {
-                    "from": "assets",
-                    "to": "assets",
-                    "filter": [
-                        "**/*"
-                    ]
-                }
-            ]
+            "icon": "assets/images/icon.ico"
         },
         "linux": {
             "target": "deb",
@@ -68,16 +59,7 @@
             "target": "dmg",
             "category": "public.app-category.utilities",
             "compression": "maximum",
-            "icon": "assets/images/icon.icns",
-            "extraResources": [
-                {
-                    "from": "assets",
-                    "to": "assets",
-                    "filter": [
-                        "**/*"
-                    ]
-                }
-            ]
+            "icon": "assets/images/icon.icns"
         },
         "publish": {
             "provider": "github",
