@@ -42,7 +42,7 @@
             "target": "deb",
             "category": "Utility",
             "maintainer": "Gabriel Tavares <gabrieltxtavares@gmail.com>",
-            "compression": "xz"
+            "compression": null
         },
         "mac": {
             "target": "dmg",
@@ -62,7 +62,11 @@
                     "**/*"
                 ]
             }
-        ]
+        ],
+        "publish": {
+            "provider": "github",
+            "releaseType": "release"
+        }
     },
     "dependencies": {
         "electron-squirrel-startup": "^1.0.1",
