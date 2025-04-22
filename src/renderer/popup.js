@@ -6,20 +6,39 @@ function loadQuotes() {
     return JSON.parse(fs.readFileSync(quotesPath, 'utf-8'));
 }
 
-function getRandomQuote() {
+const quoteIndices = {};
+const imageIndices = {};
+
+function getSequentialQuote() {
     const quotes = loadQuotes();
     const dayOfWeek = new Date().getDay() + 1; // 1-7 (Domingo-Sábado)
     const dayQuotes = quotes[dayOfWeek.toString()].quotes;
-    const randomIndex = Math.floor(Math.random() * dayQuotes.length);
-    return dayQuotes[randomIndex];
+
+    if (!quoteIndices[dayOfWeek]) {
+        quoteIndices[dayOfWeek] = 0;
+    }
+
+    const quote = dayQuotes[quoteIndices[dayOfWeek]];
+
+    quoteIndices[dayOfWeek] = (quoteIndices[dayOfWeek] + 1) % dayQuotes.length;
+
+    return quote;
 }
 
-function getRandomImage() {
+function getSequentialImage() {
     const dayOfWeek = new Date().getDay() + 1; // 1-7 (Domingo-Sábado)
     const imagesDir = path.join(__dirname, `../../assets/images/ordinary/${dayOfWeek}`);
     const images = fs.readdirSync(imagesDir);
-    const randomImage = images[Math.floor(Math.random() * images.length)];
-    return path.join(imagesDir, randomImage);
+
+    if (!imageIndices[dayOfWeek]) {
+        imageIndices[dayOfWeek] = 0;
+    }
+
+    const image = images[imageIndices[dayOfWeek]];
+
+    imageIndices[dayOfWeek] = (imageIndices[dayOfWeek] + 1) % images.length;
+
+    return path.join(imagesDir, image);
 }
 
 function updatePopupContent() {
@@ -28,8 +47,8 @@ function updatePopupContent() {
 
     if (quoteElement && imageElement) {
         try {
-            const quote = getRandomQuote();
-            const imagePath = getRandomImage();
+            const quote = getSequentialQuote();
+            const imagePath = getSequentialImage();
 
             quoteElement.textContent = quote;
             imageElement.src = imagePath;

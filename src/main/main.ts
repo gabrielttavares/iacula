@@ -297,7 +297,7 @@ class IaculaApp {
     private showSettings() {
         this.settingsWindow = new BrowserWindow({
             width: 400,
-            height: 300,
+            height: 450,
             webPreferences: {
                 nodeIntegration: true,
                 contextIsolation: false
