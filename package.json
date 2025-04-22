@@ -9,7 +9,7 @@
         "build": "npm run prebuild && tsc && electron-builder",
         "watch": "tsc -w",
         "prebuild": "npm run copy-renderer",
-        "copy-renderer": "mkdir -p dist/renderer && cp -r src/renderer/*.html src/renderer/*.js dist/renderer/ && cp -r assets/prayers dist/assets/ && cp -r assets/images dist/assets/"
+        "copy-renderer": "node scripts/copy-assets.js"
     },
     "author": {
         "name": "Gabriel Tavares",
