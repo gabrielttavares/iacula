@@ -2,15 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { app } = require('@electron/remote');
 
-function getAssetsPath() {
-    if (process.env.NODE_ENV === 'development') {
-        return path.join(__dirname, '../../assets');
-    }
-    return path.join(process.resourcesPath, 'assets');
-}
-
 function loadQuotes() {
-    const quotesPath = path.join(getAssetsPath(), 'quotes/quotes.json');
+    const quotesPath = path.join(__dirname, '../../assets/quotes/quotes.json');
     return JSON.parse(fs.readFileSync(quotesPath, 'utf-8'));
 }
 
@@ -75,7 +68,7 @@ function getSequentialQuote() {
 
 function getSequentialImage() {
     const dayOfWeek = new Date().getDay() + 1; // 1-7 (Domingo-Sábado)
-    const imagesDir = path.join(getAssetsPath(), `images/ordinary/${dayOfWeek}`);
+    const imagesDir = path.join(__dirname, `../../assets/images/ordinary/${dayOfWeek}`);
     const images = fs.readdirSync(imagesDir);
 
     if (!imageIndices[dayOfWeek]) {
