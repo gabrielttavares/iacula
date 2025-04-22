@@ -10,17 +10,32 @@ function loadIndices() {
     const indicesPath = path.join(__dirname, '../../assets/indices.json');
     try {
         if (fs.existsSync(indicesPath)) {
-            return JSON.parse(fs.readFileSync(indicesPath, 'utf-8'));
+            const data = JSON.parse(fs.readFileSync(indicesPath, 'utf-8'));
+            const currentDay = new Date().getDay() + 1;
+
+            if (data.lastDay !== currentDay) {
+                return {
+                    quoteIndices: {},
+                    imageIndices: {},
+                    lastDay: currentDay
+                };
+            }
+            return data;
         }
     } catch (error) {
         console.error('Error loading indices:', error);
     }
-    return { quoteIndices: {}, imageIndices: {} };
+    return {
+        quoteIndices: {},
+        imageIndices: {},
+        lastDay: new Date().getDay() + 1
+    };
 }
 
 function saveIndices(indices) {
     const indicesPath = path.join(__dirname, '../../assets/indices.json');
     try {
+        indices.lastDay = new Date().getDay() + 1;
         fs.writeFileSync(indicesPath, JSON.stringify(indices, null, 2));
     } catch (error) {
         console.error('Error saving indices:', error);
