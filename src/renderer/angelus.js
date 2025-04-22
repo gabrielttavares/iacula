@@ -1,52 +1,78 @@
 const fs = require('fs');
 const path = require('path');
+const { getAssetPath } = require('./utils');
 
 // Função para carregar as orações do arquivo JSON
 function loadPrayers() {
-    const prayersPath = path.join(__dirname, '../../assets/prayers/angelus.json');
-    return JSON.parse(fs.readFileSync(prayersPath, 'utf-8'));
+    try {
+        const prayersPath = getAssetPath('prayers/angelus.json');
+        console.log('Loading prayers from:', prayersPath);
+        const prayers = JSON.parse(fs.readFileSync(prayersPath, 'utf-8'));
+        console.log('Loaded prayers:', prayers);
+        return prayers;
+    } catch (error) {
+        console.error('Error loading prayers:', error);
+        return null;
+    }
 }
 
 function getAngelusImage() {
-    const imagePath = path.join(__dirname, '../../assets/images/angelus/J.jpg');
-    return imagePath;
+    try {
+        const imagePath = getAssetPath('images/angelus/J.jpg');
+        console.log('Loading Angelus image from:', imagePath);
+        return imagePath;
+    } catch (error) {
+        console.error('Error getting Angelus image:', error);
+        return null;
+    }
 }
 
 // Função para atualizar o conteúdo da oração
 function updatePrayerContent() {
-    const prayers = loadPrayers();
-    const angelus = prayers.regular;
-    const imagePath = getAngelusImage();
+    try {
+        const prayers = loadPrayers();
+        if (!prayers) {
+            console.error('Failed to load prayers');
+            return;
+        }
 
-    // Atualizar título
-    document.getElementById('prayer-title').textContent = angelus.title;
+        const angelus = prayers.regular;
+        const imagePath = getAngelusImage();
 
-    // Atualizar imagem
-    const imageElement = document.getElementById('angelus-image');
-    imageElement.src = imagePath;
+        // Atualizar título
+        document.getElementById('prayer-title').textContent = angelus.title;
 
-    // Atualizar versículos
-    const versesContainer = document.getElementById('verses-container');
-    versesContainer.innerHTML = '';
+        // Atualizar imagem
+        const imageElement = document.getElementById('angelus-image');
+        if (imagePath) {
+            imageElement.src = imagePath;
+        }
 
-    angelus.verses.forEach(verse => {
-        const verseElement = document.createElement('p');
-        verseElement.className = 'verse';
-        verseElement.textContent = verse.verse;
+        // Atualizar versículos
+        const versesContainer = document.getElementById('verses-container');
+        versesContainer.innerHTML = '';
 
-        const responseElement = document.createElement('p');
-        responseElement.className = 'response';
-        responseElement.textContent = verse.response;
+        angelus.verses.forEach(verse => {
+            const verseElement = document.createElement('p');
+            verseElement.className = 'verse';
+            verseElement.textContent = verse.verse;
 
-        versesContainer.appendChild(verseElement);
-        versesContainer.appendChild(responseElement);
-    });
+            const responseElement = document.createElement('p');
+            responseElement.className = 'response';
+            responseElement.textContent = verse.response;
 
-    // Atualizar oração final
-    document.getElementById('final-prayer').textContent = angelus.prayer;
+            versesContainer.appendChild(verseElement);
+            versesContainer.appendChild(responseElement);
+        });
 
-    // Adicionar classe de fade-in ao carregar
-    document.body.classList.add('fade-in');
+        // Atualizar oração final
+        document.getElementById('final-prayer').textContent = angelus.prayer;
+
+        // Adicionar classe de fade-in ao carregar
+        document.body.classList.add('fade-in');
+    } catch (error) {
+        console.error('Error updating prayer content:', error);
+    }
 }
 
 // Atualizar o conteúdo quando a página carregar

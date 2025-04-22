@@ -1,15 +1,24 @@
 const fs = require('fs');
 const path = require('path');
-const { app } = require('electron').remote;
+const { ipcRenderer } = require('electron');
+const { getAssetPath } = require('./utils');
 
 function loadQuotes() {
-    const quotesPath = path.join(__dirname, '../../assets/quotes/quotes.json');
-    return JSON.parse(fs.readFileSync(quotesPath, 'utf-8'));
+    try {
+        const quotesPath = getAssetPath('quotes/quotes.json');
+        console.log('Loading quotes from:', quotesPath);
+        return JSON.parse(fs.readFileSync(quotesPath, 'utf-8'));
+    } catch (error) {
+        console.error('Error loading quotes:', error);
+        return null;
+    }
 }
 
 function loadIndices() {
-    const indicesPath = path.join(app.getPath('userData'), 'indices.json');
     try {
+        const indicesPath = path.join(ipcRenderer.sendSync('get-user-data-path'), 'indices.json');
+        console.log('Loading indices from:', indicesPath);
+
         if (fs.existsSync(indicesPath)) {
             const data = JSON.parse(fs.readFileSync(indicesPath, 'utf-8'));
             const currentDay = new Date().getDay() + 1;
@@ -34,8 +43,9 @@ function loadIndices() {
 }
 
 function saveIndices(indices) {
-    const indicesPath = path.join(app.getPath('userData'), 'indices.json');
     try {
+        const indicesPath = path.join(ipcRenderer.sendSync('get-user-data-path'), 'indices.json');
+        console.log('Saving indices to:', indicesPath);
         indices.lastDay = new Date().getDay() + 1;
         fs.writeFileSync(indicesPath, JSON.stringify(indices, null, 2));
     } catch (error) {
@@ -50,6 +60,11 @@ const imageIndices = indices.imageIndices;
 
 function getSequentialQuote() {
     const quotes = loadQuotes();
+    if (!quotes) {
+        console.error('Failed to load quotes');
+        return 'Error loading quote';
+    }
+
     const dayOfWeek = new Date().getDay() + 1; // 1-7 (Domingo-Sábado)
     const dayQuotes = quotes[dayOfWeek.toString()].quotes;
 
@@ -67,21 +82,33 @@ function getSequentialQuote() {
 }
 
 function getSequentialImage() {
-    const dayOfWeek = new Date().getDay() + 1; // 1-7 (Domingo-Sábado)
-    const imagesDir = path.join(__dirname, `../../assets/images/ordinary/${dayOfWeek}`);
-    const images = fs.readdirSync(imagesDir);
+    try {
+        const dayOfWeek = new Date().getDay() + 1; // 1-7 (Domingo-Sábado)
+        const imagesDir = getAssetPath(`images/ordinary/${dayOfWeek}`);
+        console.log('Loading images from:', imagesDir);
 
-    if (!imageIndices[dayOfWeek]) {
-        imageIndices[dayOfWeek] = 0;
+        const images = fs.readdirSync(imagesDir);
+        if (images.length === 0) {
+            console.error('No images found in directory:', imagesDir);
+            return null;
+        }
+
+        if (!imageIndices[dayOfWeek]) {
+            imageIndices[dayOfWeek] = 0;
+        }
+
+        const image = images[imageIndices[dayOfWeek]];
+        imageIndices[dayOfWeek] = (imageIndices[dayOfWeek] + 1) % images.length;
+
+        saveIndices({ quoteIndices, imageIndices });
+
+        const imagePath = path.join(imagesDir, image);
+        console.log('Selected image path:', imagePath);
+        return imagePath;
+    } catch (error) {
+        console.error('Error getting sequential image:', error);
+        return null;
     }
-
-    const image = images[imageIndices[dayOfWeek]];
-
-    imageIndices[dayOfWeek] = (imageIndices[dayOfWeek] + 1) % images.length;
-
-    saveIndices({ quoteIndices, imageIndices });
-
-    return path.join(imagesDir, image);
 }
 
 function updatePopupContent() {

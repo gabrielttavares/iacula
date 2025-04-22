@@ -77,11 +77,23 @@ class IaculaApp {
         ipcMain.handle('get-config', () => {
             return this.config;
         });
+
+        ipcMain.on('get-user-data-path', (event) => {
+            event.returnValue = app.getPath('userData');
+        });
     }
 
     private createTray() {
-        const iconPath = path.join(__dirname, '../../assets/images/icon.png');
-        const trayIcon = nativeImage.createFromPath(iconPath);
+        let iconPath;
+        if (process.platform === 'win32') {
+            iconPath = path.join(__dirname, '../../assets/images/icon.ico');
+        } else if (process.platform === 'darwin') {
+            iconPath = path.join(__dirname, '../../assets/images/icon.icns');
+        } else {
+            iconPath = path.join(__dirname, '../../assets/images/icon.png');
+        }
+
+        const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
         this.tray = new Tray(trayIcon);
 
         const contextMenu = Menu.buildFromTemplate([
