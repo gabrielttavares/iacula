@@ -80,8 +80,17 @@ class IaculaApp {
     }
 
     private createTray() {
-        const iconPath = path.join(__dirname, '../../assets/images/icon.png');
-        const trayIcon = nativeImage.createFromPath(iconPath);
+        // Use different icon paths based on platform
+        let iconPath;
+        if (process.platform === 'win32') {
+            iconPath = path.join(__dirname, '../../assets/images/icon.ico');
+        } else if (process.platform === 'darwin') {
+            iconPath = path.join(__dirname, '../../assets/images/icon.icns');
+        } else {
+            iconPath = path.join(__dirname, '../../assets/images/icon.png');
+        }
+
+        const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
         this.tray = new Tray(trayIcon);
 
         const contextMenu = Menu.buildFromTemplate([
