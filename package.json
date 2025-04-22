@@ -43,18 +43,21 @@
         ],
         "win": {
             "target": "nsis",
-            "compression": "maximum"
+            "compression": "maximum",
+            "icon": "assets/images/icon.png"
         },
         "linux": {
             "target": "deb",
             "category": "Utility",
             "maintainer": "Gabriel Tavares <gabrieltxtavares@gmail.com>",
-            "compression": null
+            "compression": null,
+            "icon": "assets/images/icon.png"
         },
         "mac": {
             "target": "dmg",
             "category": "public.app-category.utilities",
-            "compression": "maximum"
+            "compression": "maximum",
+            "icon": "assets/images/icon.png"
         },
         "publish": {
             "provider": "github",

@@ -2,6 +2,7 @@ import { app, BrowserWindow, Tray, Menu, nativeImage, screen, ipcMain } from 'el
 import path from 'path';
 import fs from 'fs';
 import { setupAutoStart } from './autostart';
+require('@electron/remote/main').initialize();
 
 // Configurações padrão
 const DEFAULT_CONFIG = {
@@ -194,6 +195,8 @@ class IaculaApp {
             }
         });
 
+        require('@electron/remote/main').enable(this.mainWindow.webContents);
+
         this.mainWindow.loadFile(path.join(__dirname, '../renderer/popup.html'));
 
         // Handle window close event
@@ -240,7 +243,7 @@ class IaculaApp {
             }
         });
 
-        this.mainWindow.loadFile(path.join(__dirname, `../renderer/${prayerType}.html`));
+        require('@electron/remote/main').enable(this.mainWindow.webContents);
 
         // Handle window close event
         this.mainWindow.on('closed', () => {
