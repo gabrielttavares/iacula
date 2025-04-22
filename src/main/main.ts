@@ -177,11 +177,14 @@ class IaculaApp {
         }
 
         const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+        const windowWidth = 280;
+        const windowHeight = 360;
+
         this.mainWindow = new BrowserWindow({
-            width: 280,
-            height: 380,
-            x: width - 300,
-            y: height - 380,
+            width: windowWidth,
+            height: windowHeight,
+            x: width - windowWidth,  // aligns with right edge
+            y: height - windowHeight, // aligns with bottom edge, above taskbar
             frame: false,
             transparent: true,
             alwaysOnTop: true,
@@ -220,11 +223,14 @@ class IaculaApp {
         }
 
         const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+        const windowWidth = 320;
+        const windowHeight = 740;
+
         this.mainWindow = new BrowserWindow({
-            width: 320,
-            height: 700,
-            x: width - 340,
-            y: height - 720,
+            width: windowWidth,
+            height: windowHeight,
+            x: width - windowWidth,  // aligns with right edge
+            y: height - windowHeight, // aligns with bottom edge, above taskbar
             frame: false,
             transparent: true,
             alwaysOnTop: true,

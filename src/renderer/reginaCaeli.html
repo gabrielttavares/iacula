@@ -9,16 +9,18 @@
         @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
         :root {
-            --primary-color: #014421;
-            /* Forest green */
-            --secondary-color: #4A4A4A;
-            /* Dark gray */
-            --accent-color: #D4AF37;
+            --primary-color: #E0E0E0;
+            /* Light gray for text */
+            --secondary-color: #B0B0B0;
+            /* Medium gray for secondary text */
+            --accent-color: #FFD700;
             /* Gold */
-            --background-color: #FFFDF6;
-            /* Cream */
-            --text-color: #333333;
-            --light-text: #555555;
+            --background-color: rgba(30, 30, 35, 0.85);
+            /* Dark background with transparency */
+            --text-color: #E0E0E0;
+            --light-text: #B0B0B0;
+            --card-background: rgba(40, 40, 45, 0.9);
+            --border-color: rgba(255, 215, 0, 0.3);
         }
 
         * {
@@ -29,7 +31,7 @@
 
         body {
             font-family: 'EB Garamond', serif;
-            background-color: var(--background-color);
+            background-color: transparent;
             color: var(--text-color);
             display: flex;
             flex-direction: column;
@@ -43,7 +45,7 @@
 
         .prayer-card {
             width: 100%;
-            max-width: 550px;
+            max-width: 300px;
             overflow: hidden;
             position: fixed;
             right: 0;
@@ -51,6 +53,11 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+            border-radius: 12px;
+            box-shadow: -2px 0 15px rgba(0, 0, 0, 0.4);
+            background-color: var(--card-background);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
         }
 
         .prayer-card::before {
@@ -60,14 +67,16 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(to right, var(--accent-color), var(--primary-color));
+            background: linear-gradient(to right, var(--accent-color), transparent);
         }
 
         .image-container {
             width: 100%;
-            height: 30vh;
+            height: 18vh;
             overflow: hidden;
             position: relative;
+            border-radius: 12px 12px 0 0;
+            transition: height 0.5s ease;
         }
 
         .image-container::after {
@@ -76,35 +85,54 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 40px;
-            background: linear-gradient(to top, white, transparent);
+            height: 80px;
+            background: linear-gradient(to top, var(--card-background) 0%, rgba(40, 40, 45, 0.8) 30%, transparent 100%);
+            transition: all 0.5s ease;
         }
 
         .image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.5s ease;
         }
 
         .prayer-container {
-            padding: 2rem;
+            padding: 1.4rem 1.6rem;
             text-align: center;
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            background-color: var(--background-color);
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
+        }
+
+        .prayer-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .prayer-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .prayer-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+            border-radius: 3px;
         }
 
         .title {
             font-family: 'Libre Baskerville', serif;
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--primary-color);
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             letter-spacing: 0.5px;
             position: relative;
             display: inline-block;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .title::after {
@@ -113,33 +141,36 @@
             bottom: -8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 40px;
+            width: 50px;
             height: 2px;
-            background-color: var(--accent-color);
+            background: linear-gradient(to right, transparent, var(--accent-color), transparent);
         }
 
         .verse {
             font-family: 'EB Garamond', serif;
-            font-size: 1.15rem;
+            font-size: 1rem;
             color: var(--text-color);
-            margin: 1rem 0;
+            margin: 0.4rem 0;
             font-weight: 500;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         }
 
         .response {
             font-family: 'EB Garamond', serif;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--light-text);
             font-style: italic;
             margin: 0.7rem 0;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         }
 
         .prayer {
             font-family: 'EB Garamond', serif;
-            margin-top: 1.5rem;
-            font-size: 1.05rem;
+            margin-top: 1rem;
+            font-size: 0.95rem;
             color: var(--secondary-color);
             line-height: 1.6;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         }
 
         .close-button {
@@ -150,22 +181,20 @@
         }
 
         .control-button {
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--accent-color);
             border: none;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s;
-        }
-
-        .control-button:hover {
-            background: rgba(0, 0, 0, 0.7);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         @keyframes fadeIn {
@@ -194,58 +223,6 @@
 
         .fade-out {
             animation: fadeOut 0.7s ease forwards;
-        }
-
-        @media (max-width: 768px) {
-            .prayer-card {
-                max-width: 100%;
-            }
-
-            .image-container {
-                height: 180px;
-            }
-
-            .title {
-                font-size: 1.6rem;
-            }
-
-            .verse {
-                font-size: 1.05rem;
-            }
-
-            .response {
-                font-size: 0.95rem;
-            }
-
-            .prayer {
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 1rem;
-            }
-
-            .prayer-container {
-                padding: 1.2rem;
-            }
-
-            .title {
-                font-size: 1.4rem;
-            }
-
-            .verse {
-                font-size: 1rem;
-            }
-
-            .response {
-                font-size: 0.9rem;
-            }
-
-            .prayer {
-                font-size: 0.95rem;
-            }
         }
     </style>
 </head>
