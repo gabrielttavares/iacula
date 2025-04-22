@@ -6,8 +6,31 @@ function loadQuotes() {
     return JSON.parse(fs.readFileSync(quotesPath, 'utf-8'));
 }
 
-const quoteIndices = {};
-const imageIndices = {};
+function loadIndices() {
+    const indicesPath = path.join(__dirname, '../../assets/indices.json');
+    try {
+        if (fs.existsSync(indicesPath)) {
+            return JSON.parse(fs.readFileSync(indicesPath, 'utf-8'));
+        }
+    } catch (error) {
+        console.error('Error loading indices:', error);
+    }
+    return { quoteIndices: {}, imageIndices: {} };
+}
+
+function saveIndices(indices) {
+    const indicesPath = path.join(__dirname, '../../assets/indices.json');
+    try {
+        fs.writeFileSync(indicesPath, JSON.stringify(indices, null, 2));
+    } catch (error) {
+        console.error('Error saving indices:', error);
+    }
+}
+
+// Load initial indices
+const indices = loadIndices();
+const quoteIndices = indices.quoteIndices;
+const imageIndices = indices.imageIndices;
 
 function getSequentialQuote() {
     const quotes = loadQuotes();
@@ -21,6 +44,8 @@ function getSequentialQuote() {
     const quote = dayQuotes[quoteIndices[dayOfWeek]];
 
     quoteIndices[dayOfWeek] = (quoteIndices[dayOfWeek] + 1) % dayQuotes.length;
+
+    saveIndices({ quoteIndices, imageIndices });
 
     return quote;
 }
@@ -37,6 +62,8 @@ function getSequentialImage() {
     const image = images[imageIndices[dayOfWeek]];
 
     imageIndices[dayOfWeek] = (imageIndices[dayOfWeek] + 1) % images.length;
+
+    saveIndices({ quoteIndices, imageIndices });
 
     return path.join(imagesDir, image);
 }
