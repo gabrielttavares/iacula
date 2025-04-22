@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { app } = require('@electron/remote');
+const { app } = require('electron').remote;
 
 function loadQuotes() {
     const quotesPath = path.join(__dirname, '../../assets/quotes/quotes.json');

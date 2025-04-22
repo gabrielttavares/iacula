@@ -32,15 +32,13 @@
             "buildResources": "assets"
         },
         "files": [
-            "dist/**/*"
+            "dist/**/*",
+            "assets/**/*"
         ],
         "extraResources": [
             {
                 "from": "assets",
-                "to": "assets",
-                "filter": [
-                    "**/*"
-                ]
+                "to": "assets"
             }
         ],
         "win": {
