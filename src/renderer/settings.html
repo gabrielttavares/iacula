@@ -45,9 +45,27 @@
             line-height: 1.5;
             padding: 1.5rem;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            gap: 1.5rem;
+        }
+
+        .author-credit {
+            font-size: 0.7rem;
+            color: var(--light-text);
+            text-align: center;
+        }
+
+        .author-credit a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .author-credit a:hover {
+            color: var(--primary-color);
         }
 
         .container {
@@ -222,6 +240,9 @@
 </head>
 
 <body>
+    <div class="author-credit">
+        Contato: <a href="https://gabrielttavares.github.io/landing-page/" target="_blank">Gabriel Tavares</a>
+    </div>
     <div class="container">
         <div class="header">
             <h1>Configurações</h1>
