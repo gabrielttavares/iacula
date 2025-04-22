@@ -6,7 +6,7 @@
     "scripts": {
         "start": "electron .",
         "dev": "concurrently \"npm run watch\" \"npm run copy-renderer\" \"npm run start\"",
-        "build": "npm run prebuild && tsc && electron-builder",
+        "build": "npm run prebuild && tsc && electron-builder --publish never",
         "watch": "tsc -w",
         "prebuild": "npm run copy-renderer",
         "copy-renderer": "node scripts/copy-assets.js"
@@ -49,6 +49,7 @@
             "category": "public.app-category.utilities",
             "compression": "maximum"
         },
+        "publish": "never",
         "compression": "maximum",
         "asar": true,
         "asarUnpack": [
