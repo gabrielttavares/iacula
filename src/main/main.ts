@@ -24,7 +24,8 @@ class IaculaApp {
     private mainWindow: BrowserWindow | null = null;
     private tray: Tray | null = null;
     private config: AppConfig = DEFAULT_CONFIG;
-    private popupTimer: NodeJS.Timeout | null = null;
+    private popupIntervalTimer: NodeJS.Timeout | null = null;
+    private popupCloseTimer: NodeJS.Timeout | null = null;
     private angelusTimer: NodeJS.Timeout | null = null;
     private settingsWindow: BrowserWindow | null = null;
 
@@ -47,11 +48,13 @@ class IaculaApp {
         // Handler para salvar configurações
         ipcMain.on('save-settings', (event, settings) => {
             try {
+                console.log('Saving new settings:', settings);
                 this.config = { ...this.config, ...settings };
                 this.saveConfig();
                 // Reiniciar timers com novas configurações
-                if (this.popupTimer) {
-                    clearInterval(this.popupTimer);
+                if (this.popupIntervalTimer) {
+                    console.log('Clearing existing interval timer');
+                    clearInterval(this.popupIntervalTimer);
                 }
                 this.setupTimers();
                 event.reply('settings-saved', true);
@@ -139,7 +142,9 @@ class IaculaApp {
 
     private setupTimers() {
         // Timer para popups regulares
-        this.popupTimer = setInterval(() => {
+        console.log('Setting up popup interval timer:', this.config.interval, 'minutes');
+        this.popupIntervalTimer = setInterval(() => {
+            console.log('Interval timer triggered, showing popup');
             this.showPopup();
         }, this.config.interval * 60 * 1000);
 
@@ -207,11 +212,11 @@ class IaculaApp {
             this.mainWindow = null;
         });
 
-        if (this.popupTimer) {
-            clearTimeout(this.popupTimer);
+        if (this.popupCloseTimer) {
+            clearTimeout(this.popupCloseTimer);
         }
 
-        this.popupTimer = setTimeout(() => {
+        this.popupCloseTimer = setTimeout(() => {
             if (this.mainWindow) {
                 this.mainWindow.destroy();
                 this.mainWindow = null;
@@ -253,13 +258,13 @@ class IaculaApp {
             this.mainWindow = null;
         });
 
-        // Clear any existing popup timer
-        if (this.popupTimer) {
-            clearTimeout(this.popupTimer);
+        // Clear any existing close timer
+        if (this.popupCloseTimer) {
+            clearTimeout(this.popupCloseTimer);
         }
 
         // Set new timer for this popup with fixed 1-minute duration
-        this.popupTimer = setTimeout(() => {
+        this.popupCloseTimer = setTimeout(() => {
             if (this.mainWindow) {
                 this.mainWindow.destroy();
                 this.mainWindow = null;
