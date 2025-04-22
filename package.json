@@ -44,7 +44,7 @@
         "win": {
             "target": "nsis",
             "compression": "maximum",
-            "icon": "assets/images/icon.png"
+            "icon": "assets/images/icon.ico"
         },
         "linux": {
             "target": "deb",
@@ -57,7 +57,7 @@
             "target": "dmg",
             "category": "public.app-category.utilities",
             "compression": "maximum",
-            "icon": "assets/images/icon.png"
+            "icon": "assets/images/icon.icns"
         },
         "publish": {
             "provider": "github",
