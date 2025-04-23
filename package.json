@@ -17,10 +17,12 @@
     },
     "license": "ISC",
     "devDependencies": {
+        "@electron/notarize": "^3.0.1",
         "@types/electron-squirrel-startup": "^1.0.2",
         "@types/node": "^20.17.30",
         "concurrently": "^8.2.2",
         "cross-env": "^7.0.3",
+        "dotenv": "^16.5.0",
         "electron": "^28.2.0",
         "electron-builder": "^24.9.1",
         "typescript": "^5.3.3"
