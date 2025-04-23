@@ -58,7 +58,10 @@
             "target": "dmg",
             "category": "public.app-category.utilities",
             "compression": "maximum",
-            "icon": "assets/images/icon.icns"
+            "icon": "assets/images/icon.icns",
+            "hardenedRuntime": false,
+            "gatekeeperAssess": false,
+            "identity": null
         },
         "publish": {
             "provider": "github",
