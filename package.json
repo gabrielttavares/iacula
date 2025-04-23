@@ -49,6 +49,19 @@
             "compression": "maximum",
             "icon": "assets/images/icon.ico"
         },
+        "nsis": {
+            "oneClick": true,
+            "perMachine": false,
+            "allowToChangeInstallationDirectory": false,
+            "deleteAppDataOnUninstall": false,
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true,
+            "runAfterFinish": true,
+            "artifactName": "${productName}-Setup-${version}.${ext}",
+            "shortcutName": "${productName}",
+            "uninstallDisplayName": "${productName}",
+            "differentialPackage": true
+        },
         "linux": {
             "target": "deb",
             "category": "Utility",

@@ -1,7 +1,7 @@
-import { notarize } from '@electron/notarize';
-import { build } from '../package.json' assert { type: 'json' };
+require('dotenv').config();
+const { notarize } = require('@electron/notarize');
 
-export default async function notarizing(context) {
+exports.default = async function notarizing(context) {
     const { electronPlatformName, appOutDir } = context;
     if (electronPlatformName !== 'darwin') {
         return;
@@ -26,4 +26,4 @@ export default async function notarizing(context) {
     }
 
     console.log(`Done notarizing ${appPath}`);
-} 
+}; 
