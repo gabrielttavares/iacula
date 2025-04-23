@@ -143,6 +143,18 @@
             margin-top: 0.5rem;
         }
 
+        .checkbox-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .checkbox-row .checkbox-group {
+            margin-top: 0;
+            flex: 1;
+        }
+
         .checkbox-group input[type="checkbox"] {
             margin-right: 10px;
             width: 18px;
@@ -257,7 +269,11 @@
                     <label for="duration">Duração do popup (segundos):</label>
                     <input type="number" id="duration" name="duration" min="5" max="30" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group checkbox-row">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="easterTime" name="easterTime">
+                        <label for="easterTime">Tempo Pascal</label>
+                    </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="autostart" name="autostart">
                         <label for="autostart">Iniciar com o sistema</label>

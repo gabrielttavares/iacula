@@ -59,10 +59,15 @@
             "category": "public.app-category.utilities",
             "compression": "maximum",
             "icon": "assets/images/icon.icns",
-            "hardenedRuntime": false,
+            "hardenedRuntime": true,
             "gatekeeperAssess": false,
-            "identity": null
+            "entitlements": "build/entitlements.mac.plist",
+            "entitlementsInherit": "build/entitlements.mac.plist",
+            "signIgnore": [
+                "node_modules"
+            ]
         },
+        "afterSign": "scripts/notarize.js",
         "publish": {
             "provider": "github",
             "releaseType": "release"

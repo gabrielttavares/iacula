@@ -4,7 +4,8 @@ const { ipcRenderer } = require('electron');
 const DEFAULT_CONFIG = {
     interval: 15,
     duration: 10,
-    autostart: true
+    autostart: true,
+    easterTime: false
 };
 
 // Carregar configurações atuais
@@ -14,12 +15,14 @@ async function loadCurrentSettings() {
         document.getElementById('interval').value = config.interval;
         document.getElementById('duration').value = config.duration;
         document.getElementById('autostart').checked = config.autostart;
+        document.getElementById('easterTime').checked = config.easterTime;
     } catch (error) {
         console.error('Erro ao carregar configurações:', error);
         // Em caso de erro, usar as configurações padrão
         document.getElementById('interval').value = DEFAULT_CONFIG.interval;
         document.getElementById('duration').value = DEFAULT_CONFIG.duration;
         document.getElementById('autostart').checked = DEFAULT_CONFIG.autostart;
+        document.getElementById('easterTime').checked = DEFAULT_CONFIG.easterTime;
     }
 }
 
@@ -30,7 +33,8 @@ function saveSettings(event) {
     const settings = {
         interval: parseInt(document.getElementById('interval').value),
         duration: parseInt(document.getElementById('duration').value),
-        autostart: document.getElementById('autostart').checked
+        autostart: document.getElementById('autostart').checked,
+        easterTime: document.getElementById('easterTime').checked
     };
 
     // Validar valores

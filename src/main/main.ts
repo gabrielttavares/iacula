@@ -10,7 +10,8 @@ require('@electron/remote/main').initialize();
 const DEFAULT_CONFIG = {
     interval: 15, // minutos
     duration: 10, // segundos
-    autostart: true
+    autostart: true,
+    easterTime: false
 };
 
 // Interface para as configurações
@@ -18,6 +19,7 @@ interface AppConfig {
     interval: number;
     duration: number;
     autostart: boolean;
+    easterTime: boolean;
 }
 
 class IaculaApp {
@@ -33,6 +35,15 @@ class IaculaApp {
         app.whenReady().then(() => {
             this.createTray();
             this.loadConfig();
+
+            console.log('==================================');
+            console.log('APP CONFIGURATION:');
+            console.log('Interval:', this.config.interval, 'minutes');
+            console.log('Duration:', this.config.duration, 'seconds');
+            console.log('Autostart:', this.config.autostart);
+            console.log('Easter Time (Tempo Pascal):', this.config.easterTime);
+            console.log('==================================');
+
             this.setupTimers();
             this.setupAngelusTimer();
             this.setupIPC();
@@ -49,13 +60,27 @@ class IaculaApp {
         ipcMain.on('save-settings', (event, settings) => {
             try {
                 console.log('Saving new settings:', settings);
+                const oldEasterTime = this.config.easterTime;
                 this.config = { ...this.config, ...settings };
                 this.saveConfig();
+
                 // Reiniciar timers com novas configurações
                 if (this.popupIntervalTimer) {
                     console.log('Clearing existing interval timer');
                     clearInterval(this.popupIntervalTimer);
                 }
+
+                // Reset Angelus/Regina Caeli timer if easterTime setting changed
+                if (oldEasterTime !== this.config.easterTime) {
+                    console.log(`Easter time setting changed from ${oldEasterTime} to ${this.config.easterTime}`);
+                    if (this.angelusTimer) {
+                        console.log('Clearing and resetting Angelus/Regina Caeli timer');
+                        clearTimeout(this.angelusTimer);
+                        clearInterval(this.angelusTimer);
+                        this.setupAngelusTimer();
+                    }
+                }
+
                 this.setupTimers();
                 event.reply('settings-saved', true);
             } catch (error) {
@@ -130,7 +155,23 @@ class IaculaApp {
         try {
             if (fs.existsSync(configPath)) {
                 const configData = fs.readFileSync(configPath, 'utf-8');
-                this.config = { ...DEFAULT_CONFIG, ...JSON.parse(configData) };
+                let loadedConfig = JSON.parse(configData);
+
+                // Handle potential nested config object (seen in logs)
+                if (loadedConfig.config && typeof loadedConfig.config === 'object') {
+                    console.log('Found nested config object, flattening...');
+                    loadedConfig = { ...loadedConfig, ...loadedConfig.config };
+                    delete loadedConfig.config;
+                }
+
+                // Ensure all properties exist, using defaults for any missing ones
+                this.config = {
+                    ...DEFAULT_CONFIG,
+                    ...loadedConfig,
+                    // Make sure easterTime is explicitly set if missing
+                    easterTime: loadedConfig.easterTime !== undefined ? loadedConfig.easterTime : DEFAULT_CONFIG.easterTime
+                };
+                console.log('Loaded config:', this.config);
             } else {
                 // Se o arquivo de configuração não existir, criar com as configurações padrão
                 this.saveConfig();
@@ -174,6 +215,7 @@ class IaculaApp {
         }
 
         const timeUntilNoon = nextNoon.getTime() - now.getTime();
+        console.log(`Setting up Angelus/Regina Caeli timer for ${nextNoon.toLocaleString()}, in ${timeUntilNoon / 1000 / 60} minutes`);
 
         // Clear any existing angelus timer
         if (this.angelusTimer) {
@@ -182,9 +224,11 @@ class IaculaApp {
 
         // Set initial timer for today's noon
         this.angelusTimer = setTimeout(() => {
+            console.log('Noon timer triggered, current easterTime setting:', this.config.easterTime);
             this.showAngelus();
             // Configurar o próximo timer para amanhã
             this.angelusTimer = setInterval(() => {
+                console.log('Daily noon timer triggered, current easterTime setting:', this.config.easterTime);
                 this.showAngelus();
             }, 24 * 60 * 60 * 1000);
         }, timeUntilNoon);
@@ -236,9 +280,12 @@ class IaculaApp {
         }, this.config.duration * 1000);
     }
 
-    private showAngelus(forceEasterTime: boolean = false) {
-        const isEasterTime = forceEasterTime !== undefined ? forceEasterTime : this.isEasterTime();
+    private showAngelus(forceEasterTime: boolean | undefined = undefined) {
+        console.log(`showAngelus called with forceEasterTime=${forceEasterTime}, config.easterTime=${this.config.easterTime}`);
+        // Use the forced value if provided, otherwise use the config setting
+        const isEasterTime = forceEasterTime === undefined ? this.config.easterTime : forceEasterTime;
         const prayerType = isEasterTime ? 'reginaCaeli' : 'angelus';
+        console.log(`Showing ${prayerType} based on isEasterTime=${isEasterTime}`);
 
         if (this.mainWindow) {
             this.mainWindow.destroy();
@@ -282,39 +329,6 @@ class IaculaApp {
                 this.mainWindow = null;
             }
         }, 60 * 1000); // 1 minute in milliseconds
-    }
-
-    private isEasterTime(): boolean {
-        const now = new Date();
-        const year = now.getFullYear();
-
-        // Implementar lógica para determinar se estamos no Tempo Pascal
-        // (desde o Sábado Santo até Pentecostes)
-        const easterDate = this.calculateEasterDate(year);
-        const pentecostDate = new Date(easterDate);
-        pentecostDate.setDate(easterDate.getDate() + 49);
-
-        return now >= easterDate && now <= pentecostDate;
-    }
-
-    private calculateEasterDate(year: number): Date {
-        // Algoritmo de Meeus/Jones/Butcher para calcular a Páscoa
-        const a = year % 19;
-        const b = Math.floor(year / 100);
-        const c = year % 100;
-        const d = Math.floor(b / 4);
-        const e = b % 4;
-        const f = Math.floor((b + 8) / 25);
-        const g = Math.floor((b - f + 1) / 3);
-        const h = (19 * a + b - d - g + 15) % 30;
-        const i = Math.floor(c / 4);
-        const k = c % 4;
-        const l = (32 + 2 * e + 2 * i - h - k) % 7;
-        const m = Math.floor((a + 11 * h + 22 * l) / 451);
-        const month = Math.floor((h + l - 7 * m + 114) / 31);
-        const day = ((h + l - 7 * m + 114) % 31) + 1;
-
-        return new Date(year, month - 1, day);
     }
 
     private showSettings() {
