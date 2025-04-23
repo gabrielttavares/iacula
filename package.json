@@ -67,9 +67,9 @@
             "entitlementsInherit": "build/entitlements.mac.plist",
             "signIgnore": [
                 "node_modules"
-            ]
+            ],
+            "afterSign": "scripts/notarize.js"
         },
-        "afterSign": "scripts/notarize.js",
         "publish": {
             "provider": "github",
             "releaseType": "release"
