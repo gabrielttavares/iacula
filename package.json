@@ -12,7 +12,7 @@
         "copy-renderer": "node scripts/copy-assets.js"
     },
     "author": {
-        "name": "Gabriel Tavares",
+        "name": "Gabriel Tavares & Mateus Apolinário",
         "email": "gabrieltxtavares@gmail.com"
     },
     "license": "ISC",

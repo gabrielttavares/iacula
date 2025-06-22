@@ -11,7 +11,8 @@ const DEFAULT_CONFIG = {
     interval: 15, // minutos
     duration: 10, // segundos
     autostart: true,
-    easterTime: false
+    easterTime: false,
+    language: 'pt-br' // Idioma padrão
 };
 
 // Interface para as configurações
