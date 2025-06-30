@@ -1,11 +1,25 @@
 const fs = require('fs');
 const path = require('path');
 const { getAssetPath } = require('./utils');
+const { ipcRenderer } = require('electron');
+
+const DEFAULT_LANGUAGE = 'pt-br';
+
+async function loadLanguage() {
+    try {
+        const config = await ipcRenderer.invoke('get-config');
+        const language = config.language || 'pt-br';
+        return language;
+    } catch (error) {
+        return DEFAULT_LANGUAGE;
+    }
+}
 
 // Função para carregar as orações do arquivo JSON
-function loadPrayers() {
+async function loadPrayers() {
     try {
-        const prayersPath = getAssetPath('prayers/angelus.json');
+        const language = await loadLanguage();
+        const prayersPath = getAssetPath(`prayers/${language}/angelus.json`);
         console.log('Loading prayers from:', prayersPath);
         const prayers = JSON.parse(fs.readFileSync(prayersPath, 'utf-8'));
         console.log('Loaded prayers:', prayers);
@@ -28,9 +42,9 @@ function getAngelusImage() {
 }
 
 // Função para atualizar o conteúdo da oração
-function updatePrayerContent() {
+async function updatePrayerContent() {
     try {
-        const prayers = loadPrayers();
+        const prayers = await loadPrayers();
         if (!prayers) {
             console.error('Failed to load prayers');
             return;
@@ -75,8 +89,16 @@ function updatePrayerContent() {
     }
 }
 
+async function initializeAngelus() {
+    try {
+        await updatePrayerContent();
+    } catch (error) {
+        console.error('Error initializing Angelus:', error);
+    }
+}
+
 // Atualizar o conteúdo quando a página carregar
-window.addEventListener('load', updatePrayerContent);
+window.addEventListener('load', initializeAngelus);
 
 document.getElementById('close-button').addEventListener('click', () => {
     window.close();

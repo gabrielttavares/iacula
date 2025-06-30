@@ -5,7 +5,8 @@ const DEFAULT_CONFIG = {
     interval: 15,
     duration: 10,
     autostart: true,
-    easterTime: false
+    easterTime: false,
+    language: 'pt-br'
 };
 
 // Carregar configurações atuais
@@ -16,6 +17,7 @@ async function loadCurrentSettings() {
         document.getElementById('duration').value = config.duration;
         document.getElementById('autostart').checked = config.autostart;
         document.getElementById('easterTime').checked = config.easterTime;
+        document.getElementById('language-select').value = config.language;
     } catch (error) {
         console.error('Erro ao carregar configurações:', error);
         // Em caso de erro, usar as configurações padrão
@@ -23,6 +25,7 @@ async function loadCurrentSettings() {
         document.getElementById('duration').value = DEFAULT_CONFIG.duration;
         document.getElementById('autostart').checked = DEFAULT_CONFIG.autostart;
         document.getElementById('easterTime').checked = DEFAULT_CONFIG.easterTime;
+        document.getElementById('language-select').value = DEFAULT_CONFIG.language;
     }
 }
 
@@ -34,7 +37,8 @@ function saveSettings(event) {
         interval: parseInt(document.getElementById('interval').value),
         duration: parseInt(document.getElementById('duration').value),
         autostart: document.getElementById('autostart').checked,
-        easterTime: document.getElementById('easterTime').checked
+        easterTime: document.getElementById('easterTime').checked,
+        language: document.getElementById('language-select').value
     };
 
     // Validar valores

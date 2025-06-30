@@ -137,6 +137,38 @@
             box-shadow: 0 0 0 2px rgba(69, 123, 157, 0.1);
         }
 
+        select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: 'EB Garamond', serif;
+            color: var(--text-color);
+            background-color: #FAFCFF;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(69, 123, 157, 0.1);
+        }
+
+        option {
+            font-family: 'EB Garamond', serif;
+            color: var(--text-color);
+            background-color: #FAFCFF;
+            padding: 0.5rem;
+        }
+
+        option:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
         .checkbox-group {
             display: flex;
             align-items: center;
@@ -244,6 +276,7 @@
             label,
             input,
             button,
+            option,
             .checkbox-group label {
                 font-size: 0.95rem;
             }
@@ -253,7 +286,8 @@
 
 <body>
     <div class="author-credit">
-        Contato: <a href="https://gabrielttavares.github.io/landing-page/" target="_blank">Gabriel Tavares</a>
+        Contato: <a href="https://gabrielttavares.github.io/landing-page/" target="_blank">Gabriel Tavares</a><br/><br/>
+        Contato: <a href="https://codezonext.com.br/" target="_blank">Mateus Apolinário</a><br/><br/>
     </div>
     <div class="container">
         <div class="header">
@@ -268,6 +302,14 @@
                 <div class="form-group">
                     <label for="duration">Duração do popup (segundos):</label>
                     <input type="number" id="duration" name="duration" min="5" max="30" required>
+                </div>
+                <div class="form-group">
+                    <label for="language-select">Idioma</label>
+                    <select id="language-select">
+                        <option value="la">Latim</option>
+                        <option value="en">Inglês</option>
+                        <option value="pt-br">Português</option>
+                    </select>
                 </div>
                 <div class="form-group checkbox-row">
                     <div class="checkbox-group">
