@@ -49,6 +49,9 @@ class IaculaApp {
             this.setupAngelusTimer();
             this.setupIPC();
             this.showPopup();
+
+            // Configurar menu do Dock para macOS
+            this.setupDockMenu();
         });
 
         app.on('window-all-closed', () => {
@@ -149,6 +152,37 @@ class IaculaApp {
 
         this.tray.setToolTip('Iacula');
         this.tray.setContextMenu(contextMenu);
+    }
+
+    private setupDockMenu() {
+        if (process.platform === 'darwin' && this.tray) {
+            const contextMenu = Menu.buildFromTemplate([
+                {
+                    label: 'Mostrar jaculatória',
+                    click: () => this.showPopup()
+                },
+                {
+                    label: 'Mostrar Angelus',
+                    click: () => this.showAngelus(false)
+                },
+                {
+                    label: 'Mostrar Regina Caeli (Tempo Pascal)',
+                    click: () => this.showAngelus(true)
+                },
+                { type: 'separator' },
+                {
+                    label: 'Configurações',
+                    click: () => this.showSettings()
+                },
+                { type: 'separator' },
+                {
+                    label: 'Sair',
+                    click: () => app.quit()
+                }
+            ]);
+            
+            app.dock.setMenu(contextMenu);
+        }
     }
 
     private loadConfig() {
