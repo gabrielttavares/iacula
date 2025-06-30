@@ -3,9 +3,22 @@ const path = require('path');
 const { ipcRenderer } = require('electron');
 const { getAssetPath } = require('./utils');
 
-function loadQuotes() {
+const DEFAULT_LANGUAGE = 'pt-br';
+
+async function loadLanguage() {
     try {
-        const quotesPath = getAssetPath('quotes/quotes.json');
+        const config = await ipcRenderer.invoke('get-config');
+        const language = config.language || 'pt-br';
+        return language;
+    } catch (error) {
+        return DEFAULT_LANGUAGE;
+    }
+}
+
+async function loadQuotes() {
+    try {
+        const language = await loadLanguage();
+        const quotesPath = getAssetPath(`quotes/${language}/quotes.json`);
         console.log('Loading quotes from:', quotesPath);
         return JSON.parse(fs.readFileSync(quotesPath, 'utf-8'));
     } catch (error) {
@@ -58,8 +71,8 @@ const indices = loadIndices();
 const quoteIndices = indices.quoteIndices;
 const imageIndices = indices.imageIndices;
 
-function getSequentialQuote() {
-    const quotes = loadQuotes();
+async function getSequentialQuote() {
+    const quotes = await loadQuotes();
     if (!quotes) {
         console.error('Failed to load quotes');
         return 'Error loading quote';
@@ -111,13 +124,13 @@ function getSequentialImage() {
     }
 }
 
-function updatePopupContent() {
+async function updatePopupContent() {
     const quoteElement = document.getElementById('daily-quote');
     const imageElement = document.getElementById('daily-image');
 
     if (quoteElement && imageElement) {
         try {
-            const quote = getSequentialQuote();
+            const quote = await getSequentialQuote();
             const imagePath = getSequentialImage();
 
             quoteElement.textContent = quote;
@@ -135,7 +148,15 @@ function closePopup() {
     window.close();
 }
 
+async function initializePopup() {
+    try {
+        await updatePopupContent();
+    } catch (error) {
+        console.error('Erro ao inicializar popup:', error);
+    }
+}
+
 // Atualizar o conteúdo quando a página carregar
-window.addEventListener('load', updatePopupContent);
+window.addEventListener('load', initializePopup);
 
 document.getElementById('close-button').addEventListener('click', closePopup);

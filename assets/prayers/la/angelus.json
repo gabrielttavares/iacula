@@ -1,0 +1,42 @@
+{
+    "regular": {
+        "title": "Angelus",
+        "verses": [
+            {
+                "verse": "Angelus Domini nuntiavit Mariae.",
+                "response": "Et concepit de Spiritu Sancto."
+            },
+            {
+                "verse": "Ecce ancilla Domini.",
+                "response": "Fiat mihi secundum verbum tuum."
+            },
+            {
+                "verse": "Et Verbum caro factum est.",
+                "response": "Et habitavit in nobis."
+            },
+            {
+                "verse": "Ora pro nobis, Sancta Dei Genetrix.",
+                "response": "Ut digni efficiamur promissionibus Christi."
+            }
+        ],
+        "prayer": "Oremus. Gratiam tuam, quaesumus, Domine, mentibus nostris infunde; ut qui, Angelo nuntiante, Christi Filii tui Incarnationem cognovimus, per Passionem eius et Crucem ad Resurrectionis gloriam perducamur. Per eumdem Christum Dominum nostrum. Amen."
+    },
+    "easter": {
+        "title": "Regina Caeli",
+        "verses": [
+            {
+                "verse": "Regina caeli, laetare, alleluia.",
+                "response": "Quia quem meruisti portare, alleluia."
+            },
+            {
+                "verse": "Resurrexit, sicut dixit, alleluia.",
+                "response": "Ora pro nobis Deum, alleluia."
+            },
+            {
+                "verse": "Gaude et laetare, Virgo Maria, alleluia.",
+                "response": "Quia surrexit Dominus vere, alleluia."
+            }
+        ],
+        "prayer": "Oremus. Deus, qui per Resurrectionem Filii tui Domini nostri Iesu Christi mundum laetificare dignatus es: praesta, quaesumus, ut per eius Genitricem Virginem Mariam, perpetuae vitae gaudia consequamur. Per eumdem Christum Dominum nostrum. Amen."
+    }
+}
