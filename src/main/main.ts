@@ -3,6 +3,26 @@ import path from 'path';
 import fs from 'fs';
 import { setupAutoStart } from './autostart';
 
+const isMac = process.platform === 'darwin';
+
+function applyMacWindowTweaks(win: BrowserWindow) {
+    if (!isMac) return;
+
+    // glass (vibrancy) + transparent background
+    win.setVibrancy('under-window');           // blur effect
+    win.setBackgroundColor('#00000000');       // fully transparent
+    win.setHasShadow(false);                   // avoids window shadow
+    // optional in frameless:
+    win.setWindowButtonVisibility(false);
+
+    // inject a "mac" class into <html> of the renderer (for conditional CSS)
+    win.webContents.on('did-finish-load', () => {
+        win.webContents.executeJavaScript(
+        "document.documentElement.classList.add('mac');"
+        );
+    });
+}
+
 // Enable remote module
 require('@electron/remote/main').initialize();
 
@@ -253,6 +273,10 @@ class IaculaApp {
             frame: false,
             transparent: true,
             alwaysOnTop: true,
+            backgroundColor: '#00000000',  // important for transparency
+            hasShadow: false,  // prevents window shadow
+            roundedCorners: true, // (macOS) improves antialiasing
+            titleBarStyle: 'customButtonsOnHover', // optional in frameless
             webPreferences: {
                 nodeIntegration: true,
                 contextIsolation: false
@@ -305,6 +329,12 @@ class IaculaApp {
             frame: false,
             transparent: true,
             alwaysOnTop: true,
+            backgroundColor: '#00000000',  // important for transparency
+            hasShadow: false,  // prevents window shadow
+            roundedCorners: true, // (macOS) improves antialiasing
+            titleBarStyle: 'hiddenInset', // integrates better with macOS
+            vibrancy: 'hud', // key for the glass effect
+            visualEffectState: 'active', // keeps the effect alive
             webPreferences: {
                 nodeIntegration: true,
                 contextIsolation: false
