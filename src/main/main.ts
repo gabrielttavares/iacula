@@ -61,8 +61,6 @@ class IaculaApp {
                 { label: 'Mostrar Regina Caeli (Tempo Pascal)', click: () => this.showAngelus(true) },
                 { type: 'separator' },
                 { label: 'Configurações', click: () => this.showSettings() },
-                { type: 'separator' },
-                { label: 'Sair', click: () => app.quit() }
             ]);
 
             try {
