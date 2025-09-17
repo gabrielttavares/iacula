@@ -52,9 +52,53 @@ class IaculaApp {
     private angelusTimer: NodeJS.Timeout | null = null;
     private settingsWindow: BrowserWindow | null = null;
 
-    constructor() {
+    private createDockMenu() {
+        if (process.platform !== 'darwin') return;
+
+        const dockMenu = Menu.buildFromTemplate([
+                { label: 'Mostrar jaculatória', click: () => this.showPopup() },
+                { label: 'Mostrar Angelus', click: () => this.showAngelus(false) },
+                { label: 'Mostrar Regina Caeli (Tempo Pascal)', click: () => this.showAngelus(true) },
+                { type: 'separator' },
+                { label: 'Configurações', click: () => this.showSettings() },
+                { type: 'separator' },
+                { label: 'Sair', click: () => app.quit() }
+            ]);
+
+            try {
+                console.log('[dock] setMenu start');
+                app.dock.setMenu(dockMenu);
+                console.log('[dock] setMenu done');
+            } catch (e) {
+                console.error('[dock] setMenu error', e);
+            }
+        }
+
+        constructor() {
         app.whenReady().then(() => {
+            if (process.platform === 'darwin') {
+                try {
+                app.setActivationPolicy('regular'); 
+                app.dock.show();                   
+                console.log('[dock] policy=regular + show');
+                } catch (e) {
+                console.warn('[dock] activation/show warn', e);
+                }
+            }
+
+            if (process.platform === 'darwin') {
+            app.on('activate', () => {
+                console.log('[dock] reapply on activate');
+                this.createDockMenu();
+            });
+            app.on('browser-window-created', () => {
+                console.log('[dock] reapply on window-created');
+                this.createDockMenu();
+            });
+            }
+
             this.createTray();
+            this.createDockMenu();
             this.loadConfig();
 
             console.log('==================================');
