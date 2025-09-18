@@ -1,6 +1,6 @@
 {
     "name": "iacula",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "description": "Cultivar Presença de Deus",
     "main": "dist/main/main.js",
     "scripts": {
@@ -9,7 +9,10 @@
         "build": "npm run prebuild && tsc && electron-builder",
         "watch": "tsc -w",
         "prebuild": "npm run copy-renderer",
-        "copy-renderer": "node scripts/copy-assets.js"
+        "copy-renderer": "node scripts/copy-assets.js",
+        "release:patch": "npm version patch && npm run build",
+        "release:minor": "npm version minor && npm run build",
+        "release:major": "npm version major && npm run build"
     },
     "author": {
         "name": "Gabriel Tavares & Mateus Apolinário",
