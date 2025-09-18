@@ -1,0 +1,7 @@
+mac/node_modules/
+mac/dist/
+mac/release/
+mac/build/
+.DS_Store
+
+
