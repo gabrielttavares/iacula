@@ -15,7 +15,7 @@
         "release:major": "npm version major && npm run build"
     },
     "author": {
-        "name": "Gabriel Tavares & Mateus Apolinário",
+        "name": "Gabriel Tavares",
         "email": "gabrieltxtavares@gmail.com"
     },
     "license": "ISC",
