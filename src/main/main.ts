@@ -374,14 +374,17 @@ class IaculaApp {
             backgroundColor: '#00000000',  // important for transparency
             hasShadow: false,  // prevents window shadow
             roundedCorners: true, // (macOS) improves antialiasing
-            titleBarStyle: 'hiddenInset', // integrates better with macOS
-            vibrancy: 'hud', // key for the glass effect
-            visualEffectState: 'active', // keeps the effect alive
+            titleBarStyle: 'hidden', // integrates better with macOS
             webPreferences: {
                 nodeIntegration: true,
                 contextIsolation: false
             }
         });
+
+        // hidden the natives buttons
+        if (process.platform === 'darwin') {
+         this.mainWindow.setWindowButtonVisibility(false); // << esconde nativos
+        }
 
         this.mainWindow.loadFile(path.join(__dirname, `../renderer/${prayerType}.html`));
 
