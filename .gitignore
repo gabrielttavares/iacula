@@ -1,7 +1,12 @@
+# Ignorar dependências globais
+node_modules/
+
+# Ignorar builds globais
+dist/
+release/
+
+# Ignorar builds dentro de mac/
 mac/node_modules/
 mac/dist/
 mac/release/
 mac/build/
-.DS_Store
-
-
