@@ -1,11 +1,9 @@
-# Ignorar dependências globais
+# Globais
 node_modules/
-
-# Ignorar builds globais
 dist/
 release/
 
-# Ignorar builds dentro de mac/
+# Dentro de mac/
 mac/node_modules/
 mac/dist/
 mac/release/
