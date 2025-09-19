@@ -35,6 +35,7 @@ class IaculaApp {
     constructor() {
         app.whenReady().then(() => {
             this.createTray();
+            this.createDockMenu();
             this.loadConfig();
 
             console.log('==================================');
@@ -149,6 +150,21 @@ class IaculaApp {
 
         this.tray.setToolTip('Iacula');
         this.tray.setContextMenu(contextMenu);
+    }
+
+    private createDockMenu() {
+        if (process.platform !== 'darwin') return;
+
+        const dockMenu = Menu.buildFromTemplate([
+        { label: 'Mostrar jaculatória', click: () => this.showPopup() },
+        { label: 'Mostrar Angelus', click: () => this.showAngelus(false) },
+        { label: 'Mostrar Regina Caeli (Tempo Pascal)', click: () => this.showAngelus(true) },
+        { type: 'separator' },
+        { label: 'Configurações', click: () => this.showSettings() },
+        { type: 'separator' },
+        ]);
+
+        app.dock.setMenu(dockMenu);
     }
 
     private loadConfig() {
