@@ -3,6 +3,26 @@ import path from 'path';
 import fs from 'fs';
 import { setupAutoStart } from './autostart';
 
+const isMac = process.platform === 'darwin';
+
+function applyMacWindowTweaks(win: BrowserWindow) {
+    if (!isMac) return;
+
+    // glass (vibrancy) + transparent background
+    win.setVibrancy('under-window');           // blur effect
+    win.setBackgroundColor('#00000000');       // fully transparent
+    win.setHasShadow(false);                   // avoids window shadow
+    // optional in frameless:
+    win.setWindowButtonVisibility(false);
+
+    // inject a "mac" class into <html> of the renderer (for conditional CSS)
+    win.webContents.on('did-finish-load', () => {
+        win.webContents.executeJavaScript(
+        "document.documentElement.classList.add('mac');"
+        );
+    });
+}
+
 // Enable remote module
 require('@electron/remote/main').initialize();
 
@@ -32,8 +52,49 @@ class IaculaApp {
     private angelusTimer: NodeJS.Timeout | null = null;
     private settingsWindow: BrowserWindow | null = null;
 
-    constructor() {
+    private createDockMenu() {
+        if (process.platform !== 'darwin') return;
+
+        const dockMenu = Menu.buildFromTemplate([
+                { label: 'Mostrar jaculatória', click: () => this.showPopup() },
+                { label: 'Mostrar Angelus', click: () => this.showAngelus(false) },
+                { label: 'Mostrar Regina Caeli (Tempo Pascal)', click: () => this.showAngelus(true) },
+                { type: 'separator' },
+                { label: 'Configurações', click: () => this.showSettings() },
+            ]);
+
+            try {
+                console.log('[dock] setMenu start');
+                app.dock.setMenu(dockMenu);
+                console.log('[dock] setMenu done');
+            } catch (e) {
+                console.error('[dock] setMenu error', e);
+            }
+        }
+
+        constructor() {
         app.whenReady().then(() => {
+            if (process.platform === 'darwin') {
+                try {
+                app.setActivationPolicy('regular'); 
+                app.dock.show();                   
+                console.log('[dock] policy=regular + show');
+                } catch (e) {
+                console.warn('[dock] activation/show warn', e);
+                }
+            }
+
+            if (process.platform === 'darwin') {
+            app.on('activate', () => {
+                console.log('[dock] reapply on activate');
+                this.createDockMenu();
+            });
+            app.on('browser-window-created', () => {
+                console.log('[dock] reapply on window-created');
+                this.createDockMenu();
+            });
+            }
+
             this.createTray();
             this.createDockMenu();
             this.loadConfig();
@@ -152,21 +213,6 @@ class IaculaApp {
         this.tray.setContextMenu(contextMenu);
     }
 
-    private createDockMenu() {
-        if (process.platform !== 'darwin') return;
-
-        const dockMenu = Menu.buildFromTemplate([
-        { label: 'Mostrar jaculatória', click: () => this.showPopup() },
-        { label: 'Mostrar Angelus', click: () => this.showAngelus(false) },
-        { label: 'Mostrar Regina Caeli (Tempo Pascal)', click: () => this.showAngelus(true) },
-        { type: 'separator' },
-        { label: 'Configurações', click: () => this.showSettings() },
-        { type: 'separator' },
-        ]);
-
-        app.dock.setMenu(dockMenu);
-    }
-
     private loadConfig() {
         const configPath = path.join(app.getPath('userData'), 'config.json');
         try {
@@ -269,6 +315,10 @@ class IaculaApp {
             frame: false,
             transparent: true,
             alwaysOnTop: true,
+            backgroundColor: '#00000000',  // important for transparency
+            hasShadow: false,  // prevents window shadow
+            roundedCorners: true, // (macOS) improves antialiasing
+            titleBarStyle: 'customButtonsOnHover', // optional in frameless
             webPreferences: {
                 nodeIntegration: true,
                 contextIsolation: false
@@ -321,11 +371,20 @@ class IaculaApp {
             frame: false,
             transparent: true,
             alwaysOnTop: true,
+            backgroundColor: '#00000000',  // important for transparency
+            hasShadow: false,  // prevents window shadow
+            roundedCorners: true, // (macOS) improves antialiasing
+            titleBarStyle: 'hidden', // integrates better with macOS
             webPreferences: {
                 nodeIntegration: true,
                 contextIsolation: false
             }
         });
+
+        // hidden the natives buttons
+        if (process.platform === 'darwin') {
+         this.mainWindow.setWindowButtonVisibility(false); // << esconde nativos
+        }
 
         this.mainWindow.loadFile(path.join(__dirname, `../renderer/${prayerType}.html`));
 
