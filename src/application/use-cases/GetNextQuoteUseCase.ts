@@ -26,6 +26,8 @@ export class GetNextQuoteUseCase {
     const quotes = await this.assetService.loadQuotes(settings.language);
     const images = await this.assetService.listDayImages(dayOfWeek);
 
+    console.log(`[GetNextQuoteUseCase] Day: ${dayOfWeek}, Quotes found: ${quotes[dayOfWeek.toString()]?.quotes?.length}, Images found: ${images.length}`);
+
     const dayData = quotes[dayOfWeek.toString()];
     if (!dayData || !dayData.quotes || dayData.quotes.length === 0) {
       throw new Error(`No quotes found for day ${dayOfWeek}`);

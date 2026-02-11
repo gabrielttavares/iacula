@@ -73,7 +73,7 @@ export class FileAssetService implements IAssetService {
       const files = fs.readdirSync(imagesDir);
       return files
         .filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
-        .map(file => path.join(imagesDir, file));
+        .map(file => `file://${path.join(imagesDir, file)}`);
     } catch (error) {
       console.error(`Error listing images for day ${dayOfWeek}:`, error);
       return [];
@@ -81,10 +81,10 @@ export class FileAssetService implements IAssetService {
   }
 
   async getAngelusImagePath(): Promise<string> {
-    return this.getAssetPath('images/angelus/J.jpg');
+    return `file://${this.getAssetPath('images/angelus/J.jpg')}`;
   }
 
   async getReginaCaeliImagePath(): Promise<string> {
-    return this.getAssetPath('images/reginaCaeli/Regina caeli.jpg');
+    return `file://${this.getAssetPath('images/reginaCaeli/Regina caeli.jpg')}`;
   }
 }

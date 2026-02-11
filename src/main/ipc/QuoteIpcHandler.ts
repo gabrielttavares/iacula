@@ -12,7 +12,15 @@ export class QuoteIpcHandler {
 
   register(): void {
     ipcMain.handle(IPC_CHANNELS.GET_QUOTE, async () => {
-      return this.getNextQuoteUseCase.execute();
+      console.log('[QuoteIpcHandler] Received GET_QUOTE request');
+      try {
+        const result = await this.getNextQuoteUseCase.execute();
+        console.log('[QuoteIpcHandler] Returning quote:', result);
+        return result;
+      } catch (error) {
+        console.error('[QuoteIpcHandler] Error getting quote:', error);
+        throw error;
+      }
     });
   }
 

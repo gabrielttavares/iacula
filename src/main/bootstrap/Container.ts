@@ -64,10 +64,16 @@ export class Container {
   private readonly presentationPath: string;
 
   constructor() {
-    this.isDevelopment = process.env.NODE_ENV === 'development';
+    this.isDevelopment = !app.isPackaged;
     this.userDataPath = app.getPath('userData');
     this.resourcesPath = process.resourcesPath || process.cwd();
-    this.presentationPath = path.join(__dirname, '../../presentation');
+    // Use app.getAppPath() to ensure correct path resolution relative to project root
+    this.presentationPath = path.join(app.getAppPath(), 'dist/presentation');
+    
+    console.log('[Container] Initialized');
+    console.log('[Container] Is Development:', this.isDevelopment);
+    console.log('[Container] App Path:', app.getAppPath());
+    console.log('[Container] Presentation Path:', this.presentationPath);
   }
 
   // Repositories

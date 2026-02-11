@@ -42,7 +42,7 @@
             overflow: auto;
             border-radius: 12px;
             /* Rounded borders */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            /* box-shadow removed to avoid conflict with window transparency */
         }
 
 
@@ -193,7 +193,14 @@
             </div>
         </div>
     </div>
-    <script src="popup.controller.js"></script>
+    <script>
+        try {
+            require('./popup.controller.js');
+        } catch (e) {
+            console.error('Failed to load controller:', e);
+            document.body.innerHTML += `<div style="color:red;background:black;padding:10px;">Error: ${e.message}</div>`;
+        }
+    </script>
 </body>
 
 </html>

@@ -15,8 +15,8 @@ interface WindowConfig {
 
 const WINDOW_CONFIGS: Record<WindowType, WindowConfig> = {
   popup: {
-    width: 280,
-    height: 360,
+    width: 220,
+    height: 300,
     htmlFile: 'popup/popup.html',
   },
   angelus: {
@@ -70,10 +70,13 @@ export class WindowService implements IWindowService {
       show: false,
       focusable: !isPopupType,
       skipTaskbar: isPopupType,
-      backgroundColor: isPopupType ? '#00000000' : undefined,
-      hasShadow: !isPopupType,
+      backgroundColor: '#00000000', // Fully transparent
+      hasShadow: false, // Disable native shadow
       roundedCorners: true,
       titleBarStyle: isPopupType ? 'hidden' : undefined,
+      resizable: !isPopupType,
+      useContentSize: true, // Ensure content size matches window size exactly
+      visualEffectState: 'active', // Ensure vibrancy works even when window is inactive
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -90,6 +93,9 @@ export class WindowService implements IWindowService {
     // Apply Mac-specific tweaks for popup windows
     if (this.isMac && isPopupType) {
       this.applyMacTweaks(window);
+    } else if (isPopupType) {
+        // Ensure transparency on Windows/Linux
+        window.setBackgroundColor('#00000000');
     }
 
     const htmlPath = path.join(this.rendererPath, config.htmlFile);
@@ -137,7 +143,8 @@ export class WindowService implements IWindowService {
   }
 
   private applyMacTweaks(window: BrowserWindow): void {
-    window.setVibrancy('under-window');
+    // Vibrancy removed to avoid rectangular background behind rounded corners
+    // window.setVibrancy('under-window'); 
     window.setBackgroundColor('#00000000');
     window.setHasShadow(false);
     window.setWindowButtonVisibility(false);

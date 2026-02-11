@@ -43,13 +43,20 @@ class SettingsController {
 
   private async loadSettings(): Promise<void> {
     try {
+      console.log('Requesting settings...');
       const settings = await ipcRenderer.invoke(IPC_CHANNELS.GET_CONFIG) as SettingsDTO;
+      console.log('Settings received:', settings);
 
-      if (this.intervalInput) this.intervalInput.value = settings.interval.toString();
-      if (this.durationInput) this.durationInput.value = settings.duration.toString();
-      if (this.autostartCheckbox) this.autostartCheckbox.checked = settings.autostart;
-      if (this.easterTimeCheckbox) this.easterTimeCheckbox.checked = settings.easterTime;
-      if (this.languageSelect) this.languageSelect.value = settings.language;
+      if (settings) {
+        if (this.intervalInput) this.intervalInput.value = (settings.interval || 15).toString();
+        if (this.durationInput) this.durationInput.value = (settings.duration || 10).toString();
+        if (this.autostartCheckbox) this.autostartCheckbox.checked = settings.autostart ?? true;
+        if (this.easterTimeCheckbox) this.easterTimeCheckbox.checked = settings.easterTime ?? false;
+        if (this.languageSelect) this.languageSelect.value = settings.language || 'pt-br';
+      } else {
+        console.warn('Settings received were null/undefined, applying defaults');
+        this.applyDefaults();
+      }
     } catch (error) {
       console.error('Error loading settings:', error);
       this.applyDefaults();

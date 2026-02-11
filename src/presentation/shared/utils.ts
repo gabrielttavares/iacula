@@ -3,6 +3,7 @@
  * Utilitários compartilhados entre as views.
  */
 
+import { ipcRenderer } from 'electron';
 import path from 'path';
 
 export function getAssetPath(relativePath: string): string {
@@ -18,7 +19,16 @@ export function getAssetPath(relativePath: string): string {
 }
 
 export function closeWindow(): void {
-  window.close();
+  try {
+    window.close();
+  } catch (e) {
+    console.warn('window.close() failed, trying IPC', e);
+    // Fallback if window.close() is blocked or not working
+    // Note: You might need to add a specific IPC channel for generic close if 'close-window' isn't handled
+    // But usually window.close() works in Electron renderer if nodeIntegration is true or contextIsolation false
+    // If not, we can send a message to main process
+    // ipcRenderer.send('window-close'); 
+  }
 }
 
 export function addFadeInEffect(): void {
