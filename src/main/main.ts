@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, screen, ipcMain } from 'electron';
+import { app, BrowserWindow, Tray, Menu, nativeImage, screen, ipcMain, powerMonitor } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { setupAutoStart } from './autostart';
@@ -51,6 +51,14 @@ class IaculaApp {
     private popupCloseTimer: NodeJS.Timeout | null = null;
     private angelusTimer: NodeJS.Timeout | null = null;
     private settingsWindow: BrowserWindow | null = null;
+
+    // Verifica se o horario atual e meio-dia (12:00 - 12:01)
+    private isNoonTime(): boolean {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        return hours === 12 && minutes <= 1;
+    }
 
     private createDockMenu() {
         if (process.platform !== 'darwin') return;
@@ -108,9 +116,18 @@ class IaculaApp {
             console.log('==================================');
 
             this.setupTimers();
-            this.setupAngelusTimer();
             this.setupIPC();
             this.showPopup();
+
+            // Reagendar timer do Angelus quando o sistema acordar do sleep
+            powerMonitor.on('resume', () => {
+                console.log('System resumed from sleep, resetting Angelus timer');
+                if (this.angelusTimer) {
+                    clearTimeout(this.angelusTimer);
+                    clearInterval(this.angelusTimer);
+                }
+                this.setupAngelusTimer();
+            });
         });
 
         app.on('window-all-closed', () => {
@@ -288,11 +305,25 @@ class IaculaApp {
         // Set initial timer for today's noon
         this.angelusTimer = setTimeout(() => {
             console.log('Noon timer triggered, current easterTime setting:', this.config.easterTime);
-            this.showAngelus();
+            // Validar se realmente e meio-dia (protege contra wake-from-sleep)
+            if (this.isNoonTime()) {
+                this.showAngelus();
+            } else {
+                console.log('Timer fired but not noon time, rescheduling...');
+                this.setupAngelusTimer();
+                return;
+            }
             // Configurar o próximo timer para amanhã
             this.angelusTimer = setInterval(() => {
                 console.log('Daily noon timer triggered, current easterTime setting:', this.config.easterTime);
-                this.showAngelus();
+                // Validar se realmente e meio-dia (protege contra wake-from-sleep)
+                if (this.isNoonTime()) {
+                    this.showAngelus();
+                } else {
+                    console.log('Interval timer fired but not noon time, resetting timer...');
+                    clearInterval(this.angelusTimer!);
+                    this.setupAngelusTimer();
+                }
             }, 24 * 60 * 60 * 1000);
         }, timeUntilNoon);
     }
