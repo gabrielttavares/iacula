@@ -48,11 +48,18 @@ class SettingsController {
       console.log('Settings received:', settings);
 
       if (settings) {
-        if (this.intervalInput) this.intervalInput.value = (settings.interval || 15).toString();
-        if (this.durationInput) this.durationInput.value = (settings.duration || 10).toString();
-        if (this.autostartCheckbox) this.autostartCheckbox.checked = settings.autostart ?? true;
-        if (this.easterTimeCheckbox) this.easterTimeCheckbox.checked = settings.easterTime ?? false;
-        if (this.languageSelect) this.languageSelect.value = settings.language || 'pt-br';
+        // Use default values if properties are missing or undefined
+        const interval = settings.interval !== undefined ? settings.interval : 15;
+        const duration = settings.duration !== undefined ? settings.duration : 10;
+        const autostart = settings.autostart !== undefined ? settings.autostart : true;
+        const easterTime = settings.easterTime !== undefined ? settings.easterTime : false;
+        const language = settings.language || 'pt-br';
+
+        if (this.intervalInput) this.intervalInput.value = interval.toString();
+        if (this.durationInput) this.durationInput.value = duration.toString();
+        if (this.autostartCheckbox) this.autostartCheckbox.checked = autostart;
+        if (this.easterTimeCheckbox) this.easterTimeCheckbox.checked = easterTime;
+        if (this.languageSelect) this.languageSelect.value = language;
       } else {
         console.warn('Settings received were null/undefined, applying defaults');
         this.applyDefaults();

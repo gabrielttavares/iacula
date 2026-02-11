@@ -20,12 +20,13 @@ export class Settings {
   }
 
   static create(props: Partial<SettingsProps>): Settings {
+    const defaults = Settings.defaults;
     const validated = Settings.validate({
-      interval: props.interval ?? Settings.defaults.interval,
-      duration: props.duration ?? Settings.defaults.duration,
-      autostart: props.autostart ?? Settings.defaults.autostart,
-      easterTime: props.easterTime ?? Settings.defaults.easterTime,
-      language: props.language ?? Settings.defaults.language,
+      interval: props.interval !== undefined ? props.interval : defaults.interval,
+      duration: props.duration !== undefined ? props.duration : defaults.duration,
+      autostart: props.autostart !== undefined ? props.autostart : defaults.autostart,
+      easterTime: props.easterTime !== undefined ? props.easterTime : defaults.easterTime,
+      language: props.language !== undefined ? props.language : defaults.language,
     });
     return new Settings(validated);
   }

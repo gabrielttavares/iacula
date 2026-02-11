@@ -325,7 +325,14 @@
             <div id="status" class="status"></div>
         </div>
     </div>
-    <script src="settings.controller.js"></script>
+    <script>
+        try {
+            require('./settings.controller.js');
+        } catch (e) {
+            console.error('Failed to load controller:', e);
+            document.body.innerHTML += `<div style="color:red;background:black;padding:10px;">Error: ${e.message}</div>`;
+        }
+    </script>
 </body>
 
 </html>

@@ -18,7 +18,10 @@ export class FileSettingsRepository implements ISettingsRepository {
   async load(): Promise<Settings> {
     try {
       if (!fs.existsSync(this.configPath)) {
-        return Settings.create({});
+        console.log('Config file not found, creating default settings');
+        const defaultSettings = Settings.create({});
+        await this.save(defaultSettings);
+        return defaultSettings;
       }
 
       const configData = fs.readFileSync(this.configPath, 'utf-8');
