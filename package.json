@@ -10,6 +10,9 @@
         "watch": "tsc -w",
         "prebuild": "npm run copy-renderer",
         "copy-renderer": "node scripts/copy-assets.js",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage",
         "release:patch": "npm version patch && npm run build",
         "release:minor": "npm version minor && npm run build",
         "release:major": "npm version major && npm run build"
@@ -22,12 +25,15 @@
     "devDependencies": {
         "@electron/notarize": "^3.0.1",
         "@types/electron-squirrel-startup": "^1.0.2",
+        "@types/jest": "^30.0.0",
         "@types/node": "^20.17.30",
         "concurrently": "^8.2.2",
         "cross-env": "^7.0.3",
         "dotenv": "^16.5.0",
         "electron": "^28.2.0",
         "electron-builder": "^24.9.1",
+        "jest": "^30.2.0",
+        "ts-jest": "^29.4.6",
         "typescript": "^5.3.3"
     },
     "build": {

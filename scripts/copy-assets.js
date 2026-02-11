@@ -29,22 +29,36 @@ function copyFiles(source, dest) {
 }
 
 // Ensure dist directories exist
-ensureDirExists('dist/renderer');
+ensureDirExists('dist/presentation/popup');
+ensureDirExists('dist/presentation/angelus');
+ensureDirExists('dist/presentation/regina-caeli');
+ensureDirExists('dist/presentation/settings');
 ensureDirExists('dist/assets');
 
-// Copy renderer files
-const rendererDir = 'src/renderer';
-fs.readdirSync(rendererDir).forEach(file => {
-    if (file.endsWith('.html') || file.endsWith('.js')) {
-        copyFiles(
-            path.join(rendererDir, file),
-            path.join('dist/renderer', file)
-        );
+// Copy presentation layer HTML files
+const presentationDirs = [
+    { src: 'src/presentation/popup', dest: 'dist/presentation/popup' },
+    { src: 'src/presentation/angelus', dest: 'dist/presentation/angelus' },
+    { src: 'src/presentation/regina-caeli', dest: 'dist/presentation/regina-caeli' },
+    { src: 'src/presentation/settings', dest: 'dist/presentation/settings' },
+];
+
+presentationDirs.forEach(({ src, dest }) => {
+    if (fs.existsSync(src)) {
+        fs.readdirSync(src).forEach(file => {
+            if (file.endsWith('.html')) {
+                copyFiles(
+                    path.join(src, file),
+                    path.join(dest, file)
+                );
+            }
+        });
     }
 });
 
 // Copy assets
 copyFiles('assets/prayers', 'dist/assets/prayers');
 copyFiles('assets/images', 'dist/assets/images');
+copyFiles('assets/quotes', 'dist/assets/quotes');
 
-console.log('Assets copied successfully!'); 
+console.log('Assets copied successfully!');
