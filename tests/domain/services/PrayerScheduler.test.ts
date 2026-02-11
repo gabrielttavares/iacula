@@ -87,6 +87,21 @@ describe('PrayerScheduler Service', () => {
       const midnight = new Date('2024-01-15T00:00:00');
       expect(PrayerScheduler.isNoonTime(midnight)).toBe(false);
     });
+
+    it('should return true at 12:01:59 (edge case)', () => {
+      const noonEdge = new Date('2024-01-15T12:01:59');
+      expect(PrayerScheduler.isNoonTime(noonEdge)).toBe(true);
+    });
+
+    it('should return false at 12:02:00 exactly', () => {
+      const afterWindow = new Date('2024-01-15T12:02:00');
+      expect(PrayerScheduler.isNoonTime(afterWindow)).toBe(false);
+    });
+
+    it('should return false at 11:59:59 (just before noon)', () => {
+      const beforeNoon = new Date('2024-01-15T11:59:59');
+      expect(PrayerScheduler.isNoonTime(beforeNoon)).toBe(false);
+    });
   });
 
   describe('dailyIntervalMs', () => {
