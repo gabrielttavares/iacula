@@ -1,468 +1,151 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, screen, ipcMain, powerMonitor } from 'electron';
-import path from 'path';
-import fs from 'fs';
-import { setupAutoStart } from './autostart';
+/**
+ * Main Process Entry Point
+ * Bootstrap do aplicativo Electron.
+ * Responsável apenas por inicialização e coordenação.
+ */
 
-const isMac = process.platform === 'darwin';
-
-function applyMacWindowTweaks(win: BrowserWindow) {
-    if (!isMac) return;
-
-    // glass (vibrancy) + transparent background
-    win.setVibrancy('under-window');           // blur effect
-    win.setBackgroundColor('#00000000');       // fully transparent
-    win.setHasShadow(false);                   // avoids window shadow
-    // optional in frameless:
-    win.setWindowButtonVisibility(false);
-
-    // inject a "mac" class into <html> of the renderer (for conditional CSS)
-    win.webContents.on('did-finish-load', () => {
-        win.webContents.executeJavaScript(
-            "document.documentElement.classList.add('mac');"
-        );
-    });
-}
+import { app } from 'electron';
+import { Container } from './bootstrap/Container';
+import { TrayManager } from './bootstrap/TrayManager';
+import { DockManager } from './bootstrap/DockManager';
+import { TimerManager } from './bootstrap/TimerManager';
+import { Settings } from '../domain/entities/Settings';
 
 // Enable remote module
 require('@electron/remote/main').initialize();
 
-// Configurações padrão
-const DEFAULT_CONFIG = {
-    interval: 15, // minutos
-    duration: 10, // segundos
-    autostart: true,
-    easterTime: false,
-    language: 'pt-br' // Idioma padrão
-};
-
-// Interface para as configurações
-interface AppConfig {
-    interval: number;
-    duration: number;
-    autostart: boolean;
-    easterTime: boolean;
-}
-
 class IaculaApp {
-    private mainWindow: BrowserWindow | null = null;
-    private tray: Tray | null = null;
-    private config: AppConfig = DEFAULT_CONFIG;
-    private popupIntervalTimer: NodeJS.Timeout | null = null;
-    private popupCloseTimer: NodeJS.Timeout | null = null;
-    private angelusTimer: NodeJS.Timeout | null = null;
-    private settingsWindow: BrowserWindow | null = null;
+  private container: Container;
+  private trayManager: TrayManager | null = null;
+  private dockManager: DockManager | null = null;
+  private timerManager: TimerManager | null = null;
+  private currentSettings: Settings | null = null;
 
-    // Verifica se o horario atual e meio-dia (12:00 - 12:01)
-    private isNoonTime(): boolean {
-        const now = new Date();
-        const hours = now.getHours();
-        const minutes = now.getMinutes();
-        return hours === 12 && minutes <= 1;
+  constructor() {
+    this.container = new Container();
+    this.initialize();
+  }
+
+  private async initialize(): Promise<void> {
+    await app.whenReady();
+
+    // Load initial settings
+    this.currentSettings = await this.loadSettings();
+    this.logSettings();
+
+    // Setup managers
+    this.setupManagers();
+
+    // Setup IPC handlers
+    this.setupIpc();
+
+    // Start timers
+    this.timerManager?.setup(this.currentSettings);
+
+    // Show initial popup
+    await this.showPopup();
+
+    // Handle window-all-closed
+    app.on('window-all-closed', () => {
+      // Keep app running in background
+    });
+  }
+
+  private async loadSettings(): Promise<Settings> {
+    const dto = await this.container.getSettingsUseCase.execute();
+    return Settings.create(dto);
+  }
+
+  private logSettings(): void {
+    if (!this.currentSettings) return;
+
+    console.log('==================================');
+    console.log('APP CONFIGURATION:');
+    console.log('Interval:', this.currentSettings.interval, 'minutes');
+    console.log('Duration:', this.currentSettings.duration, 'seconds');
+    console.log('Autostart:', this.currentSettings.autostart);
+    console.log('Easter Time (Tempo Pascal):', this.currentSettings.easterTime);
+    console.log('==================================');
+  }
+
+  private setupManagers(): void {
+    const callbacks = {
+      onShowPopup: () => this.showPopup(),
+      onShowAngelus: () => this.showAngelus(false),
+      onShowReginaCaeli: () => this.showAngelus(true),
+      onShowSettings: () => this.showSettings(),
+    };
+
+    // Tray Manager
+    this.trayManager = new TrayManager(callbacks);
+    this.trayManager.create();
+
+    // Dock Manager (macOS only)
+    this.dockManager = new DockManager(callbacks);
+    this.dockManager.setup();
+
+    // Timer Manager
+    this.timerManager = new TimerManager({
+      onPopupInterval: () => this.showPopup(),
+      onAngelusTime: () => this.showAngelus(),
+    });
+  }
+
+  private setupIpc(): void {
+    this.container.createIpcHandlers({
+      onSettingsUpdated: (easterTimeChanged) => this.handleSettingsUpdated(easterTimeChanged),
+      onCloseSettingsAndShowPopup: () => this.handleCloseSettingsAndShowPopup(),
+    });
+
+    this.container.registerIpcHandlers();
+  }
+
+  private async handleSettingsUpdated(easterTimeChanged: boolean): Promise<void> {
+    console.log('Settings updated, easterTimeChanged:', easterTimeChanged);
+
+    // Reload settings
+    this.currentSettings = await this.loadSettings();
+
+    // Update timers
+    this.timerManager?.updateSettings(this.currentSettings);
+
+    // Reset Angelus timer if easter time changed
+    if (easterTimeChanged) {
+      console.log('Easter time setting changed, resetting Angelus timer');
+      this.timerManager?.resetAngelusTimer();
     }
+  }
 
-    private createDockMenu() {
-        if (process.platform !== 'darwin') return;
+  private async handleCloseSettingsAndShowPopup(): Promise<void> {
+    await this.container.windowService.close('settings');
+    await this.showPopup();
+  }
 
-        const dockMenu = Menu.buildFromTemplate([
-            { label: 'Mostrar jaculatória', click: () => this.showPopup() },
-            { label: 'Mostrar Angelus', click: () => this.showAngelus(false) },
-            { label: 'Mostrar Regina Caeli (Tempo Pascal)', click: () => this.showAngelus(true) },
-            { type: 'separator' },
-            { label: 'Configurações', click: () => this.showSettings() },
-        ]);
+  private async showPopup(): Promise<void> {
+    if (!this.currentSettings) return;
 
-        try {
-            console.log('[dock] setMenu start');
-            app.dock.setMenu(dockMenu);
-            console.log('[dock] setMenu done');
-        } catch (e) {
-            console.error('[dock] setMenu error', e);
-        }
-    }
+    await this.container.windowService.show('popup', {
+      autoClose: true,
+      autoCloseDelayMs: this.currentSettings.durationInMs,
+    });
+  }
 
-    constructor() {
-        app.whenReady().then(() => {
-            if (process.platform === 'darwin') {
-                try {
-                    app.setActivationPolicy('regular');
-                    app.dock.show();
-                    console.log('[dock] policy=regular + show');
-                } catch (e) {
-                    console.warn('[dock] activation/show warn', e);
-                }
-            }
+  private async showAngelus(forceEasterTime?: boolean): Promise<void> {
+    const isEasterTime = forceEasterTime ?? this.currentSettings?.easterTime ?? false;
+    const windowType = isEasterTime ? 'reginaCaeli' : 'angelus';
 
-            if (process.platform === 'darwin') {
-                app.on('activate', () => {
-                    console.log('[dock] reapply on activate');
-                    this.createDockMenu();
-                });
-                app.on('browser-window-created', () => {
-                    console.log('[dock] reapply on window-created');
-                    this.createDockMenu();
-                });
-            }
+    console.log(`Showing ${windowType} based on isEasterTime=${isEasterTime}`);
 
-            this.createTray();
-            this.createDockMenu();
-            this.loadConfig();
+    await this.container.windowService.show(windowType, {
+      autoClose: true,
+      autoCloseDelayMs: 60 * 1000, // 1 minute
+    });
+  }
 
-            console.log('==================================');
-            console.log('APP CONFIGURATION:');
-            console.log('Interval:', this.config.interval, 'minutes');
-            console.log('Duration:', this.config.duration, 'seconds');
-            console.log('Autostart:', this.config.autostart);
-            console.log('Easter Time (Tempo Pascal):', this.config.easterTime);
-            console.log('==================================');
-
-            this.setupTimers();
-            this.setupIPC();
-            this.showPopup();
-
-            // Reagendar timer do Angelus quando o sistema acordar do sleep
-            powerMonitor.on('resume', () => {
-                console.log('System resumed from sleep, resetting Angelus timer');
-                if (this.angelusTimer) {
-                    clearTimeout(this.angelusTimer);
-                    clearInterval(this.angelusTimer);
-                }
-                this.setupAngelusTimer();
-            });
-        });
-
-        app.on('window-all-closed', () => {
-            // app in background
-        });
-    }
-
-    private setupIPC() {
-        // Handler para salvar configurações
-        ipcMain.on('save-settings', (event, settings) => {
-            try {
-                console.log('Saving new settings:', settings);
-                const oldEasterTime = this.config.easterTime;
-                this.config = { ...this.config, ...settings };
-                this.saveConfig();
-
-                // Reiniciar timers com novas configurações
-                if (this.popupIntervalTimer) {
-                    console.log('Clearing existing interval timer');
-                    clearInterval(this.popupIntervalTimer);
-                }
-
-                // Reset Angelus/Regina Caeli timer if easterTime setting changed
-                if (oldEasterTime !== this.config.easterTime) {
-                    console.log(`Easter time setting changed from ${oldEasterTime} to ${this.config.easterTime}`);
-                    if (this.angelusTimer) {
-                        console.log('Clearing and resetting Angelus/Regina Caeli timer');
-                        clearTimeout(this.angelusTimer);
-                        clearInterval(this.angelusTimer);
-                        this.setupAngelusTimer();
-                    }
-                }
-
-                this.setupTimers();
-                event.reply('settings-saved', true);
-            } catch (error) {
-                console.error('Erro ao salvar configurações:', error);
-                event.reply('settings-saved', false);
-            }
-        });
-
-        // Handler para fechar janela de configurações e mostrar popup
-        ipcMain.on('close-settings-and-show-popup', () => {
-            if (this.settingsWindow) {
-                this.settingsWindow.close();
-                this.settingsWindow = null;
-            }
-            this.showPopup();
-        });
-
-        // Handler para carregar configurações
-        ipcMain.handle('get-config', () => {
-            return this.config;
-        });
-
-        ipcMain.on('get-user-data-path', (event) => {
-            event.returnValue = app.getPath('userData');
-        });
-    }
-
-    private createTray() {
-        let iconPath;
-        if (process.platform === 'win32') {
-            iconPath = path.join(__dirname, '../../assets/images/icon.ico');
-        } else if (process.platform === 'darwin') {
-            iconPath = path.join(__dirname, '../../assets/images/icon.icns');
-        } else {
-            iconPath = path.join(__dirname, '../../assets/images/icon.png');
-        }
-
-        const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
-        this.tray = new Tray(trayIcon);
-
-        const contextMenu = Menu.buildFromTemplate([
-            {
-                label: 'Mostrar jaculatória',
-                click: () => this.showPopup()
-            },
-            {
-                label: 'Mostrar Angelus',
-                click: () => this.showAngelus(false)
-            },
-            {
-                label: 'Mostrar Regina Caeli (Tempo Pascal)',
-                click: () => this.showAngelus(true)
-            },
-            { type: 'separator' },
-            {
-                label: 'Configurações',
-                click: () => this.showSettings()
-            },
-            { type: 'separator' },
-            {
-                label: 'Sair',
-                click: () => app.quit()
-            }
-        ]);
-
-        this.tray.setToolTip('Iacula');
-        this.tray.setContextMenu(contextMenu);
-    }
-
-    private loadConfig() {
-        const configPath = path.join(app.getPath('userData'), 'config.json');
-        try {
-            if (fs.existsSync(configPath)) {
-                const configData = fs.readFileSync(configPath, 'utf-8');
-                let loadedConfig = JSON.parse(configData);
-
-                // Handle potential nested config object (seen in logs)
-                if (loadedConfig.config && typeof loadedConfig.config === 'object') {
-                    console.log('Found nested config object, flattening...');
-                    loadedConfig = { ...loadedConfig, ...loadedConfig.config };
-                    delete loadedConfig.config;
-                }
-
-                // Ensure all properties exist, using defaults for any missing ones
-                this.config = {
-                    ...DEFAULT_CONFIG,
-                    ...loadedConfig,
-                    // Make sure easterTime is explicitly set if missing
-                    easterTime: loadedConfig.easterTime !== undefined ? loadedConfig.easterTime : DEFAULT_CONFIG.easterTime
-                };
-                console.log('Loaded config:', this.config);
-            } else {
-                // Se o arquivo de configuração não existir, criar com as configurações padrão
-                this.saveConfig();
-            }
-        } catch (error) {
-            console.error('Erro ao carregar configurações:', error);
-            this.config = { ...DEFAULT_CONFIG };
-        }
-    }
-
-    private saveConfig() {
-        const configPath = path.join(app.getPath('userData'), 'config.json');
-        try {
-            fs.writeFileSync(configPath, JSON.stringify(this.config, null, 2));
-            // Update autostart setting
-            setupAutoStart(this.config.autostart);
-        } catch (error) {
-            console.error('Erro ao salvar configurações:', error);
-        }
-    }
-
-    private setupTimers() {
-        // Timer para popups regulares
-        console.log('Setting up popup interval timer:', this.config.interval, 'minutes');
-        this.popupIntervalTimer = setInterval(() => {
-            console.log('Interval timer triggered, showing popup');
-            this.showPopup();
-        }, this.config.interval * 60 * 1000);
-
-        // Timer para Angelus/Regina Caeli
-        this.setupAngelusTimer();
-    }
-
-    private setupAngelusTimer() {
-        const now = new Date();
-        const nextNoon = new Date(now);
-        nextNoon.setHours(12, 0, 0, 0);
-
-        if (now > nextNoon) {
-            nextNoon.setDate(nextNoon.getDate() + 1);
-        }
-
-        const timeUntilNoon = nextNoon.getTime() - now.getTime();
-        console.log(`Setting up Angelus/Regina Caeli timer for ${nextNoon.toLocaleString()}, in ${timeUntilNoon / 1000 / 60} minutes`);
-
-        // Clear any existing angelus timer
-        if (this.angelusTimer) {
-            clearTimeout(this.angelusTimer);
-        }
-
-        // Set initial timer for today's noon
-        this.angelusTimer = setTimeout(() => {
-            console.log('Noon timer triggered, current easterTime setting:', this.config.easterTime);
-            // Validar se realmente e meio-dia (protege contra wake-from-sleep)
-            if (this.isNoonTime()) {
-                this.showAngelus();
-            } else {
-                console.log('Timer fired but not noon time, rescheduling...');
-                this.setupAngelusTimer();
-                return;
-            }
-            // Configurar o próximo timer para amanhã
-            this.angelusTimer = setInterval(() => {
-                console.log('Daily noon timer triggered, current easterTime setting:', this.config.easterTime);
-                // Validar se realmente e meio-dia (protege contra wake-from-sleep)
-                if (this.isNoonTime()) {
-                    this.showAngelus();
-                } else {
-                    console.log('Interval timer fired but not noon time, resetting timer...');
-                    clearInterval(this.angelusTimer!);
-                    this.setupAngelusTimer();
-                }
-            }, 24 * 60 * 60 * 1000);
-        }, timeUntilNoon);
-    }
-
-    private showPopup() {
-        if (this.mainWindow) {
-            this.mainWindow.destroy();
-            this.mainWindow = null;
-        }
-
-        const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-        const windowWidth = 280;
-        const windowHeight = 360;
-
-        this.mainWindow = new BrowserWindow({
-            width: windowWidth,
-            height: windowHeight,
-            x: width - windowWidth,  // aligns with right edge
-            y: height - windowHeight, // aligns with bottom edge, above taskbar
-            frame: false,
-            transparent: true,
-            alwaysOnTop: true,
-            show: false, // Don't show immediately, use showInactive() instead
-            focusable: false, // Prevent window from receiving focus
-            skipTaskbar: true, // Don't show in taskbar/dock
-            backgroundColor: '#00000000',  // important for transparency
-            hasShadow: false,  // prevents window shadow
-            roundedCorners: true, // (macOS) improves antialiasing
-            titleBarStyle: 'customButtonsOnHover', // optional in frameless
-            webPreferences: {
-                nodeIntegration: true,
-                contextIsolation: false
-            }
-        });
-
-        // Enable remote module for this window
-        require('@electron/remote/main').enable(this.mainWindow.webContents);
-
-        this.mainWindow.loadFile(path.join(__dirname, '../renderer/popup.html'));
-
-        // Show window without stealing focus
-        this.mainWindow.showInactive();
-
-        // Handle window close event
-        this.mainWindow.on('closed', () => {
-            this.mainWindow = null;
-        });
-
-        if (this.popupCloseTimer) {
-            clearTimeout(this.popupCloseTimer);
-        }
-
-        this.popupCloseTimer = setTimeout(() => {
-            if (this.mainWindow) {
-                this.mainWindow.destroy();
-                this.mainWindow = null;
-            }
-        }, this.config.duration * 1000);
-    }
-
-    private showAngelus(forceEasterTime: boolean | undefined = undefined) {
-        console.log(`showAngelus called with forceEasterTime=${forceEasterTime}, config.easterTime=${this.config.easterTime}`);
-        // Use the forced value if provided, otherwise use the config setting
-        const isEasterTime = forceEasterTime === undefined ? this.config.easterTime : forceEasterTime;
-        const prayerType = isEasterTime ? 'reginaCaeli' : 'angelus';
-        console.log(`Showing ${prayerType} based on isEasterTime=${isEasterTime}`);
-
-        if (this.mainWindow) {
-            this.mainWindow.destroy();
-            this.mainWindow = null;
-        }
-
-        const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-        const windowWidth = 320;
-        const windowHeight = 740;
-
-        this.mainWindow = new BrowserWindow({
-            width: windowWidth,
-            height: windowHeight,
-            x: width - windowWidth,  // aligns with right edge
-            y: height - windowHeight, // aligns with bottom edge, above taskbar
-            frame: false,
-            transparent: true,
-            alwaysOnTop: true,
-            show: false, // Don't show immediately, use showInactive() instead
-            focusable: false, // Prevent window from receiving focus
-            skipTaskbar: true, // Don't show in taskbar/dock
-            backgroundColor: '#00000000',  // important for transparency
-            hasShadow: false,  // prevents window shadow
-            roundedCorners: true, // (macOS) improves antialiasing
-            titleBarStyle: 'hidden', // integrates better with macOS
-            webPreferences: {
-                nodeIntegration: true,
-                contextIsolation: false
-            }
-        });
-
-        // hidden the natives buttons
-        if (process.platform === 'darwin') {
-            this.mainWindow.setWindowButtonVisibility(false); // << esconde nativos
-        }
-
-        this.mainWindow.loadFile(path.join(__dirname, `../renderer/${prayerType}.html`));
-
-        // Show window without stealing focus
-        this.mainWindow.showInactive();
-
-        // Handle window close event
-        this.mainWindow.on('closed', () => {
-            this.mainWindow = null;
-        });
-
-        // Clear any existing close timer
-        if (this.popupCloseTimer) {
-            clearTimeout(this.popupCloseTimer);
-        }
-
-        // Set new timer for this popup with fixed 1-minute duration
-        this.popupCloseTimer = setTimeout(() => {
-            if (this.mainWindow) {
-                this.mainWindow.destroy();
-                this.mainWindow = null;
-            }
-        }, 60 * 1000); // 1 minute in milliseconds
-    }
-
-    private showSettings() {
-        this.settingsWindow = new BrowserWindow({
-            width: 400,
-            height: 450,
-            webPreferences: {
-                nodeIntegration: true,
-                contextIsolation: false
-            }
-        });
-
-        this.settingsWindow.loadFile(path.join(__dirname, '../renderer/settings.html'));
-    }
+  private async showSettings(): Promise<void> {
+    await this.container.windowService.show('settings');
+  }
 }
 
-// Inicializar o aplicativo
-new IaculaApp(); 
+// Initialize the application
+new IaculaApp();
