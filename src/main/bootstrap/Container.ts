@@ -67,7 +67,7 @@ export class Container {
     this.isDevelopment = process.env.NODE_ENV === 'development';
     this.userDataPath = app.getPath('userData');
     this.resourcesPath = process.resourcesPath || process.cwd();
-    this.presentationPath = path.join(__dirname, '../presentation');
+    this.presentationPath = path.join(__dirname, '../../presentation');
   }
 
   // Repositories
