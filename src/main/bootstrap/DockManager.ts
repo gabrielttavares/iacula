@@ -1,9 +1,10 @@
 /**
  * Bootstrap: DockManager
- * Gerencia o menu do Dock no macOS.
+ * Gerencia a visibilidade do Dock no macOS.
+ * Para menu bar apps, esconde o icone do Dock.
  */
 
-import { Menu, app } from 'electron';
+import { app } from 'electron';
 
 export interface DockCallbacks {
   onShowPopup: () => void;
@@ -21,46 +22,7 @@ export class DockManager {
 
   setup(): void {
     if (!this.isMac) return;
-
-    try {
-      app.setActivationPolicy('regular');
-      app.dock.show();
-      console.log('[dock] policy=regular + show');
-    } catch (e) {
-      console.warn('[dock] activation/show warn', e);
-    }
-
-    this.createDockMenu();
-
-    // Re-apply dock menu on certain events
-    app.on('activate', () => {
-      console.log('[dock] reapply on activate');
-      this.createDockMenu();
-    });
-
-    app.on('browser-window-created', () => {
-      console.log('[dock] reapply on window-created');
-      this.createDockMenu();
-    });
-  }
-
-  private createDockMenu(): void {
-    if (!this.isMac) return;
-
-    const dockMenu = Menu.buildFromTemplate([
-      { label: 'Mostrar jaculatoria', click: () => this.callbacks.onShowPopup() },
-      { label: 'Mostrar Angelus', click: () => this.callbacks.onShowAngelus() },
-      { label: 'Mostrar Regina Caeli (Tempo Pascal)', click: () => this.callbacks.onShowReginaCaeli() },
-      { type: 'separator' },
-      { label: 'Configuracoes', click: () => this.callbacks.onShowSettings() },
-    ]);
-
-    try {
-      console.log('[dock] setMenu start');
-      app.dock.setMenu(dockMenu);
-      console.log('[dock] setMenu done');
-    } catch (e) {
-      console.error('[dock] setMenu error', e);
-    }
+    // LSUIElement in Info.plist handles dock visibility
+    console.log('[dock] LSUIElement handles dock visibility');
   }
 }

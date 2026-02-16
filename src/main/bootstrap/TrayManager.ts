@@ -1,10 +1,11 @@
 /**
  * Bootstrap: TrayManager
- * Gerencia o ícone na bandeja do sistema.
+ * Gerencia o icone na bandeja do sistema (menu bar no macOS).
  */
 
 import { Tray, Menu, nativeImage, app } from 'electron';
 import path from 'path';
+import fs from 'fs';
 
 export interface TrayCallbacks {
   onShowPopup: () => void;
@@ -19,12 +20,40 @@ export class TrayManager {
   constructor(private readonly callbacks: TrayCallbacks) {}
 
   create(): void {
-    const iconPath = this.getIconPath();
-    const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
+    try {
+      const iconPath = this.getIconPath();
+      console.log('[tray] icon path:', iconPath);
+      console.log('[tray] file exists:', fs.existsSync(iconPath));
 
-    this.tray = new Tray(trayIcon);
-    this.tray.setToolTip('Iacula');
-    this.tray.setContextMenu(this.createContextMenu());
+      let icon = nativeImage.createFromPath(iconPath);
+      console.log('[tray] image empty:', icon.isEmpty());
+      console.log('[tray] image size:', icon.getSize());
+
+      if (icon.isEmpty()) {
+        console.warn('[tray] icon is empty, using fallback');
+        icon = this.createFallbackIcon();
+      }
+
+      // Resize to proper tray size
+      icon = icon.resize({ width: 16, height: 16 });
+
+      // Mark as template image for macOS (auto color inversion)
+      if (process.platform === 'darwin') {
+        icon.setTemplateImage(true);
+      }
+
+      this.tray = new Tray(icon);
+      this.tray.setToolTip('Iacula');
+      this.tray.setContextMenu(this.createContextMenu());
+      
+      // Debug: check if tray has bounds (indicates it's rendered)
+      const bounds = this.tray.getBounds();
+      console.log('[tray] created successfully');
+      console.log('[tray] bounds:', bounds);
+      console.log('[tray] isDestroyed:', this.tray.isDestroyed());
+    } catch (e) {
+      console.error('[tray] creation failed:', e);
+    }
   }
 
   destroy(): void {
@@ -36,14 +65,30 @@ export class TrayManager {
 
   private getIconPath(): string {
     const platform = process.platform;
-    const basePath = path.join(__dirname, '../../assets/images');
+    const isDev = !app.isPackaged;
 
+    if (platform === 'darwin') {
+      if (isDev) {
+        // Dev mode: use project assets directly
+        return path.join(app.getAppPath(), 'assets/images/iconTemplate.png');
+      }
+      // Production: use extraResources
+      return path.join(process.resourcesPath, 'assets/images/iconTemplate.png');
+    }
+
+    // Windows/Linux: dist/assets/images copiado pelo copy-assets.js
+    const basePath = path.join(__dirname, '../../assets/images');
     if (platform === 'win32') {
       return path.join(basePath, 'icon.ico');
-    } else if (platform === 'darwin') {
-      return path.join(basePath, 'icon.icns');
     }
     return path.join(basePath, 'icon.png');
+  }
+
+  private createFallbackIcon(): Electron.NativeImage {
+    // 16x16 black filled circle PNG, base64 encoded
+    // This is a simple black dot that will be visible in the menu bar
+    const base64 = 'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAaklEQVQ4T2NkoBAwUqifYdQAhtEwGPAw+P//PwMjIyMDAwMDw////xn+//8PYjMwMDAwgNgMDAwMYDYDAwMDmA1iMzAwMIDZIDYDA8P/////MzAw/P8PYv///5+BgeH/fxCb4f9/BoaRHgYAVvMnEXvOZHoAAAAASUVORK5CYII=';
+    return nativeImage.createFromDataURL(`data:image/png;base64,${base64}`);
   }
 
   private createContextMenu(): Menu {
