@@ -13,6 +13,8 @@ interface WindowConfig {
   htmlFile: string;
 }
 
+const FADE_OUT_DURATION_MS = 700;
+
 const WINDOW_CONFIGS: Record<WindowType, WindowConfig> = {
   popup: {
     width: 220,
@@ -160,10 +162,45 @@ export class WindowService implements IWindowService {
     this.clearCloseTimer(type);
 
     const timer = setTimeout(() => {
-      this.close(type);
+      this.closeWithFade(type).catch(() => {
+        this.close(type);
+      });
     }, delayMs);
 
     this.closeTimers.set(type, timer);
+  }
+
+  private async closeWithFade(type: WindowType): Promise<void> {
+    const window = this.windows.get(type);
+
+    if (!window || window.isDestroyed()) {
+      return;
+    }
+
+    if (type === 'settings') {
+      await this.close(type);
+      return;
+    }
+
+    try {
+      await window.webContents.executeJavaScript(`
+        (() => {
+          const body = document.body;
+          if (!body) return;
+          body.classList.remove('fade-in');
+          body.classList.add('fade-out');
+        })();
+      `);
+    } catch {
+      await this.close(type);
+      return;
+    }
+
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), FADE_OUT_DURATION_MS);
+    });
+
+    await this.close(type);
   }
 
   private clearCloseTimer(type: WindowType): void {
