@@ -10,13 +10,41 @@ interface ChurchCalendarDay {
 }
 
 export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
+  private static readonly REQUEST_TIMEOUT_MS = 1500;
   private readonly baseUrl: string;
+  private cachedSeasonByDate = new Map<string, LiturgicalSeason>();
+  private pendingRequestByDate = new Map<string, Promise<LiturgicalSeason>>();
 
   constructor(baseUrl: string = 'https://calapi.inadiutorium.cz/api/v0/en/calendars/default') {
     this.baseUrl = baseUrl;
   }
 
   async getCurrentSeason(date: Date = new Date()): Promise<LiturgicalSeason> {
+    const dateKey = this.toDateKey(date);
+    const cached = this.cachedSeasonByDate.get(dateKey);
+    if (cached) {
+      return cached;
+    }
+
+    const pending = this.pendingRequestByDate.get(dateKey);
+    if (pending) {
+      return pending;
+    }
+
+    const request = this.resolveSeason(date)
+      .then((season) => {
+        this.cachedSeasonByDate.set(dateKey, season);
+        return season;
+      })
+      .finally(() => {
+        this.pendingRequestByDate.delete(dateKey);
+      });
+
+    this.pendingRequestByDate.set(dateKey, request);
+    return request;
+  }
+
+  private async resolveSeason(date: Date): Promise<LiturgicalSeason> {
     const year = date.getUTCFullYear();
     const month = String(date.getUTCMonth() + 1).padStart(2, '0');
     const day = String(date.getUTCDate()).padStart(2, '0');
@@ -35,16 +63,34 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     }
   }
 
+  private toDateKey(date: Date): string {
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   private async fetchWithFallback(url: string): Promise<Response> {
     try {
-      return await fetch(url);
+      return await this.fetchWithTimeout(url);
     } catch (error) {
       const fallbackUrl = this.getHttpFallbackUrl(url);
       if (!fallbackUrl) {
         throw error;
       }
 
-      return fetch(fallbackUrl);
+      return this.fetchWithTimeout(fallbackUrl);
+    }
+  }
+
+  private async fetchWithTimeout(url: string): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), RemoteLiturgicalSeasonService.REQUEST_TIMEOUT_MS);
+
+    try {
+      return await fetch(url, { signal: controller.signal });
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

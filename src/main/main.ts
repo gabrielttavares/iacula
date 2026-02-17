@@ -42,6 +42,9 @@ class IaculaApp {
     // Start timers
     this.timerManager?.setup(this.currentSettings);
 
+    // Preload liturgical season once at startup to reduce popup wait.
+    await this.preloadLiturgicalSeason();
+
     // Show initial popup
     await this.showPopup();
 
@@ -139,6 +142,15 @@ class IaculaApp {
       autoClose: true,
       autoCloseDelayMs: this.currentSettings.durationInMs,
     });
+  }
+
+  private async preloadLiturgicalSeason(): Promise<void> {
+    try {
+      const season = await this.container.liturgicalSeasonService.getCurrentSeason();
+      console.log(`[IaculaApp] Preloaded liturgical season: ${season}`);
+    } catch (error) {
+      console.warn('[IaculaApp] Failed to preload liturgical season, using fallback on demand.', error);
+    }
   }
 
   private async showAngelus(forceEasterTime?: boolean): Promise<void> {

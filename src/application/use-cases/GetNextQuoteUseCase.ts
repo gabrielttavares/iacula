@@ -85,6 +85,7 @@ export class GetNextQuoteUseCase {
       imagePath,
       dayOfWeek,
       theme: dayData.theme,
+      season,
     };
   }
 }

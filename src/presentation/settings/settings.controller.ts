@@ -8,6 +8,8 @@ import { ipcRenderer } from 'electron';
 import { IPC_CHANNELS } from '../../shared/types/IpcChannels';
 import { SettingsDTO, UpdateSettingsDTO } from '../../application/dto/SettingsDTO';
 
+const CLOSE_AFTER_SAVE_DELAY_MS = 700;
+
 class SettingsController {
   private form: HTMLFormElement | null = null;
   private intervalInput: HTMLInputElement | null = null;
@@ -100,7 +102,9 @@ class SettingsController {
   private handleSaveResponse(success: boolean): void {
     if (success) {
       this.showStatus('Configuracoes salvas com sucesso!', 'success');
-      ipcRenderer.send(IPC_CHANNELS.CLOSE_SETTINGS_AND_SHOW_POPUP);
+      window.setTimeout(() => {
+        ipcRenderer.send(IPC_CHANNELS.CLOSE_SETTINGS_AND_SHOW_POPUP);
+      }, CLOSE_AFTER_SAVE_DELAY_MS);
     } else {
       this.showStatus('Erro ao salvar configuracoes', 'error');
     }

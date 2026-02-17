@@ -91,6 +91,7 @@ describe('GetNextQuoteUseCase', () => {
     expect(result).toHaveProperty('imagePath');
     expect(result).toHaveProperty('dayOfWeek');
     expect(result).toHaveProperty('theme');
+    expect(result).toHaveProperty('season');
   });
 
   it('should return first quote when indices are empty', async () => {

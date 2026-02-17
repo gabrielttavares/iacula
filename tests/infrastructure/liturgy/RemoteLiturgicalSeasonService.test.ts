@@ -19,7 +19,10 @@ describe('RemoteLiturgicalSeasonService', () => {
     const season = await service.getCurrentSeason(new Date('2026-12-10T12:00:00Z'));
 
     expect(season).toBe('advent');
-    expect(fetchMock).toHaveBeenCalledWith('https://example.com/calendar/2026/12/10');
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://example.com/calendar/2026/12/10',
+      expect.objectContaining({ signal: expect.any(Object) }),
+    );
   });
 
   it('should map lent season from remote api', async () => {
@@ -77,11 +80,47 @@ describe('RemoteLiturgicalSeasonService', () => {
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
       'https://calapi.inadiutorium.cz/api/v0/en/calendars/default/2026/02/18',
+      expect.objectContaining({ signal: expect.any(Object) }),
     );
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
       'http://calapi.inadiutorium.cz/api/v0/en/calendars/default/2026/02/18',
+      expect.objectContaining({ signal: expect.any(Object) }),
     );
     expect(season).toBe('lent');
+  });
+
+  it('should use cached season for repeated calls on same date', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ season: 'advent' }),
+    });
+
+    const date = new Date('2026-12-10T12:00:00Z');
+    const first = await service.getCurrentSeason(date);
+    const second = await service.getCurrentSeason(date);
+
+    expect(first).toBe('advent');
+    expect(second).toBe('advent');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('should fetch again when date changes', async () => {
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ season: 'advent' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ season: 'christmas' }),
+      });
+
+    const first = await service.getCurrentSeason(new Date('2026-12-10T12:00:00Z'));
+    const second = await service.getCurrentSeason(new Date('2026-12-25T12:00:00Z'));
+
+    expect(first).toBe('advent');
+    expect(second).toBe('christmas');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

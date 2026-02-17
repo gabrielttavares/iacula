@@ -235,6 +235,23 @@
             pointer-events: auto;
         }
 
+        body.loading .image-container img {
+            filter: blur(2px) saturate(0.85);
+            transform: scale(1.02);
+        }
+
+        body.loading .prayer-container {
+            opacity: 0.78;
+        }
+
+        body.loading .title::before {
+            content: 'Carregando...';
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+            color: var(--light-text);
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -265,7 +282,7 @@
     </style>
 </head>
 
-<body>
+<body class="loading">
     <div class="prayer-card">
         <div class="image-container">
             <img id="angelus-image" src="/placeholder.svg" alt="Angelus">
