@@ -27,7 +27,7 @@ export class GetNextQuoteUseCase {
 
     const dayOfWeek = PrayerScheduler.getDayOfWeek() as DayOfWeek;
     const quotes = await this.assetService.loadQuotes(settings.language, season);
-    const images = await this.assetService.listDayImages(dayOfWeek);
+    const images = await this.assetService.listDayImages(dayOfWeek, season);
 
     console.log(`[GetNextQuoteUseCase] Day: ${dayOfWeek}, Quotes found: ${quotes[dayOfWeek.toString()]?.quotes?.length}, Images found: ${images.length}`);
 

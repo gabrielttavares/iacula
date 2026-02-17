@@ -22,12 +22,12 @@ export interface IAssetService {
   /**
    * Obtém o caminho absoluto para uma imagem do dia.
    */
-  getImagePath(dayOfWeek: number): Promise<string | null>;
+  getImagePath(dayOfWeek: number, season?: LiturgicalSeason): Promise<string | null>;
 
   /**
    * Lista todas as imagens disponíveis para um dia.
    */
-  listDayImages(dayOfWeek: number): Promise<string[]>;
+  listDayImages(dayOfWeek: number, season?: LiturgicalSeason): Promise<string[]>;
 
   /**
    * Obtém o caminho da imagem do Angelus.

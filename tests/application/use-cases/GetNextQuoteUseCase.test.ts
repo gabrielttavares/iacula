@@ -186,6 +186,7 @@ describe('GetNextQuoteUseCase', () => {
     await useCase.execute();
 
     expect(mockAssetService.loadQuotes).toHaveBeenCalledWith('en', 'advent');
+    expect(mockAssetService.listDayImages).toHaveBeenCalledWith(1, 'advent');
   });
 
   it('should return image path when images are available', async () => {

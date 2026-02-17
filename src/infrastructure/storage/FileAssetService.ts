@@ -69,9 +69,9 @@ export class FileAssetService implements IAssetService {
     }
   }
 
-  async getImagePath(dayOfWeek: number): Promise<string | null> {
+  async getImagePath(dayOfWeek: number, season: LiturgicalSeason = 'ordinary'): Promise<string | null> {
     try {
-      const images = await this.listDayImages(dayOfWeek);
+      const images = await this.listDayImages(dayOfWeek, season);
       if (images.length === 0) {
         return null;
       }
@@ -82,22 +82,32 @@ export class FileAssetService implements IAssetService {
     }
   }
 
-  async listDayImages(dayOfWeek: number): Promise<string[]> {
+  async listDayImages(dayOfWeek: number, season: LiturgicalSeason = 'ordinary'): Promise<string[]> {
     try {
-      const imagesDir = this.getAssetPath(`images/ordinary/${dayOfWeek}`);
-
-      if (!fs.existsSync(imagesDir)) {
-        return [];
+      if (season !== 'ordinary') {
+        const seasonalImages = this.readImageFilesFromDirectory(this.getAssetPath(`images/${season}/${dayOfWeek}`));
+        if (seasonalImages.length > 0) {
+          return seasonalImages;
+        }
+        console.log(`[FileAssetService] No images found for season=${season}, day=${dayOfWeek}. Falling back to ordinary.`);
       }
 
-      const files = fs.readdirSync(imagesDir);
-      return files
-        .filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
-        .map(file => `file://${path.join(imagesDir, file)}`);
+      return this.readImageFilesFromDirectory(this.getAssetPath(`images/ordinary/${dayOfWeek}`));
     } catch (error) {
       console.error(`Error listing images for day ${dayOfWeek}:`, error);
       return [];
     }
+  }
+
+  private readImageFilesFromDirectory(imagesDir: string): string[] {
+    if (!fs.existsSync(imagesDir)) {
+      return [];
+    }
+
+    const files = fs.readdirSync(imagesDir);
+    return files
+      .filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
+      .map(file => `file://${path.join(imagesDir, file)}`);
   }
 
   async getAngelusImagePath(): Promise<string> {
