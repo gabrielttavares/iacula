@@ -95,6 +95,7 @@ class IaculaApp {
     this.container.createIpcHandlers({
       onSettingsUpdated: (easterTimeChanged) => this.handleSettingsUpdated(easterTimeChanged),
       onCloseSettingsAndShowPopup: () => this.handleCloseSettingsAndShowPopup(),
+      onOpenSettingsFromContent: () => this.handleOpenSettingsFromContent(),
     });
 
     this.container.registerIpcHandlers();
@@ -119,6 +120,16 @@ class IaculaApp {
   private async handleCloseSettingsAndShowPopup(): Promise<void> {
     await this.container.windowService.close('settings');
     await this.showPopup();
+  }
+
+  private async handleOpenSettingsFromContent(): Promise<void> {
+    await Promise.all([
+      this.container.windowService.close('popup'),
+      this.container.windowService.close('angelus'),
+      this.container.windowService.close('reginaCaeli'),
+    ]);
+
+    await this.showSettings();
   }
 
   private async showPopup(): Promise<void> {

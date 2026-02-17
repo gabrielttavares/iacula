@@ -4,6 +4,8 @@
  */
 
 import path from 'path';
+import { ipcRenderer } from 'electron';
+import { IPC_CHANNELS } from '../../shared/types/IpcChannels';
 
 const CLOSE_FALLBACK_DELAY_MS = 800;
 let isClosingWindow = false;
@@ -26,24 +28,45 @@ export function closeWindow(): void {
   }
 
   isClosingWindow = true;
-
-  const finishClose = (): void => {
+  fadeOutAndRun(() => {
     try {
       window.close();
     } catch (e) {
       console.warn('window.close() failed, trying IPC', e);
-      // Fallback if window.close() is blocked or not working
-      // Note: You might need to add a specific IPC channel for generic close if 'close-window' isn't handled
-      // But usually window.close() works in Electron renderer if nodeIntegration is true or contextIsolation false
-      // If not, we can send a message to main process
-      // ipcRenderer.send('window-close');
     }
+  });
+}
+
+export function openSettingsFromContent(): void {
+  if (isClosingWindow) {
+    return;
+  }
+
+  isClosingWindow = true;
+  fadeOutAndRun(() => {
+    try {
+      ipcRenderer.send(IPC_CHANNELS.OPEN_SETTINGS_FROM_CONTENT);
+    } catch (e) {
+      console.warn('Failed to send open-settings request', e);
+    }
+
+    try {
+      window.close();
+    } catch (e) {
+      console.warn('window.close() failed after opening settings', e);
+    }
+  });
+}
+
+function fadeOutAndRun(onDone: () => void): void {
+  const finish = (): void => {
+    onDone();
   };
 
   const body = document.body;
 
   if (!body) {
-    finishClose();
+    finish();
     return;
   }
 
@@ -61,7 +84,7 @@ export function closeWindow(): void {
     didClose = true;
     window.clearTimeout(timeoutId);
     body.removeEventListener('animationend', onAnimationEnd);
-    finishClose();
+    finish();
   };
 
   body.addEventListener('animationend', onAnimationEnd);

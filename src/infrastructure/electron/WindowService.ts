@@ -32,8 +32,8 @@ const WINDOW_CONFIGS: Record<WindowType, WindowConfig> = {
     htmlFile: 'regina-caeli/reginaCaeli.html',
   },
   settings: {
-    width: 400,
-    height: 450,
+    width: 440,
+    height: 560,
     htmlFile: 'settings/settings.html',
   },
 };
@@ -60,6 +60,7 @@ export class WindowService implements IWindowService {
     const windowHeight = options?.height ?? config.height;
 
     const isPopupType = type !== 'settings';
+    const isFocusableWindow = type === 'settings' || type === 'popup';
 
     const window = new BrowserWindow({
       width: windowWidth,
@@ -70,7 +71,7 @@ export class WindowService implements IWindowService {
       transparent: isPopupType,
       alwaysOnTop: isPopupType,
       show: false,
-      focusable: !isPopupType,
+      focusable: isFocusableWindow,
       skipTaskbar: isPopupType,
       backgroundColor: '#00000000', // Fully transparent
       hasShadow: false, // Disable native shadow

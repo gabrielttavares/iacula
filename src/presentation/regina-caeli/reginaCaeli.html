@@ -97,6 +97,31 @@
             transition: transform 0.5s ease;
         }
 
+        .settings-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-control-button {
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .settings-button:hover .settings-control-button,
+        .settings-button:focus-within .settings-control-button {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .prayer-container {
             padding: 1.4rem 1.6rem;
             text-align: center;
@@ -178,6 +203,11 @@
             top: 10px;
             right: 10px;
             z-index: 2;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .control-button {
@@ -195,6 +225,14 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(4px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .close-button:hover .control-button,
+        .close-button:focus-within .control-button {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         @keyframes fadeIn {
@@ -231,6 +269,11 @@
     <div class="prayer-card">
         <div class="image-container">
             <img id="regina-caeli-image" src="/placeholder.svg" alt="Regina Caeli">
+            <div class="settings-button">
+                <button class="control-button settings-control-button" id="settings-button" aria-label="Abrir configuracoes">
+                    ⚙
+                </button>
+            </div>
             <div class="close-button">
                 <button class="control-button" id="close-button">
                     X

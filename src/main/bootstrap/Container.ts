@@ -36,6 +36,7 @@ import { SystemIpcHandler } from '../ipc/SystemIpcHandler';
 export interface ContainerCallbacks {
   onSettingsUpdated: (easterTimeChanged: boolean) => void;
   onCloseSettingsAndShowPopup: () => void;
+  onOpenSettingsFromContent: () => void;
 }
 
 export class Container {
@@ -165,6 +166,7 @@ export class Container {
 
     this._systemIpcHandler = new SystemIpcHandler({
       onCloseSettingsAndShowPopup: callbacks.onCloseSettingsAndShowPopup,
+      onOpenSettingsFromContent: callbacks.onOpenSettingsFromContent,
     });
   }
 

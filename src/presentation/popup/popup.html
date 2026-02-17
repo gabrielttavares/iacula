@@ -32,7 +32,6 @@
             color: #FFFFFF;
             background: transparent !important;
             overflow: hidden;
-
         }
 
         .quote-card {
@@ -107,6 +106,31 @@
             padding: 0.2rem;
         }
 
+        .settings-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-control-button {
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .settings-button:hover .settings-control-button,
+        .settings-button:focus-within .settings-control-button {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -156,6 +180,11 @@
             top: 10px;
             right: 10px;
             z-index: 2;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .control-button {
@@ -171,10 +200,18 @@
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .control-button:hover {
             background: rgba(0, 0, 0, 0.7);
+        }
+
+        .close-button:hover .control-button,
+        .close-button:focus-within .control-button {
+            opacity: 1;
+            pointer-events: auto;
         }
     </style>
 </head>
@@ -185,6 +222,11 @@
             <img id="daily-image" src="/placeholder.svg" alt="Imagem do dia">
             <div class="quote-container">
                 <p id="daily-quote"></p>
+            </div>
+            <div class="settings-button">
+                <button class="control-button settings-control-button" id="settings-button" aria-label="Abrir configuracoes">
+                    ⚙
+                </button>
             </div>
             <div class="close-button">
                 <button class="control-button" id="close-button">

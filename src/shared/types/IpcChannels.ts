@@ -22,6 +22,7 @@ export const IPC_CHANNELS = {
 
   // Window management
   CLOSE_SETTINGS_AND_SHOW_POPUP: 'close-settings-and-show-popup',
+  OPEN_SETTINGS_FROM_CONTENT: 'open-settings-from-content',
 
   // System
   GET_USER_DATA_PATH: 'get-user-data-path',
@@ -34,6 +35,7 @@ export interface IpcRequestMap {
   [IPC_CHANNELS.GET_QUOTE]: void;
   [IPC_CHANNELS.GET_PRAYER]: { forceEasterTime?: boolean };
   [IPC_CHANNELS.CLOSE_SETTINGS_AND_SHOW_POPUP]: void;
+  [IPC_CHANNELS.OPEN_SETTINGS_FROM_CONTENT]: void;
   [IPC_CHANNELS.GET_USER_DATA_PATH]: void;
 }
 
@@ -43,5 +45,6 @@ export interface IpcResponseMap {
   [IPC_CHANNELS.GET_QUOTE]: QuoteDTO;
   [IPC_CHANNELS.GET_PRAYER]: PrayerDTO;
   [IPC_CHANNELS.CLOSE_SETTINGS_AND_SHOW_POPUP]: void;
+  [IPC_CHANNELS.OPEN_SETTINGS_FROM_CONTENT]: void;
   [IPC_CHANNELS.GET_USER_DATA_PATH]: string;
 }

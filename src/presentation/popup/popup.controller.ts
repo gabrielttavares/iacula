@@ -7,11 +7,12 @@
 import { ipcRenderer } from 'electron';
 import { IPC_CHANNELS } from '../../shared/types/IpcChannels';
 import { QuoteDTO } from '../../application/dto/QuoteDTO';
-import { closeWindow, addFadeInEffect } from '../shared/utils';
+import { closeWindow, addFadeInEffect, openSettingsFromContent } from '../shared/utils';
 
 class PopupController {
   private quoteElement: HTMLElement | null = null;
   private imageElement: HTMLImageElement | null = null;
+  private settingsButton: HTMLElement | null = null;
   private closeButton: HTMLElement | null = null;
 
   async initialize(): Promise<void> {
@@ -23,11 +24,19 @@ class PopupController {
   private bindElements(): void {
     this.quoteElement = document.getElementById('daily-quote');
     this.imageElement = document.getElementById('daily-image') as HTMLImageElement;
+    this.settingsButton = document.getElementById('settings-button');
     this.closeButton = document.getElementById('close-button');
   }
 
   private bindEvents(): void {
-    this.closeButton?.addEventListener('click', closeWindow);
+    this.closeButton?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      closeWindow();
+    });
+    this.settingsButton?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      openSettingsFromContent();
+    });
   }
 
   private async loadContent(): Promise<void> {

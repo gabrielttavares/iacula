@@ -7,13 +7,14 @@
 import { ipcRenderer } from 'electron';
 import { IPC_CHANNELS } from '../../shared/types/IpcChannels';
 import { PrayerDTO } from '../../application/dto/PrayerDTO';
-import { closeWindow, addFadeInEffect } from '../shared/utils';
+import { closeWindow, addFadeInEffect, openSettingsFromContent } from '../shared/utils';
 
 class ReginaCaeliController {
   private titleElement: HTMLElement | null = null;
   private versesContainer: HTMLElement | null = null;
   private finalPrayerElement: HTMLElement | null = null;
   private imageElement: HTMLImageElement | null = null;
+  private settingsButton: HTMLElement | null = null;
   private closeButton: HTMLElement | null = null;
 
   async initialize(): Promise<void> {
@@ -27,11 +28,19 @@ class ReginaCaeliController {
     this.versesContainer = document.getElementById('verses-container');
     this.finalPrayerElement = document.getElementById('final-prayer');
     this.imageElement = document.getElementById('regina-caeli-image') as HTMLImageElement;
+    this.settingsButton = document.getElementById('settings-button');
     this.closeButton = document.getElementById('close-button');
   }
 
   private bindEvents(): void {
-    this.closeButton?.addEventListener('click', closeWindow);
+    this.closeButton?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      closeWindow();
+    });
+    this.settingsButton?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      openSettingsFromContent();
+    });
   }
 
   private async loadContent(): Promise<void> {

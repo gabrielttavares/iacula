@@ -1,9 +1,9 @@
 /**
  * Bootstrap: DockManager
- * Gerencia o menu do Dock no macOS.
+ * Gerencia visibilidade do app no Dock no macOS.
  */
 
-import { Menu, app } from 'electron';
+import { app } from 'electron';
 
 export interface DockCallbacks {
   onShowPopup: () => void;
@@ -15,7 +15,7 @@ export interface DockCallbacks {
 export class DockManager {
   private readonly isMac: boolean;
 
-  constructor(private readonly callbacks: DockCallbacks) {
+  constructor(_callbacks: DockCallbacks) {
     this.isMac = process.platform === 'darwin';
   }
 
@@ -23,44 +23,11 @@ export class DockManager {
     if (!this.isMac) return;
 
     try {
-      app.setActivationPolicy('regular');
-      app.dock.show();
-      console.log('[dock] policy=regular + show');
+      app.setActivationPolicy('accessory');
+      app.dock.hide();
+      console.log('[dock] policy=accessory + hidden');
     } catch (e) {
-      console.warn('[dock] activation/show warn', e);
-    }
-
-    this.createDockMenu();
-
-    // Re-apply dock menu on certain events
-    app.on('activate', () => {
-      console.log('[dock] reapply on activate');
-      this.createDockMenu();
-    });
-
-    app.on('browser-window-created', () => {
-      console.log('[dock] reapply on window-created');
-      this.createDockMenu();
-    });
-  }
-
-  private createDockMenu(): void {
-    if (!this.isMac) return;
-
-    const dockMenu = Menu.buildFromTemplate([
-      { label: 'Mostrar jaculatoria', click: () => this.callbacks.onShowPopup() },
-      { label: 'Mostrar Angelus', click: () => this.callbacks.onShowAngelus() },
-      { label: 'Mostrar Regina Caeli (Tempo Pascal)', click: () => this.callbacks.onShowReginaCaeli() },
-      { type: 'separator' },
-      { label: 'Configuracoes', click: () => this.callbacks.onShowSettings() },
-    ]);
-
-    try {
-      console.log('[dock] setMenu start');
-      app.dock.setMenu(dockMenu);
-      console.log('[dock] setMenu done');
-    } catch (e) {
-      console.error('[dock] setMenu error', e);
+      console.warn('[dock] activation/hide warn', e);
     }
   }
 }

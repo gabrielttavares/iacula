@@ -8,6 +8,7 @@ import { IPC_CHANNELS } from '../../shared/types/IpcChannels';
 
 export interface SystemIpcHandlerCallbacks {
   onCloseSettingsAndShowPopup: () => void;
+  onOpenSettingsFromContent: () => void;
 }
 
 export class SystemIpcHandler {
@@ -23,10 +24,16 @@ export class SystemIpcHandler {
     ipcMain.on(IPC_CHANNELS.CLOSE_SETTINGS_AND_SHOW_POPUP, () => {
       this.callbacks.onCloseSettingsAndShowPopup();
     });
+
+    // Handler for opening settings from popup/prayer content
+    ipcMain.on(IPC_CHANNELS.OPEN_SETTINGS_FROM_CONTENT, () => {
+      this.callbacks.onOpenSettingsFromContent();
+    });
   }
 
   unregister(): void {
     ipcMain.removeAllListeners(IPC_CHANNELS.GET_USER_DATA_PATH);
     ipcMain.removeAllListeners(IPC_CHANNELS.CLOSE_SETTINGS_AND_SHOW_POPUP);
+    ipcMain.removeAllListeners(IPC_CHANNELS.OPEN_SETTINGS_FROM_CONTENT);
   }
 }
