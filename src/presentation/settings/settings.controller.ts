@@ -13,7 +13,6 @@ class SettingsController {
   private intervalInput: HTMLInputElement | null = null;
   private durationInput: HTMLInputElement | null = null;
   private autostartCheckbox: HTMLInputElement | null = null;
-  private easterTimeCheckbox: HTMLInputElement | null = null;
   private languageSelect: HTMLSelectElement | null = null;
   private statusElement: HTMLElement | null = null;
 
@@ -28,7 +27,6 @@ class SettingsController {
     this.intervalInput = document.getElementById('interval') as HTMLInputElement;
     this.durationInput = document.getElementById('duration') as HTMLInputElement;
     this.autostartCheckbox = document.getElementById('autostart') as HTMLInputElement;
-    this.easterTimeCheckbox = document.getElementById('easterTime') as HTMLInputElement;
     this.languageSelect = document.getElementById('language-select') as HTMLSelectElement;
     this.statusElement = document.getElementById('status');
   }
@@ -52,13 +50,11 @@ class SettingsController {
         const interval = settings.interval !== undefined ? settings.interval : 15;
         const duration = settings.duration !== undefined ? settings.duration : 10;
         const autostart = settings.autostart !== undefined ? settings.autostart : true;
-        const easterTime = settings.easterTime !== undefined ? settings.easterTime : false;
         const language = settings.language || 'pt-br';
 
         if (this.intervalInput) this.intervalInput.value = interval.toString();
         if (this.durationInput) this.durationInput.value = duration.toString();
         if (this.autostartCheckbox) this.autostartCheckbox.checked = autostart;
-        if (this.easterTimeCheckbox) this.easterTimeCheckbox.checked = easterTime;
         if (this.languageSelect) this.languageSelect.value = language;
       } else {
         console.warn('Settings received were null/undefined, applying defaults');
@@ -74,7 +70,6 @@ class SettingsController {
     if (this.intervalInput) this.intervalInput.value = '15';
     if (this.durationInput) this.durationInput.value = '10';
     if (this.autostartCheckbox) this.autostartCheckbox.checked = true;
-    if (this.easterTimeCheckbox) this.easterTimeCheckbox.checked = false;
     if (this.languageSelect) this.languageSelect.value = 'pt-br';
   }
 
@@ -85,7 +80,6 @@ class SettingsController {
       interval: parseInt(this.intervalInput?.value || '15', 10),
       duration: parseInt(this.durationInput?.value || '10', 10),
       autostart: this.autostartCheckbox?.checked ?? true,
-      easterTime: this.easterTimeCheckbox?.checked ?? false,
       language: this.languageSelect?.value || 'pt-br',
     };
 

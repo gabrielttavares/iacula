@@ -142,7 +142,8 @@ class IaculaApp {
   }
 
   private async showAngelus(forceEasterTime?: boolean): Promise<void> {
-    const isEasterTime = forceEasterTime ?? this.currentSettings?.easterTime ?? false;
+    const season = await this.container.liturgicalSeasonService.getCurrentSeason();
+    const isEasterTime = forceEasterTime ?? season === 'easter';
     const windowType = isEasterTime ? 'reginaCaeli' : 'angelus';
 
     console.log(`Showing ${windowType} based on isEasterTime=${isEasterTime}`);

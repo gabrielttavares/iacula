@@ -8,6 +8,7 @@ import path from 'path';
 import { IAssetService } from '../../application/ports/IAssetService';
 import { QuotesCollection } from '../../domain/entities/Quote';
 import { PrayerCollection } from '../../domain/entities/Prayer';
+import { LiturgicalSeason } from '../../application/ports/ILiturgicalSeasonService';
 
 export class FileAssetService implements IAssetService {
   private readonly assetsPath: string;
@@ -27,13 +28,32 @@ export class FileAssetService implements IAssetService {
     return path.join(this.assetsPath, relativePath);
   }
 
-  async loadQuotes(language: string): Promise<QuotesCollection> {
+  async loadQuotes(language: string, season: LiturgicalSeason = 'ordinary'): Promise<QuotesCollection> {
     try {
-      const quotesPath = this.getAssetPath(`quotes/${language}/quotes.json`);
+      const seasonalQuoteFiles: Record<Exclude<LiturgicalSeason, 'ordinary'>, string> = {
+        advent: 'advent.json',
+        lent: 'lent.json',
+        easter: 'easter.json',
+        christmas: 'christmas.json',
+      };
+
+      const isSeasonal = season !== 'ordinary';
+      const quotesPath = isSeasonal
+        ? this.getAssetPath(`quotes/pt-br/${seasonalQuoteFiles[season]}`)
+        : this.getAssetPath(`quotes/${language}/quotes.json`);
+
       const data = fs.readFileSync(quotesPath, 'utf-8');
       return JSON.parse(data) as QuotesCollection;
     } catch (error) {
-      console.error(`Error loading quotes for language ${language}:`, error);
+      console.error(`Error loading quotes for language ${language} and season ${season}:`, error);
+
+      // Fallback to ordinary quotes for requested language if seasonal file is missing.
+      if (season !== 'ordinary') {
+        const fallbackPath = this.getAssetPath(`quotes/${language}/quotes.json`);
+        const data = fs.readFileSync(fallbackPath, 'utf-8');
+        return JSON.parse(data) as QuotesCollection;
+      }
+
       throw new Error(`Failed to load quotes: ${error}`);
     }
   }

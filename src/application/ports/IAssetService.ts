@@ -6,12 +6,13 @@
 
 import { QuotesCollection } from '../../domain/entities/Quote';
 import { PrayerCollection } from '../../domain/entities/Prayer';
+import { LiturgicalSeason } from './ILiturgicalSeasonService';
 
 export interface IAssetService {
   /**
    * Carrega a coleção de citações para um idioma específico.
    */
-  loadQuotes(language: string): Promise<QuotesCollection>;
+  loadQuotes(language: string, season?: LiturgicalSeason): Promise<QuotesCollection>;
 
   /**
    * Carrega a coleção de orações para um idioma específico.

@@ -6,6 +6,7 @@ import { Settings } from '../../../src/domain/entities/Settings';
 import { QuotesCollection } from '../../../src/domain/entities/Quote';
 import { QuoteIndices } from '../../../src/domain/services/QuoteSelector';
 import { PrayerScheduler } from '../../../src/domain/services/PrayerScheduler';
+import { ILiturgicalSeasonService } from '../../../src/application/ports/ILiturgicalSeasonService';
 
 // Mock PrayerScheduler to control day of week
 jest.mock('../../../src/domain/services/PrayerScheduler', () => ({
@@ -19,6 +20,7 @@ describe('GetNextQuoteUseCase', () => {
   let mockSettingsRepository: jest.Mocked<ISettingsRepository>;
   let mockAssetService: jest.Mocked<IAssetService>;
   let mockIndicesRepository: jest.Mocked<IIndicesRepository>;
+  let mockLiturgicalSeasonService: jest.Mocked<ILiturgicalSeasonService>;
 
   const mockQuotesCollection: QuotesCollection = {
     '1': {
@@ -54,10 +56,15 @@ describe('GetNextQuoteUseCase', () => {
       save: jest.fn(),
     };
 
+    mockLiturgicalSeasonService = {
+      getCurrentSeason: jest.fn().mockResolvedValue('ordinary'),
+    };
+
     useCase = new GetNextQuoteUseCase(
       mockSettingsRepository,
       mockAssetService,
-      mockIndicesRepository
+      mockIndicesRepository,
+      mockLiturgicalSeasonService
     );
 
     // Default mock for day of week (Sunday = 1)
@@ -162,7 +169,23 @@ describe('GetNextQuoteUseCase', () => {
 
     await useCase.execute();
 
-    expect(mockAssetService.loadQuotes).toHaveBeenCalledWith('en');
+    expect(mockAssetService.loadQuotes).toHaveBeenCalledWith('en', 'ordinary');
+  });
+
+  it('should load seasonal quotes when season is advent', async () => {
+    const settings = Settings.create({ language: 'en' });
+    const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
+
+    mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('advent');
+    mockSettingsRepository.load.mockResolvedValue(settings);
+    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
+    mockAssetService.listDayImages.mockResolvedValue([]);
+    mockIndicesRepository.load.mockResolvedValue(indices);
+    mockIndicesRepository.save.mockResolvedValue();
+
+    await useCase.execute();
+
+    expect(mockAssetService.loadQuotes).toHaveBeenCalledWith('en', 'advent');
   });
 
   it('should return image path when images are available', async () => {

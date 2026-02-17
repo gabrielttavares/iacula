@@ -10,20 +10,23 @@ import { QuoteDTO } from '../dto/QuoteDTO';
 import { QuoteSelector } from '../../domain/services/QuoteSelector';
 import { PrayerScheduler } from '../../domain/services/PrayerScheduler';
 import { DayOfWeek } from '../../domain/entities/Quote';
+import { ILiturgicalSeasonService } from '../ports/ILiturgicalSeasonService';
 
 export class GetNextQuoteUseCase {
   constructor(
     private readonly settingsRepository: ISettingsRepository,
     private readonly assetService: IAssetService,
-    private readonly indicesRepository: IIndicesRepository
+    private readonly indicesRepository: IIndicesRepository,
+    private readonly liturgicalSeasonService: ILiturgicalSeasonService
   ) {}
 
   async execute(): Promise<QuoteDTO> {
     const settings = await this.settingsRepository.load();
     const indices = await this.indicesRepository.load();
+    const season = await this.liturgicalSeasonService.getCurrentSeason();
 
     const dayOfWeek = PrayerScheduler.getDayOfWeek() as DayOfWeek;
-    const quotes = await this.assetService.loadQuotes(settings.language);
+    const quotes = await this.assetService.loadQuotes(settings.language, season);
     const images = await this.assetService.listDayImages(dayOfWeek);
 
     console.log(`[GetNextQuoteUseCase] Day: ${dayOfWeek}, Quotes found: ${quotes[dayOfWeek.toString()]?.quotes?.length}, Images found: ${images.length}`);
