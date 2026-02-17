@@ -11,6 +11,7 @@ import { DockManager } from './bootstrap/DockManager';
 import { TimerManager } from './bootstrap/TimerManager';
 import { Settings } from '../domain/entities/Settings';
 import { LiturgyHourModule } from '../application/dto/LiturgyHoursDTO';
+import { buildIbreviaryOfficeUrl } from './liturgyOfficeUrl';
 
 // Enable remote module
 require('@electron/remote/main').initialize();
@@ -259,18 +260,7 @@ class IaculaApp {
   }
 
   private moduleOfficeUrl(module: LiturgyHourModule): string {
-    switch (module) {
-      case 'laudes':
-        return 'https://www.ibreviary.com/m2/breviario.php?s=lodi';
-      case 'vespers':
-        return 'https://www.ibreviary.com/m2/breviario.php?s=vespri';
-      case 'compline':
-        return 'https://www.ibreviary.com/m2/breviario.php?s=compieta';
-      case 'ora_media':
-        return 'https://www.ibreviary.com/m2/breviario.php?s=ora_media';
-      default:
-        return 'https://www.ibreviary.com/m2/breviario.php?s=lodi';
-    }
+    return buildIbreviaryOfficeUrl(module);
   }
 
   private async showAngelus(forceEasterTime?: boolean): Promise<void> {
