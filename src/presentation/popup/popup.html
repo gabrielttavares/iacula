@@ -106,29 +106,6 @@
             padding: 0.2rem;
         }
 
-        #season-badge {
-            position: absolute;
-            top: 10px;
-            left: 40px;
-            z-index: 2;
-            font-size: 0.58rem;
-            letter-spacing: 0.02em;
-            padding: 2px 7px;
-            border-radius: 999px;
-            color: rgba(255, 255, 255, 0.92);
-            background: rgba(0, 0, 0, 0.45);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            opacity: 0;
-            transform: translateY(-2px);
-            transition: opacity 0.25s ease, transform 0.25s ease;
-            pointer-events: none;
-        }
-
-        body.loaded #season-badge {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
         .settings-button {
             position: absolute;
             top: 10px;
@@ -259,7 +236,6 @@
             <div class="quote-container">
                 <p id="daily-quote"></p>
             </div>
-            <span id="season-badge" aria-live="polite"></span>
             <div class="settings-button">
                 <button class="control-button settings-control-button" id="settings-button" aria-label="Abrir configuracoes">
                     ⚙

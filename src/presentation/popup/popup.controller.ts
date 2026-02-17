@@ -8,12 +8,10 @@ import { ipcRenderer } from 'electron';
 import { IPC_CHANNELS } from '../../shared/types/IpcChannels';
 import { QuoteDTO } from '../../application/dto/QuoteDTO';
 import { closeWindow, addFadeInEffect, openSettingsFromContent } from '../shared/utils';
-import { LiturgicalSeason } from '../../application/ports/ILiturgicalSeasonService';
 
 class PopupController {
   private quoteElement: HTMLElement | null = null;
   private imageElement: HTMLImageElement | null = null;
-  private seasonBadgeElement: HTMLElement | null = null;
   private settingsButton: HTMLElement | null = null;
   private closeButton: HTMLElement | null = null;
 
@@ -26,7 +24,6 @@ class PopupController {
   private bindElements(): void {
     this.quoteElement = document.getElementById('daily-quote');
     this.imageElement = document.getElementById('daily-image') as HTMLImageElement;
-    this.seasonBadgeElement = document.getElementById('season-badge');
     this.settingsButton = document.getElementById('settings-button');
     this.closeButton = document.getElementById('close-button');
   }
@@ -56,10 +53,6 @@ class PopupController {
         this.imageElement.src = quote.imagePath;
       }
 
-      if (this.seasonBadgeElement) {
-        this.seasonBadgeElement.textContent = this.getSeasonLabel(quote.season);
-      }
-
       addFadeInEffect();
       document.body.classList.remove('loading');
       document.body.classList.add('loaded');
@@ -67,18 +60,6 @@ class PopupController {
       console.error('Error loading popup content:', error);
       document.body.classList.remove('loading');
     }
-  }
-
-  private getSeasonLabel(season: LiturgicalSeason): string {
-    const labels: Record<LiturgicalSeason, string> = {
-      ordinary: 'Tempo Comum',
-      advent: 'Advento',
-      lent: 'Quaresma',
-      easter: 'Tempo Pascal',
-      christmas: 'Natal',
-    };
-
-    return labels[season] || 'Tempo Comum';
   }
 }
 
