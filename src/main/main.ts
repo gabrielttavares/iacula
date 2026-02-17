@@ -138,6 +138,9 @@ class IaculaApp {
   private async showPopup(): Promise<void> {
     if (!this.currentSettings) return;
 
+    const quote = await this.container.getNextQuoteUseCase.execute();
+    this.container.setPreloadedPopupQuote(quote);
+
     await this.container.windowService.show('popup', {
       autoClose: true,
       autoCloseDelayMs: this.currentSettings.durationInMs,

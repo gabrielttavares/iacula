@@ -34,6 +34,7 @@ import { SettingsIpcHandler } from '../ipc/SettingsIpcHandler';
 import { QuoteIpcHandler } from '../ipc/QuoteIpcHandler';
 import { PrayerIpcHandler } from '../ipc/PrayerIpcHandler';
 import { SystemIpcHandler } from '../ipc/SystemIpcHandler';
+import { QuoteDTO } from '../../application/dto/QuoteDTO';
 
 export interface ContainerCallbacks {
   onSettingsUpdated: (easterTimeChanged: boolean) => void;
@@ -194,5 +195,9 @@ export class Container {
     this._quoteIpcHandler?.unregister();
     this._prayerIpcHandler?.unregister();
     this._systemIpcHandler?.unregister();
+  }
+
+  setPreloadedPopupQuote(quote: QuoteDTO): void {
+    this._quoteIpcHandler?.setPreloadedQuote(quote);
   }
 }

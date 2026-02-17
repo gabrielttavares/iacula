@@ -43,7 +43,8 @@ class PopupController {
     document.body.classList.add('loading');
 
     try {
-      const quote = await ipcRenderer.invoke(IPC_CHANNELS.GET_QUOTE) as QuoteDTO;
+      const preloadedQuote = await ipcRenderer.invoke(IPC_CHANNELS.GET_PRELOADED_QUOTE) as QuoteDTO | null;
+      const quote = preloadedQuote ?? await ipcRenderer.invoke(IPC_CHANNELS.GET_QUOTE) as QuoteDTO;
 
       if (this.quoteElement) {
         this.quoteElement.textContent = quote.text;

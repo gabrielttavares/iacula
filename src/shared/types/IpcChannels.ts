@@ -16,6 +16,7 @@ export const IPC_CHANNELS = {
 
   // Popup/Quote
   GET_QUOTE: 'get-quote',
+  GET_PRELOADED_QUOTE: 'get-preloaded-quote',
 
   // Prayer
   GET_PRAYER: 'get-prayer',
@@ -33,6 +34,7 @@ export interface IpcRequestMap {
   [IPC_CHANNELS.GET_CONFIG]: void;
   [IPC_CHANNELS.SAVE_SETTINGS]: UpdateSettingsDTO;
   [IPC_CHANNELS.GET_QUOTE]: void;
+  [IPC_CHANNELS.GET_PRELOADED_QUOTE]: void;
   [IPC_CHANNELS.GET_PRAYER]: { forceEasterTime?: boolean };
   [IPC_CHANNELS.CLOSE_SETTINGS_AND_SHOW_POPUP]: void;
   [IPC_CHANNELS.OPEN_SETTINGS_FROM_CONTENT]: void;
@@ -43,6 +45,7 @@ export interface IpcResponseMap {
   [IPC_CHANNELS.GET_CONFIG]: SettingsDTO;
   [IPC_CHANNELS.SAVE_SETTINGS]: boolean;
   [IPC_CHANNELS.GET_QUOTE]: QuoteDTO;
+  [IPC_CHANNELS.GET_PRELOADED_QUOTE]: QuoteDTO | null;
   [IPC_CHANNELS.GET_PRAYER]: PrayerDTO;
   [IPC_CHANNELS.CLOSE_SETTINGS_AND_SHOW_POPUP]: void;
   [IPC_CHANNELS.OPEN_SETTINGS_FROM_CONTENT]: void;
