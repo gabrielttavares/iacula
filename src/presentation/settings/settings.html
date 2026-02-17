@@ -202,7 +202,7 @@
 
         .liturgy-module {
             display: grid;
-            grid-templaté-columns: 1fr auto;
+            grid-template-columns: 1fr auto;
             align-items: center;
             gap: 0.6rem;
         }
@@ -269,11 +269,30 @@
         }
 
         button:hover {
-            transform: translatéY(-2px);
+            transform: translateY(-2px);
         }
 
         button:active {
-            transform: translatéY(0);
+            transform: translateY(0);
+        }
+
+        .sound-controls {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .sound-controls input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary-color);
+        }
+
+        .sound-volume-value {
+            font-size: 0.85rem;
+            color: var(--light-text);
+            min-width: 42px;
+            text-align: right;
         }
 
         .status {
@@ -324,7 +343,7 @@
             }
 
             .liturgy-module {
-                grid-templaté-columns: 1fr;
+                grid-template-columns: 1fr;
                 gap: 0.45rem;
             }
         }
@@ -371,6 +390,16 @@
                         <option value="en">Ingles</option>
                         <option value="pt-br">Portugues</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="liturgy-reminder-sound-enabled" name="liturgy-reminder-sound-enabled">
+                        <label for="liturgy-reminder-sound-enabled">Som no lembrete de Liturgia das Horas</label>
+                    </div>
+                    <div class="sound-controls">
+                        <input type="range" id="liturgy-reminder-sound-volume" name="liturgy-reminder-sound-volume" min="0" max="100" step="1" value="35">
+                        <span id="liturgy-reminder-sound-volume-value" class="sound-volume-value">35%</span>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Liturgia das Horas (modulos opcionais)</label>

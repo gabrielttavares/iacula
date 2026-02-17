@@ -16,6 +16,9 @@ class SettingsController {
   private durationInput: HTMLInputElement | null = null;
   private autostartCheckbox: HTMLInputElement | null = null;
   private languageSelect: HTMLSelectElement | null = null;
+  private liturgyReminderSoundEnabledCheckbox: HTMLInputElement | null = null;
+  private liturgyReminderSoundVolumeInput: HTMLInputElement | null = null;
+  private liturgyReminderSoundVolumeValue: HTMLElement | null = null;
   private laudesEnabledCheckbox: HTMLInputElement | null = null;
   private vespersEnabledCheckbox: HTMLInputElement | null = null;
   private complineEnabledCheckbox: HTMLInputElement | null = null;
@@ -38,6 +41,9 @@ class SettingsController {
     this.durationInput = document.getElementById('duration') as HTMLInputElement;
     this.autostartCheckbox = document.getElementById('autostart') as HTMLInputElement;
     this.languageSelect = document.getElementById('language-select') as HTMLSelectElement;
+    this.liturgyReminderSoundEnabledCheckbox = document.getElementById('liturgy-reminder-sound-enabled') as HTMLInputElement;
+    this.liturgyReminderSoundVolumeInput = document.getElementById('liturgy-reminder-sound-volume') as HTMLInputElement;
+    this.liturgyReminderSoundVolumeValue = document.getElementById('liturgy-reminder-sound-volume-value');
     this.laudesEnabledCheckbox = document.getElementById('laudes-enabled') as HTMLInputElement;
     this.vespersEnabledCheckbox = document.getElementById('vespers-enabled') as HTMLInputElement;
     this.complineEnabledCheckbox = document.getElementById('compline-enabled') as HTMLInputElement;
@@ -51,6 +57,8 @@ class SettingsController {
 
   private bindEvents(): void {
     this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
+    this.liturgyReminderSoundEnabledCheckbox?.addEventListener('change', () => this.updateSoundControlsState());
+    this.liturgyReminderSoundVolumeInput?.addEventListener('input', () => this.updateVolumeLabel());
 
     ipcRenderer.on(IPC_CHANNELS.SETTINGS_SAVED, (_event, success: boolean) => {
       this.handleSaveResponse(success);
@@ -69,6 +77,8 @@ class SettingsController {
         const duration = settings.duration !== undefined ? settings.duration : 10;
         const autostart = settings.autostart !== undefined ? settings.autostart : true;
         const language = settings.language || 'pt-br';
+        const liturgyReminderSoundEnabled = settings.liturgyReminderSoundEnabled !== undefined ? settings.liturgyReminderSoundEnabled : true;
+        const liturgyReminderSoundVolume = settings.liturgyReminderSoundVolume !== undefined ? settings.liturgyReminderSoundVolume : 0.35;
         const laudesEnabled = settings.laudesEnabled !== undefined ? settings.laudesEnabled : false;
         const vespersEnabled = settings.vespersEnabled !== undefined ? settings.vespersEnabled : false;
         const complineEnabled = settings.complineEnabled !== undefined ? settings.complineEnabled : false;
@@ -82,6 +92,10 @@ class SettingsController {
         if (this.durationInput) this.durationInput.value = duration.toString();
         if (this.autostartCheckbox) this.autostartCheckbox.checked = autostart;
         if (this.languageSelect) this.languageSelect.value = language;
+        if (this.liturgyReminderSoundEnabledCheckbox) this.liturgyReminderSoundEnabledCheckbox.checked = liturgyReminderSoundEnabled;
+        if (this.liturgyReminderSoundVolumeInput) {
+          this.liturgyReminderSoundVolumeInput.value = Math.round(liturgyReminderSoundVolume * 100).toString();
+        }
         if (this.laudesEnabledCheckbox) this.laudesEnabledCheckbox.checked = laudesEnabled;
         if (this.vespersEnabledCheckbox) this.vespersEnabledCheckbox.checked = vespersEnabled;
         if (this.complineEnabledCheckbox) this.complineEnabledCheckbox.checked = complineEnabled;
@@ -90,6 +104,8 @@ class SettingsController {
         if (this.vespersTimeInput) this.vespersTimeInput.value = vespersTime;
         if (this.complineTimeInput) this.complineTimeInput.value = complineTime;
         if (this.oraMediaTimeInput) this.oraMediaTimeInput.value = oraMediaTime;
+        this.updateVolumeLabel();
+        this.updateSoundControlsState();
       } else {
         console.warn('Settings received were null/undefined, applying defaults');
         this.applyDefaults();
@@ -105,6 +121,8 @@ class SettingsController {
     if (this.durationInput) this.durationInput.value = '10';
     if (this.autostartCheckbox) this.autostartCheckbox.checked = true;
     if (this.languageSelect) this.languageSelect.value = 'pt-br';
+    if (this.liturgyReminderSoundEnabledCheckbox) this.liturgyReminderSoundEnabledCheckbox.checked = true;
+    if (this.liturgyReminderSoundVolumeInput) this.liturgyReminderSoundVolumeInput.value = '35';
     if (this.laudesEnabledCheckbox) this.laudesEnabledCheckbox.checked = false;
     if (this.vespersEnabledCheckbox) this.vespersEnabledCheckbox.checked = false;
     if (this.complineEnabledCheckbox) this.complineEnabledCheckbox.checked = false;
@@ -113,6 +131,8 @@ class SettingsController {
     if (this.vespersTimeInput) this.vespersTimeInput.value = '18:00';
     if (this.complineTimeInput) this.complineTimeInput.value = '21:00';
     if (this.oraMediaTimeInput) this.oraMediaTimeInput.value = '12:30';
+    this.updateVolumeLabel();
+    this.updateSoundControlsState();
   }
 
   private handleSubmit(event: Event): void {
@@ -123,6 +143,8 @@ class SettingsController {
       duration: parseInt(this.durationInput?.value || '10', 10),
       autostart: this.autostartCheckbox?.checked ?? true,
       language: this.languageSelect?.value || 'pt-br',
+      liturgyReminderSoundEnabled: this.liturgyReminderSoundEnabledCheckbox?.checked ?? true,
+      liturgyReminderSoundVolume: (parseInt(this.liturgyReminderSoundVolumeInput?.value || '35', 10) / 100),
       laudesEnabled: this.laudesEnabledCheckbox?.checked ?? false,
       vespersEnabled: this.vespersEnabledCheckbox?.checked ?? false,
       complineEnabled: this.complineEnabledCheckbox?.checked ?? false,
@@ -143,6 +165,10 @@ class SettingsController {
       this.showStatus('A duração deve estar entre 5 e 30 segundos', 'error');
       return;
     }
+    if ((settings.liturgyReminderSoundVolume ?? 0.35) < 0 || (settings.liturgyReminderSoundVolume ?? 0.35) > 1) {
+      this.showStatus('O volume do lembrete deve estar entre 0 e 100%', 'error');
+      return;
+    }
 
     const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
     if (!timePattern.test(settings.laudesTime || '') ||
@@ -154,6 +180,20 @@ class SettingsController {
     }
 
     ipcRenderer.send(IPC_CHANNELS.SAVE_SETTINGS, settings);
+  }
+
+  private updateSoundControlsState(): void {
+    if (!this.liturgyReminderSoundEnabledCheckbox || !this.liturgyReminderSoundVolumeInput) {
+      return;
+    }
+    this.liturgyReminderSoundVolumeInput.disabled = !this.liturgyReminderSoundEnabledCheckbox.checked;
+  }
+
+  private updateVolumeLabel(): void {
+    if (!this.liturgyReminderSoundVolumeInput || !this.liturgyReminderSoundVolumeValue) {
+      return;
+    }
+    this.liturgyReminderSoundVolumeValue.textContent = `${this.liturgyReminderSoundVolumeInput.value}%`;
   }
 
   private handleSaveResponse(success: boolean): void {

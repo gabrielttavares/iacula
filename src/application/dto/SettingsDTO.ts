@@ -10,6 +10,8 @@ export interface SettingsDTO {
   autostart: boolean;
   easterTime: boolean;
   language: string;
+  liturgyReminderSoundEnabled: boolean;
+  liturgyReminderSoundVolume: number;
   laudesEnabled: boolean;
   vespersEnabled: boolean;
   complineEnabled: boolean;
@@ -26,6 +28,8 @@ export interface UpdateSettingsDTO {
   autostart?: boolean;
   easterTime?: boolean;
   language?: string;
+  liturgyReminderSoundEnabled?: boolean;
+  liturgyReminderSoundVolume?: number;
   laudesEnabled?: boolean;
   vespersEnabled?: boolean;
   complineEnabled?: boolean;

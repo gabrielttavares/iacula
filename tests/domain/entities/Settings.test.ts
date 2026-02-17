@@ -10,6 +10,8 @@ describe('Settings Entity', () => {
       expect(settings.autostart).toBe(true);
       expect(settings.easterTime).toBe(false);
       expect(settings.language).toBe('pt-br');
+      expect(settings.liturgyReminderSoundEnabled).toBe(true);
+      expect(settings.liturgyReminderSoundVolume).toBe(0.35);
       expect(settings.laudesEnabled).toBe(false);
       expect(settings.vespersEnabled).toBe(false);
       expect(settings.complineEnabled).toBe(false);
@@ -27,6 +29,8 @@ describe('Settings Entity', () => {
         autostart: false,
         easterTime: true,
         language: 'en',
+        liturgyReminderSoundEnabled: false,
+        liturgyReminderSoundVolume: 0.8,
         laudesEnabled: true,
         vespersEnabled: true,
         complineEnabled: true,
@@ -42,6 +46,8 @@ describe('Settings Entity', () => {
       expect(settings.autostart).toBe(false);
       expect(settings.easterTime).toBe(true);
       expect(settings.language).toBe('en');
+      expect(settings.liturgyReminderSoundEnabled).toBe(false);
+      expect(settings.liturgyReminderSoundVolume).toBe(0.8);
       expect(settings.laudesEnabled).toBe(true);
       expect(settings.vespersEnabled).toBe(true);
       expect(settings.complineEnabled).toBe(true);
@@ -63,6 +69,8 @@ describe('Settings Entity', () => {
       expect(settings.autostart).toBe(true); // default
       expect(settings.easterTime).toBe(false); // default
       expect(settings.language).toBe('la');
+      expect(settings.liturgyReminderSoundEnabled).toBe(true); // default
+      expect(settings.liturgyReminderSoundVolume).toBe(0.35); // default
       expect(settings.laudesEnabled).toBe(false); // default
       expect(settings.vespersEnabled).toBe(false); // default
       expect(settings.complineEnabled).toBe(false); // default
@@ -101,6 +109,17 @@ describe('Settings Entity', () => {
       expect(() => Settings.create({ interval: 60 })).not.toThrow();
       expect(() => Settings.create({ duration: 5 })).not.toThrow();
       expect(() => Settings.create({ duration: 30 })).not.toThrow();
+      expect(() => Settings.create({ liturgyReminderSoundVolume: 0 })).not.toThrow();
+      expect(() => Settings.create({ liturgyReminderSoundVolume: 1 })).not.toThrow();
+    });
+
+    it('should throw error when liturgy reminder sound volume is out of range', () => {
+      expect(() => Settings.create({ liturgyReminderSoundVolume: -0.1 })).toThrow(
+        'Liturgy reminder sound volume must be between 0 and 1'
+      );
+      expect(() => Settings.create({ liturgyReminderSoundVolume: 1.1 })).toThrow(
+        'Liturgy reminder sound volume must be between 0 and 1'
+      );
     });
 
     it('should throw error for invalid liturgy hours time format', () => {
@@ -147,6 +166,8 @@ describe('Settings Entity', () => {
         autostart: false,
         easterTime: true,
         language: 'en',
+        liturgyReminderSoundEnabled: false,
+        liturgyReminderSoundVolume: 0.75,
         laudesEnabled: true,
         vespersEnabled: true,
         complineEnabled: true,
@@ -165,6 +186,8 @@ describe('Settings Entity', () => {
         autostart: false,
         easterTime: true,
         language: 'en',
+        liturgyReminderSoundEnabled: false,
+        liturgyReminderSoundVolume: 0.75,
         laudesEnabled: true,
         vespersEnabled: true,
         complineEnabled: true,
@@ -196,6 +219,8 @@ describe('Settings Entity', () => {
         autostart: true,
         easterTime: false,
         language: 'pt-br',
+        liturgyReminderSoundEnabled: true,
+        liturgyReminderSoundVolume: 0.35,
         laudesEnabled: false,
         vespersEnabled: false,
         complineEnabled: false,

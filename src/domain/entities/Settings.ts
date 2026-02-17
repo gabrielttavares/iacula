@@ -10,6 +10,8 @@ export interface SettingsProps {
   autostart: boolean;
   easterTime: boolean;
   language: string;
+  liturgyReminderSoundEnabled: boolean;
+  liturgyReminderSoundVolume: number;
   laudesEnabled: boolean;
   vespersEnabled: boolean;
   complineEnabled: boolean;
@@ -35,6 +37,14 @@ export class Settings {
       autostart: props.autostart !== undefined ? props.autostart : defaults.autostart,
       easterTime: props.easterTime !== undefined ? props.easterTime : defaults.easterTime,
       language: props.language !== undefined ? props.language : defaults.language,
+      liturgyReminderSoundEnabled:
+        props.liturgyReminderSoundEnabled !== undefined
+          ? props.liturgyReminderSoundEnabled
+          : defaults.liturgyReminderSoundEnabled,
+      liturgyReminderSoundVolume:
+        props.liturgyReminderSoundVolume !== undefined
+          ? props.liturgyReminderSoundVolume
+          : defaults.liturgyReminderSoundVolume,
       laudesEnabled: props.laudesEnabled !== undefined ? props.laudesEnabled : defaults.laudesEnabled,
       vespersEnabled: props.vespersEnabled !== undefined ? props.vespersEnabled : defaults.vespersEnabled,
       complineEnabled: props.complineEnabled !== undefined ? props.complineEnabled : defaults.complineEnabled,
@@ -54,6 +64,8 @@ export class Settings {
       autostart: true,
       easterTime: false,
       language: 'pt-br',
+      liturgyReminderSoundEnabled: true,
+      liturgyReminderSoundVolume: 0.35,
       laudesEnabled: false,
       vespersEnabled: false,
       complineEnabled: false,
@@ -79,6 +91,9 @@ export class Settings {
     const supportedLanguages = ['pt-br', 'en', 'la'];
     if (!supportedLanguages.includes(props.language)) {
       errors.push(`Language must be one of: ${supportedLanguages.join(', ')}`);
+    }
+    if (props.liturgyReminderSoundVolume < 0 || props.liturgyReminderSoundVolume > 1) {
+      errors.push('Liturgy reminder sound volume must be between 0 and 1');
     }
 
     const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -120,6 +135,14 @@ export class Settings {
 
   get language(): string {
     return this.props.language;
+  }
+
+  get liturgyReminderSoundEnabled(): boolean {
+    return this.props.liturgyReminderSoundEnabled;
+  }
+
+  get liturgyReminderSoundVolume(): number {
+    return this.props.liturgyReminderSoundVolume;
   }
 
   get laudesEnabled(): boolean {
