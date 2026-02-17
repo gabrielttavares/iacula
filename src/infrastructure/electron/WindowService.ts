@@ -17,8 +17,8 @@ const FADE_OUT_DURATION_MS = 700;
 
 const WINDOW_CONFIGS: Record<WindowType, WindowConfig> = {
   popup: {
-    width: 220,
-    height: 300,
+    width: 190,
+    height: 190,
     htmlFile: 'popup/popup.html',
   },
   angelus: {
