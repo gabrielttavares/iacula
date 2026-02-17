@@ -23,7 +23,7 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     const url = `${this.baseUrl}/${year}/${month}/${day}`;
 
     try {
-      const response = await fetch(url);
+      const response = await this.fetchWithFallback(url);
       if (!response.ok) {
         return 'ordinary';
       }
@@ -32,6 +32,37 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
       return this.mapSeason(data.season);
     } catch {
       return 'ordinary';
+    }
+  }
+
+  private async fetchWithFallback(url: string): Promise<Response> {
+    try {
+      return await fetch(url);
+    } catch (error) {
+      const fallbackUrl = this.getHttpFallbackUrl(url);
+      if (!fallbackUrl) {
+        throw error;
+      }
+
+      return fetch(fallbackUrl);
+    }
+  }
+
+  private getHttpFallbackUrl(url: string): string | null {
+    if (!url.startsWith('https://')) {
+      return null;
+    }
+
+    try {
+      const parsed = new URL(url);
+      if (parsed.hostname !== 'calapi.inadiutorium.cz') {
+        return null;
+      }
+
+      parsed.protocol = 'http:';
+      return parsed.toString();
+    } catch {
+      return null;
     }
   }
 

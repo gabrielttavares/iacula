@@ -58,4 +58,30 @@ describe('RemoteLiturgicalSeasonService', () => {
     const season = await service.getCurrentSeason(new Date('2026-08-10T12:00:00Z'));
     expect(season).toBe('ordinary');
   });
+
+  it('should fallback to http when https call fails for calapi host', async () => {
+    const networkError = Object.assign(new Error('connect failed'), {
+      cause: { code: 'ECONNREFUSED' },
+    });
+
+    fetchMock
+      .mockRejectedValueOnce(networkError)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ season: 'lent' }),
+      });
+
+    const calapiService = new RemoteLiturgicalSeasonService('https://calapi.inadiutorium.cz/api/v0/en/calendars/default');
+    const season = await calapiService.getCurrentSeason(new Date('2026-02-18T12:00:00Z'));
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'https://calapi.inadiutorium.cz/api/v0/en/calendars/default/2026/02/18',
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'http://calapi.inadiutorium.cz/api/v0/en/calendars/default/2026/02/18',
+    );
+    expect(season).toBe('lent');
+  });
 });
