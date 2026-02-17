@@ -23,6 +23,7 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     const dateKey = this.toDateKey(date);
     const cached = this.cachedSeasonByDate.get(dateKey);
     if (cached) {
+      console.log(`[LiturgicalSeason] Cache hit for ${dateKey}: ${cached}`);
       return cached;
     }
 
@@ -53,12 +54,16 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     try {
       const response = await this.fetchWithFallback(url);
       if (!response.ok) {
+        console.warn(`[LiturgicalSeason] API status ${response.status} for ${url}. Falling back to ordinary.`);
         return 'ordinary';
       }
 
       const data = await response.json() as ChurchCalendarDay;
-      return this.mapSeason(data.season);
+      const mappedSeason = this.mapSeason(data.season);
+      console.log(`[LiturgicalSeason] API answer for ${url}: season=${data.season ?? 'unknown'} -> mapped=${mappedSeason}`);
+      return mappedSeason;
     } catch {
+      console.warn(`[LiturgicalSeason] API request failed for ${url}. Falling back to ordinary.`);
       return 'ordinary';
     }
   }
@@ -72,6 +77,7 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
 
   private async fetchWithFallback(url: string): Promise<Response> {
     try {
+      console.log(`[LiturgicalSeason] Fetching API via HTTPS: ${url}`);
       return await this.fetchWithTimeout(url);
     } catch (error) {
       const fallbackUrl = this.getHttpFallbackUrl(url);
@@ -79,6 +85,7 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
         throw error;
       }
 
+      console.warn(`[LiturgicalSeason] HTTPS failed. Retrying via HTTP: ${fallbackUrl}`);
       return this.fetchWithTimeout(fallbackUrl);
     }
   }
