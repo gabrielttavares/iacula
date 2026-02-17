@@ -10,6 +10,14 @@ export interface SettingsDTO {
   autostart: boolean;
   easterTime: boolean;
   language: string;
+  laudesEnabled: boolean;
+  vespersEnabled: boolean;
+  complineEnabled: boolean;
+  oraMediaEnabled: boolean;
+  laudesTime: string;
+  vespersTime: string;
+  complineTime: string;
+  oraMediaTime: string;
 }
 
 export interface UpdateSettingsDTO {
@@ -18,4 +26,12 @@ export interface UpdateSettingsDTO {
   autostart?: boolean;
   easterTime?: boolean;
   language?: string;
+  laudesEnabled?: boolean;
+  vespersEnabled?: boolean;
+  complineEnabled?: boolean;
+  oraMediaEnabled?: boolean;
+  laudesTime?: string;
+  vespersTime?: string;
+  complineTime?: string;
+  oraMediaTime?: string;
 }

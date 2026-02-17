@@ -46,12 +46,10 @@
             padding: 1rem;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
             align-items: center;
-            min-height: 100%;
-            height: 100vh;
+            min-height: 100vh;
             gap: 0.8rem;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .author-credit {
@@ -73,11 +71,11 @@
         .container {
             width: 100%;
             max-width: 420px;
-            max-height: calc(100vh - 3.4rem);
+            min-height: 0;
             background-color: var(--card-bg);
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            overflow: auto;
+            overflow: visible;
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
@@ -134,7 +132,25 @@
             background-color: #FAFCFF;
         }
 
+        input[type="time"] {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: 'EB Garamond', serif;
+            color: var(--text-color);
+            background-color: #FAFCFF;
+            margin-bottom: 0.6rem;
+        }
+
         input[type="number"]:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(69, 123, 157, 0.1);
+        }
+
+        input[type="time"]:focus {
             outline: none;
             border-color: var(--secondary-color);
             box-shadow: 0 0 0 2px rgba(69, 123, 157, 0.1);
@@ -176,6 +192,28 @@
             display: flex;
             align-items: center;
             margin-top: 0.5rem;
+        }
+
+        .liturgy-modules {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .liturgy-module {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .liturgy-module .checkbox-group {
+            margin-top: 0;
+        }
+
+        .liturgy-module input[type="time"] {
+            margin-bottom: 0;
+            min-width: 118px;
         }
 
         .checkbox-row {
@@ -262,7 +300,6 @@
         @media (max-width: 480px) {
             .container {
                 max-width: 100%;
-                max-height: calc(100vh - 2.2rem);
             }
 
             body {
@@ -284,6 +321,26 @@
             option,
             .checkbox-group label {
                 font-size: 0.95rem;
+            }
+
+            .liturgy-module {
+                grid-template-columns: 1fr;
+                gap: 0.45rem;
+            }
+        }
+
+        @media (max-height: 720px) {
+            body {
+                padding: 0.75rem;
+                gap: 0.6rem;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .form-container {
+                padding: 0.95rem;
             }
         }
     </style>
@@ -314,6 +371,39 @@
                         <option value="en">Ingles</option>
                         <option value="pt-br">Portugues</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Liturgia das Horas (modulos opcionais)</label>
+                    <div class="liturgy-modules">
+                        <div class="liturgy-module">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="laudes-enabled" name="laudes-enabled">
+                                <label for="laudes-enabled">Laudes</label>
+                            </div>
+                            <input type="time" id="laudes-time" name="laudes-time" value="06:00">
+                        </div>
+                        <div class="liturgy-module">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="vespers-enabled" name="vespers-enabled">
+                                <label for="vespers-enabled">Vesperas</label>
+                            </div>
+                            <input type="time" id="vespers-time" name="vespers-time" value="18:00">
+                        </div>
+                        <div class="liturgy-module">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="compline-enabled" name="compline-enabled">
+                                <label for="compline-enabled">Completas</label>
+                            </div>
+                            <input type="time" id="compline-time" name="compline-time" value="21:00">
+                        </div>
+                        <div class="liturgy-module">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="ora-media-enabled" name="ora-media-enabled">
+                                <label for="ora-media-enabled">Ora Media</label>
+                            </div>
+                            <input type="time" id="ora-media-time" name="ora-media-time" value="12:30">
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group checkbox-row">
                     <div class="checkbox-group">

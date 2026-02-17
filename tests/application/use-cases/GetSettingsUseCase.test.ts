@@ -23,6 +23,14 @@ describe('GetSettingsUseCase', () => {
       autostart: false,
       easterTime: true,
       language: 'en',
+      laudesEnabled: true,
+      vespersEnabled: true,
+      complineEnabled: false,
+      oraMediaEnabled: true,
+      laudesTime: '05:30',
+      vespersTime: '18:30',
+      complineTime: '21:00',
+      oraMediaTime: '12:00',
     });
 
     mockSettingsRepository.load.mockResolvedValue(settings);
@@ -35,6 +43,14 @@ describe('GetSettingsUseCase', () => {
       autostart: false,
       easterTime: true,
       language: 'en',
+      laudesEnabled: true,
+      vespersEnabled: true,
+      complineEnabled: false,
+      oraMediaEnabled: true,
+      laudesTime: '05:30',
+      vespersTime: '18:30',
+      complineTime: '21:00',
+      oraMediaTime: '12:00',
     });
   });
 
@@ -50,6 +66,14 @@ describe('GetSettingsUseCase', () => {
       autostart: true,
       easterTime: false,
       language: 'pt-br',
+      laudesEnabled: false,
+      vespersEnabled: false,
+      complineEnabled: false,
+      oraMediaEnabled: false,
+      laudesTime: '06:00',
+      vespersTime: '18:00',
+      complineTime: '21:00',
+      oraMediaTime: '12:30',
     });
   });
 

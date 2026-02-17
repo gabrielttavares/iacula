@@ -2,3 +2,4 @@ export { SettingsIpcHandler, SettingsIpcHandlerCallbacks } from './SettingsIpcHa
 export { QuoteIpcHandler } from './QuoteIpcHandler';
 export { PrayerIpcHandler } from './PrayerIpcHandler';
 export { SystemIpcHandler, SystemIpcHandlerCallbacks } from './SystemIpcHandler';
+export { LiturgyHoursIpcHandler, LiturgyHoursIpcHandlerCallbacks } from './LiturgyHoursIpcHandler';

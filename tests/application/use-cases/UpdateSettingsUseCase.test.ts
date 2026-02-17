@@ -101,6 +101,14 @@ describe('UpdateSettingsUseCase', () => {
       autostart: true,
       easterTime: false,
       language: 'pt-br',
+      laudesEnabled: false,
+      vespersEnabled: false,
+      complineEnabled: false,
+      oraMediaEnabled: false,
+      laudesTime: '06:00',
+      vespersTime: '18:00',
+      complineTime: '21:00',
+      oraMediaTime: '12:30',
     });
     mockSettingsRepository.load.mockResolvedValue(currentSettings);
     mockSettingsRepository.save.mockResolvedValue();
@@ -116,6 +124,14 @@ describe('UpdateSettingsUseCase', () => {
       autostart: true,
       easterTime: false,
       language: 'en',
+      laudesEnabled: false,
+      vespersEnabled: false,
+      complineEnabled: false,
+      oraMediaEnabled: false,
+      laudesTime: '06:00',
+      vespersTime: '18:00',
+      complineTime: '21:00',
+      oraMediaTime: '12:30',
     });
   });
 });

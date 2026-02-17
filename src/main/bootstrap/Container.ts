@@ -35,11 +35,14 @@ import { QuoteIpcHandler } from '../ipc/QuoteIpcHandler';
 import { PrayerIpcHandler } from '../ipc/PrayerIpcHandler';
 import { SystemIpcHandler } from '../ipc/SystemIpcHandler';
 import { QuoteDTO } from '../../application/dto/QuoteDTO';
+import { LiturgyHoursIpcHandler } from '../ipc/LiturgyHoursIpcHandler';
+import { LiturgyHourModule, LiturgyReminderDTO } from '../../application/dto/LiturgyHoursDTO';
 
 export interface ContainerCallbacks {
   onSettingsUpdated: (easterTimeChanged: boolean) => void;
   onCloseSettingsAndShowPopup: () => void;
   onOpenSettingsFromContent: () => void;
+  onOpenLiturgyOffice: (module: LiturgyHourModule) => void;
 }
 
 export class Container {
@@ -62,6 +65,7 @@ export class Container {
   private _quoteIpcHandler: QuoteIpcHandler | null = null;
   private _prayerIpcHandler: PrayerIpcHandler | null = null;
   private _systemIpcHandler: SystemIpcHandler | null = null;
+  private _liturgyHoursIpcHandler: LiturgyHoursIpcHandler | null = null;
 
   private readonly isDevelopment: boolean;
   private readonly userDataPath: string;
@@ -181,6 +185,10 @@ export class Container {
       onCloseSettingsAndShowPopup: callbacks.onCloseSettingsAndShowPopup,
       onOpenSettingsFromContent: callbacks.onOpenSettingsFromContent,
     });
+
+    this._liturgyHoursIpcHandler = new LiturgyHoursIpcHandler({
+      onOpenLiturgyOffice: callbacks.onOpenLiturgyOffice,
+    });
   }
 
   registerIpcHandlers(): void {
@@ -188,6 +196,7 @@ export class Container {
     this._quoteIpcHandler?.register();
     this._prayerIpcHandler?.register();
     this._systemIpcHandler?.register();
+    this._liturgyHoursIpcHandler?.register();
   }
 
   unregisterIpcHandlers(): void {
@@ -195,9 +204,14 @@ export class Container {
     this._quoteIpcHandler?.unregister();
     this._prayerIpcHandler?.unregister();
     this._systemIpcHandler?.unregister();
+    this._liturgyHoursIpcHandler?.unregister();
   }
 
   setPreloadedPopupQuote(quote: QuoteDTO): void {
     this._quoteIpcHandler?.setPreloadedQuote(quote);
+  }
+
+  setPreloadedLiturgyReminder(reminder: LiturgyReminderDTO): void {
+    this._liturgyHoursIpcHandler?.setPreloadedReminder(reminder);
   }
 }

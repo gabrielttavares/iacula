@@ -10,6 +10,14 @@ describe('Settings Entity', () => {
       expect(settings.autostart).toBe(true);
       expect(settings.easterTime).toBe(false);
       expect(settings.language).toBe('pt-br');
+      expect(settings.laudesEnabled).toBe(false);
+      expect(settings.vespersEnabled).toBe(false);
+      expect(settings.complineEnabled).toBe(false);
+      expect(settings.oraMediaEnabled).toBe(false);
+      expect(settings.laudesTime).toBe('06:00');
+      expect(settings.vespersTime).toBe('18:00');
+      expect(settings.complineTime).toBe('21:00');
+      expect(settings.oraMediaTime).toBe('12:30');
     });
 
     it('should create settings with provided values', () => {
@@ -19,6 +27,14 @@ describe('Settings Entity', () => {
         autostart: false,
         easterTime: true,
         language: 'en',
+        laudesEnabled: true,
+        vespersEnabled: true,
+        complineEnabled: true,
+        oraMediaEnabled: true,
+        laudesTime: '05:30',
+        vespersTime: '18:30',
+        complineTime: '21:30',
+        oraMediaTime: '12:15',
       });
 
       expect(settings.interval).toBe(30);
@@ -26,6 +42,14 @@ describe('Settings Entity', () => {
       expect(settings.autostart).toBe(false);
       expect(settings.easterTime).toBe(true);
       expect(settings.language).toBe('en');
+      expect(settings.laudesEnabled).toBe(true);
+      expect(settings.vespersEnabled).toBe(true);
+      expect(settings.complineEnabled).toBe(true);
+      expect(settings.oraMediaEnabled).toBe(true);
+      expect(settings.laudesTime).toBe('05:30');
+      expect(settings.vespersTime).toBe('18:30');
+      expect(settings.complineTime).toBe('21:30');
+      expect(settings.oraMediaTime).toBe('12:15');
     });
 
     it('should merge partial props with defaults', () => {
@@ -39,6 +63,14 @@ describe('Settings Entity', () => {
       expect(settings.autostart).toBe(true); // default
       expect(settings.easterTime).toBe(false); // default
       expect(settings.language).toBe('la');
+      expect(settings.laudesEnabled).toBe(false); // default
+      expect(settings.vespersEnabled).toBe(false); // default
+      expect(settings.complineEnabled).toBe(false); // default
+      expect(settings.oraMediaEnabled).toBe(false); // default
+      expect(settings.laudesTime).toBe('06:00'); // default
+      expect(settings.vespersTime).toBe('18:00'); // default
+      expect(settings.complineTime).toBe('21:00'); // default
+      expect(settings.oraMediaTime).toBe('12:30'); // default
     });
   });
 
@@ -69,6 +101,13 @@ describe('Settings Entity', () => {
       expect(() => Settings.create({ interval: 60 })).not.toThrow();
       expect(() => Settings.create({ duration: 5 })).not.toThrow();
       expect(() => Settings.create({ duration: 30 })).not.toThrow();
+    });
+
+    it('should throw error for invalid liturgy hours time format', () => {
+      expect(() => Settings.create({ laudesTime: '6:00' })).toThrow('Laudes time must be in HH:MM format');
+      expect(() => Settings.create({ vespersTime: '24:00' })).toThrow('Vespers time must be in HH:MM format');
+      expect(() => Settings.create({ complineTime: 'ab:cd' })).toThrow('Compline time must be in HH:MM format');
+      expect(() => Settings.create({ oraMediaTime: '99:00' })).toThrow('Ora Media time must be in HH:MM format');
     });
   });
 
@@ -108,6 +147,14 @@ describe('Settings Entity', () => {
         autostart: false,
         easterTime: true,
         language: 'en',
+        laudesEnabled: true,
+        vespersEnabled: true,
+        complineEnabled: true,
+        oraMediaEnabled: true,
+        laudesTime: '05:30',
+        vespersTime: '18:30',
+        complineTime: '21:30',
+        oraMediaTime: '12:00',
       });
 
       const plain = settings.toPlainObject();
@@ -118,6 +165,14 @@ describe('Settings Entity', () => {
         autostart: false,
         easterTime: true,
         language: 'en',
+        laudesEnabled: true,
+        vespersEnabled: true,
+        complineEnabled: true,
+        oraMediaEnabled: true,
+        laudesTime: '05:30',
+        vespersTime: '18:30',
+        complineTime: '21:30',
+        oraMediaTime: '12:00',
       });
     });
 
@@ -141,6 +196,14 @@ describe('Settings Entity', () => {
         autostart: true,
         easterTime: false,
         language: 'pt-br',
+        laudesEnabled: false,
+        vespersEnabled: false,
+        complineEnabled: false,
+        oraMediaEnabled: false,
+        laudesTime: '06:00',
+        vespersTime: '18:00',
+        complineTime: '21:00',
+        oraMediaTime: '12:30',
       });
     });
   });
