@@ -1,6 +1,6 @@
 /**
  * Bootstrap: TrayManager
- * Gerencia o ícone na bandeja do sistema.
+ * Gerencia o ícone na bandejá do sistema.
  */
 
 import { Tray, Menu, nativeImage, app } from 'electron';
@@ -49,7 +49,7 @@ export class TrayManager {
   private createContextMenu(): Menu {
     return Menu.buildFromTemplate([
       {
-        label: 'Mostrar jaculatoria',
+        label: 'Mostrar jáculatoria',
         click: () => this.callbacks.onShowPopup(),
       },
       {
@@ -62,7 +62,7 @@ export class TrayManager {
       },
       { type: 'separator' },
       {
-        label: 'Configuracoes',
+        label: 'Configurações',
         click: () => this.callbacks.onShowSettings(),
       },
       { type: 'separator' },

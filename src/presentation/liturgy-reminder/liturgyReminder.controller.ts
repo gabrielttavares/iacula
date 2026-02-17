@@ -56,7 +56,7 @@ class LiturgyReminderController {
 
     if (!reminder) {
       if (this.titleElement) this.titleElement.textContent = 'Liturgia das Horas';
-      if (this.summaryElement) this.summaryElement.textContent = 'Abre o oficio do dia.';
+      if (this.summaryElement) this.summaryElement.textContent = 'Abre o ofício do dia.';
       addFadeInEffect();
       return;
     }

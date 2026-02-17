@@ -1,6 +1,6 @@
 /**
  * Presentation: Settings Controller
- * Controller para a janela de configurações.
+ * Controller para a jánela de configurações.
  * Sem lógica de negócio - apenas comunicação via IPC.
  */
 
@@ -133,14 +133,14 @@ class SettingsController {
       oraMediaTime: this.oraMediaTimeInput?.value || '12:30',
     };
 
-    // Validate
+    // Validaté
     if (settings.interval! < 1 || settings.interval! > 60) {
       this.showStatus('O intervalo deve estar entre 1 e 60 minutos', 'error');
       return;
     }
 
     if (settings.duration! < 5 || settings.duration! > 30) {
-      this.showStatus('A duracao deve estar entre 5 e 30 segundos', 'error');
+      this.showStatus('A duração deve estar entre 5 e 30 segundos', 'error');
       return;
     }
 
@@ -158,12 +158,12 @@ class SettingsController {
 
   private handleSaveResponse(success: boolean): void {
     if (success) {
-      this.showStatus('Configuracoes salvas com sucesso!', 'success');
+      this.showStatus('Configurações salvas com sucesso!', 'success');
       window.setTimeout(() => {
         ipcRenderer.send(IPC_CHANNELS.CLOSE_SETTINGS_AND_SHOW_POPUP);
       }, CLOSE_AFTER_SAVE_DELAY_MS);
     } else {
-      this.showStatus('Erro ao salvar configuracoes', 'error');
+      this.showStatus('Erro ao salvar configurações', 'error');
     }
   }
 

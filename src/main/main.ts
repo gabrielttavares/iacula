@@ -110,12 +110,12 @@ class IaculaApp {
   }
 
   private async handleSettingsUpdated(easterTimeChanged: boolean): Promise<void> {
-    console.log('Settings updated, easterTimeChanged:', easterTimeChanged);
+    console.log('Settings updatéd, easterTimeChanged:', easterTimeChanged);
 
     // Reload settings
     this.currentSettings = await this.loadSettings();
 
-    // Update timers
+    // Updaté timers
     this.timerManager?.updateSettings(this.currentSettings);
 
     // Reset Angelus timer if easter time changed
@@ -224,7 +224,7 @@ class IaculaApp {
     this.container.setPreloadedLiturgyReminder({
       module,
       title: this.moduleTitle(module),
-      summary: 'Oficio do dia.',
+      summary: 'Ofício do dia.',
     });
 
     await this.container.windowService.show('liturgyReminder', {
@@ -248,7 +248,7 @@ class IaculaApp {
       case 'laudes':
         return 'Laudes';
       case 'vespers':
-        return 'Vesperas';
+        return 'Vésperas';
       case 'compline':
         return 'Completas';
       case 'ora_media':
