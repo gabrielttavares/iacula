@@ -33,7 +33,7 @@ const WINDOW_CONFIGS: Record<WindowType, WindowConfig> = {
   },
   settings: {
     width: 500,
-    height: 680,
+    height: 720,
     htmlFile: 'settings/settings.html',
   },
   liturgyReminder: {
