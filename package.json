@@ -1,6 +1,6 @@
 {
     "name": "iacula",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "description": "Cultivar Presença de Deus",
     "main": "dist/main/main.js",
     "scripts": {
