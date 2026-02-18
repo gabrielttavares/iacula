@@ -16,17 +16,18 @@ import { buildIbreviaryOfficeUrl } from './liturgyOfficeUrl';
 // Enable remote module
 require('@electron/remote/main').initialize();
 
-class IaculaApp {
+export class IaculaApp {
   private container: Container;
   private trayManager: TrayManager | null = null;
   private dockManager: DockManager | null = null;
   private timerManager: TimerManager | null = null;
   private currentSettings: Settings | null = null;
   private liturgyModuleTimers: Partial<Record<LiturgyHourModule, NodeJS.Timeout>> = {};
+  private readonly initializationPromise: Promise<void>;
 
-  constructor() {
-    this.container = new Container();
-    this.initialize();
+  constructor(container?: Container, autoInitialize = true) {
+    this.container = container ?? new Container();
+    this.initializationPromise = autoInitialize ? this.initialize() : Promise.resolve();
   }
 
   private async initialize(): Promise<void> {
@@ -281,7 +282,44 @@ class IaculaApp {
   private async showSettings(): Promise<void> {
     await this.container.windowService.show('settings');
   }
+
+  public async handleRelaunchRequest(): Promise<void> {
+    await this.initializationPromise;
+    console.log('[single-instance] Relaunch request received, opening settings window');
+
+    await Promise.all([
+      this.container.windowService.close('popup'),
+      this.container.windowService.close('angelus'),
+      this.container.windowService.close('reginaCaeli'),
+      this.container.windowService.close('liturgyReminder'),
+    ]);
+
+    await this.showSettings();
+  }
+}
+
+export function bootstrapSingleInstance(
+  electronApp: Pick<typeof app, 'requestSingleInstanceLock' | 'quit' | 'on'> = app,
+  createApp: () => IaculaApp = () => new IaculaApp(),
+): IaculaApp | null {
+  const hasSingleInstanceLock = electronApp.requestSingleInstanceLock();
+  if (!hasSingleInstanceLock) {
+    console.log('[single-instance] Secondary instance detected. Quitting this instance.');
+    electronApp.quit();
+    return null;
+  }
+
+  console.log('[single-instance] Primary instance lock acquired.');
+  const iaculaApp = createApp();
+
+  electronApp.on('second-instance', () => {
+    void iaculaApp.handleRelaunchRequest();
+  });
+
+  return iaculaApp;
 }
 
 // Initialize the application
-new IaculaApp();
+if (!process.env.JEST_WORKER_ID) {
+  bootstrapSingleInstance();
+}
