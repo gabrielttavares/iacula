@@ -35,7 +35,7 @@ jobs:
           - name: linux
             os: ubuntu-latest
             platform: linux
-            build_args: --linux deb
+            build_args: --linux AppImage
             artifact_name: linux
           - name: macos-x64
             os: macos-latest
@@ -119,9 +119,10 @@ jobs:
           files: |
             release-artifacts/*.exe
             release-artifacts/*.exe.blockmap
-            release-artifacts/*.deb
             release-artifacts/*.dmg
             release-artifacts/*.dmg.blockmap
+            release-artifacts/*.AppImage
+            release-artifacts/*.AppImage.blockmap
             release-artifacts/latest.yml
             release-artifacts/latest-mac.yml
             release-artifacts/latest-linux.yml

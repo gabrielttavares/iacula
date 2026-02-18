@@ -74,7 +74,9 @@
             "differentialPackage": true
         },
         "linux": {
-            "target": "deb",
+            "target": [
+                "AppImage"
+            ],
             "category": "Utility",
             "maintainer": "Gabriel Tavares <gabrieltxtavares@gmail.com>",
             "compression": null,
@@ -102,6 +104,7 @@
     },
     "dependencies": {
         "@electron/remote": "^2.1.2",
+        "electron-updater": "^6.3.9",
         "electron-squirrel-startup": "^1.0.1",
         "electron-store": "^10.0.1"
     }
