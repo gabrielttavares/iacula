@@ -13,6 +13,7 @@ import { LiturgicalSeason } from '../../application/ports/ILiturgicalSeasonServi
 export class FileAssetService implements IAssetService {
   private readonly assetsPath: string;
   private readonly isDevelopment: boolean;
+  private seasonalImageIndex: Partial<Record<Exclude<LiturgicalSeason, 'ordinary'>, number>> = {};
 
   constructor(resourcesPath: string, isDevelopment: boolean = false) {
     this.isDevelopment = isDevelopment;
@@ -71,6 +72,16 @@ export class FileAssetService implements IAssetService {
 
   async getImagePath(dayOfWeek: number, season: LiturgicalSeason = 'ordinary'): Promise<string | null> {
     try {
+      if (season !== 'ordinary') {
+        const seasonalImages = this.readSeasonalFlatImages(season);
+        if (seasonalImages.length > 0) {
+          const currentIndex = this.seasonalImageIndex[season] ?? 0;
+          const selectedIndex = currentIndex % seasonalImages.length;
+          this.seasonalImageIndex[season] = currentIndex + 1;
+          return seasonalImages[selectedIndex];
+        }
+      }
+
       const images = await this.listDayImages(dayOfWeek, season);
       if (images.length === 0) {
         return null;
@@ -85,10 +96,17 @@ export class FileAssetService implements IAssetService {
   async listDayImages(dayOfWeek: number, season: LiturgicalSeason = 'ordinary'): Promise<string[]> {
     try {
       if (season !== 'ordinary') {
-        const seasonalImages = this.readImageFilesFromDirectory(this.getAssetPath(`images/${season}/${dayOfWeek}`));
+        const seasonalImages = this.readSeasonalFlatImages(season);
         if (seasonalImages.length > 0) {
           return seasonalImages;
         }
+
+        const seasonalLegacyByDay = this.readImageFilesFromDirectory(this.getAssetPath(`images/${season}/${dayOfWeek}`));
+        if (seasonalLegacyByDay.length > 0) {
+          console.warn(`[FileAssetService] Deprecated image layout in use for season=${season}: images/${season}/${dayOfWeek}. Move files to images/${season}/.`);
+          return seasonalLegacyByDay;
+        }
+
         console.log(`[FileAssetService] No images found for season=${season}, day=${dayOfWeek}. Falling back to ordinary.`);
       }
 
@@ -108,6 +126,10 @@ export class FileAssetService implements IAssetService {
     return files
       .filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
       .map(file => `file://${path.join(imagesDir, file)}`);
+  }
+
+  private readSeasonalFlatImages(season: Exclude<LiturgicalSeason, 'ordinary'>): string[] {
+    return this.readImageFilesFromDirectory(this.getAssetPath(`images/${season}`));
   }
 
   async getAngelusImagePath(): Promise<string> {
