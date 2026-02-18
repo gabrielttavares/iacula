@@ -9,6 +9,7 @@ import { Container } from './bootstrap/Container';
 import { TrayManager } from './bootstrap/TrayManager';
 import { DockManager } from './bootstrap/DockManager';
 import { TimerManager } from './bootstrap/TimerManager';
+import { UpdateManager } from './bootstrap/UpdateManager';
 import { Settings } from '../domain/entities/Settings';
 import { LiturgyHourModule } from '../application/dto/LiturgyHoursDTO';
 import { buildIbreviaryOfficeUrl } from './liturgyOfficeUrl';
@@ -23,6 +24,7 @@ export class IaculaApp {
   private trayManager: TrayManager | null = null;
   private dockManager: DockManager | null = null;
   private timerManager: TimerManager | null = null;
+  private updateManager: UpdateManager | null = null;
   private currentSettings: Settings | null = null;
   private liturgyModuleTimers: Partial<Record<LiturgyHourModule, NodeJS.Timeout>> = {};
   private readonly initializationPromise: Promise<void>;
@@ -46,6 +48,9 @@ export class IaculaApp {
 
     // Setup IPC handlers
     this.setupIpc();
+
+    // Setup updater
+    this.setupUpdater();
 
     // Start timers
     this.timerManager?.setup(this.currentSettings);
@@ -105,6 +110,11 @@ export class IaculaApp {
       onAngelusTime: () => this.showAngelus(),
       onFirstUnlockOfDay: () => this.showPopup(),
     });
+  }
+
+  private setupUpdater(): void {
+    this.updateManager = new UpdateManager();
+    this.updateManager.start();
   }
 
   private setupIpc(): void {
