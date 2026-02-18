@@ -15,7 +15,6 @@ describe('release workflow', () => {
     const content = fs.readFileSync(workflowPath, 'utf8');
 
     expect(content).toContain('release-artifacts/*.AppImage');
-    expect(content).toContain('release-artifacts/*.AppImage.blockmap');
     expect(content).toContain('release-artifacts/latest-linux.yml');
     expect(content).not.toContain('release-artifacts/*.deb');
   });

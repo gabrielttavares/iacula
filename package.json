@@ -46,8 +46,7 @@
             "buildResources": "assets"
         },
         "files": [
-            "dist/**/*",
-            "assets/**/*"
+            "dist/**/*"
         ],
         "extraResources": [
             {
@@ -87,11 +86,10 @@
             "category": "public.app-category.utilities",
             "compression": "maximum",
             "icon": "assets/images/icon.icns",
-            "identity": null,
-            "hardenedRuntime": false,
+            "hardenedRuntime": true,
             "gatekeeperAssess": false
         },
-        "afterSign": null,
+        "afterSign": "./scripts/notarize.js",
         "publish": {
             "provider": "github",
             "releaseType": "release"
