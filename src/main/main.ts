@@ -52,6 +52,7 @@ class IaculaApp {
 
     // Show initial popup
     await this.showPopup();
+    this.timerManager?.markFirstUnlockPopupShownToday();
 
     // Handle window-all-closed
     app.on('window-all-closed', () => {
@@ -96,6 +97,7 @@ class IaculaApp {
     this.timerManager = new TimerManager({
       onPopupInterval: () => this.showPopup(),
       onAngelusTime: () => this.showAngelus(),
+      onFirstUnlockOfDay: () => this.showPopup(),
     });
   }
 
