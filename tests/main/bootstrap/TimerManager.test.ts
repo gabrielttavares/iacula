@@ -25,6 +25,7 @@ describe('TimerManager Integration Tests', () => {
     mockCallbacks = {
       onPopupInterval: jest.fn(),
       onAngelusTime: jest.fn(),
+      onFirstUnlockOfDay: jest.fn(),
     };
 
     mockSettings = Settings.create({
@@ -189,6 +190,7 @@ describe('TimerManager Integration Tests', () => {
       timerManager.setup(mockSettings);
 
       expect(powerMonitor.on).toHaveBeenCalledWith('resume', expect.any(Function));
+      expect(powerMonitor.on).toHaveBeenCalledWith('unlock-screen', expect.any(Function));
     });
 
     it('should reset Angelus timer when system resumes from sleep', () => {
@@ -201,14 +203,41 @@ describe('TimerManager Integration Tests', () => {
 
       timerManager.setup(mockSettings);
 
-      // Captura o callback do powerMonitor
-      const powerMonitorCallback = (powerMonitor.on as jest.Mock).mock.calls[0][1];
+      // Captura o callback de resume do powerMonitor
+      const resumeCallback = (powerMonitor.on as jest.Mock).mock.calls.find(
+        ([event]) => event === 'resume',
+      )?.[1] as (() => void);
 
       // Simula o sistema acordando do sleep
-      powerMonitorCallback();
+      resumeCallback();
 
       // calculateNextNoon deve ser chamado novamente (setup + resume)
       expect(PrayerScheduler.calculateNextNoon).toHaveBeenCalledTimes(2);
+    });
+
+    it('should trigger popup only once per day on unlock events', () => {
+      timerManager.setup(mockSettings);
+
+      const unlockCallback = (powerMonitor.on as jest.Mock).mock.calls.find(
+        ([event]) => event === 'unlock-screen',
+      )?.[1] as (() => void);
+
+      timerManager.markFirstUnlockPopupShownToday(new Date('2026-02-18T08:00:00'));
+
+      // Same day: should not trigger
+      jest.setSystemTime(new Date('2026-02-18T09:00:00'));
+      unlockCallback();
+      expect(mockCallbacks.onFirstUnlockOfDay).not.toHaveBeenCalled();
+
+      // Next day: first unlock triggers
+      jest.setSystemTime(new Date('2026-02-19T08:00:00'));
+      unlockCallback();
+      expect(mockCallbacks.onFirstUnlockOfDay).toHaveBeenCalledTimes(1);
+
+      // Same next day: no second trigger
+      jest.setSystemTime(new Date('2026-02-19T10:00:00'));
+      unlockCallback();
+      expect(mockCallbacks.onFirstUnlockOfDay).toHaveBeenCalledTimes(1);
     });
   });
 

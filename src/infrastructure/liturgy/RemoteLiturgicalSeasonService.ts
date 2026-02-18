@@ -1,21 +1,28 @@
 /**
  * Infrastructure: RemoteLiturgicalSeasonService
- * Detecta a estação litúrgica consultando fonte externa.
+ * Detecta a estação litúrgica consultando a API liturgia-diaria.
+ * Source: https://github.com/Dancrf/liturgia-diaria
  */
 
 import { ILiturgicalSeasonService, LiturgicalSeason } from '../../application/ports/ILiturgicalSeasonService';
 
-interface ChurchCalendarDay {
-  season?: string;
+interface LiturgiaDiariaResponse {
+  cor?: string;
+  liturgia?: string;
+}
+
+interface SeasonResolution {
+  season: LiturgicalSeason;
+  cacheable: boolean;
 }
 
 export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
-  private static readonly REQUEST_TIMEOUT_MS = 1500;
+  private static readonly REQUEST_TIMEOUT_MS = 3000;
   private readonly baseUrl: string;
   private cachedSeasonByDate = new Map<string, LiturgicalSeason>();
   private pendingRequestByDate = new Map<string, Promise<LiturgicalSeason>>();
 
-  constructor(baseUrl: string = 'https://calapi.inadiutorium.cz/api/v0/en/calendars/default') {
+  constructor(baseUrl: string = 'https://liturgia.up.railway.app/v2') {
     this.baseUrl = baseUrl;
   }
 
@@ -33,8 +40,10 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     }
 
     const request = this.resolveSeason(date)
-      .then((season) => {
-        this.cachedSeasonByDate.set(dateKey, season);
+      .then(({ season, cacheable }) => {
+        if (cacheable) {
+          this.cachedSeasonByDate.set(dateKey, season);
+        }
         return season;
       })
       .finally(() => {
@@ -45,49 +54,34 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     return request;
   }
 
-  private async resolveSeason(date: Date): Promise<LiturgicalSeason> {
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const url = `${this.baseUrl}/${year}/${month}/${day}`;
+  private async resolveSeason(date: Date): Promise<SeasonResolution> {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const url = `${this.baseUrl}/?dia=${day}&mes=${month}&ano=${year}`;
 
     try {
-      const response = await this.fetchWithFallback(url);
+      const response = await this.fetchWithTimeout(url);
       if (!response.ok) {
-        console.warn(`[LiturgicalSeason] API status ${response.status} for ${url}. Falling back to ordinary.`);
-        return 'ordinary';
+        console.warn(`[LiturgicalSeason] API status ${response.status} for ${url}. Temporary fallback to ordinary (not cached).`);
+        return { season: 'ordinary', cacheable: false };
       }
 
-      const data = await response.json() as ChurchCalendarDay;
-      const mappedSeason = this.mapSeason(data.season);
-      console.log(`[LiturgicalSeason] API answer for ${url}: season=${data.season ?? 'unknown'} -> mapped=${mappedSeason}`);
-      return mappedSeason;
+      const data = await response.json() as LiturgiaDiariaResponse;
+      const mappedSeason = this.mapSeason(data.cor, data.liturgia);
+      console.log(`[LiturgicalSeason] API answer for ${url}: cor=${data.cor ?? 'unknown'}, liturgia=${data.liturgia ?? 'unknown'} -> mapped=${mappedSeason}`);
+      return { season: mappedSeason, cacheable: true };
     } catch {
-      console.warn(`[LiturgicalSeason] API request failed for ${url}. Falling back to ordinary.`);
-      return 'ordinary';
+      console.warn(`[LiturgicalSeason] API request failed for ${url}. Temporary fallback to ordinary (not cached).`);
+      return { season: 'ordinary', cacheable: false };
     }
   }
 
   private toDateKey(date: Date): string {
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
-  }
-
-  private async fetchWithFallback(url: string): Promise<Response> {
-    try {
-      console.log(`[LiturgicalSeason] Fetching API via HTTPS: ${url}`);
-      return await this.fetchWithTimeout(url);
-    } catch (error) {
-      const fallbackUrl = this.getHttpFallbackUrl(url);
-      if (!fallbackUrl) {
-        throw error;
-      }
-
-      console.warn(`[LiturgicalSeason] HTTPS failed. Retrying via HTTP: ${fallbackUrl}`);
-      return this.fetchWithTimeout(fallbackUrl);
-    }
   }
 
   private async fetchWithTimeout(url: string): Promise<Response> {
@@ -101,37 +95,31 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     }
   }
 
-  private getHttpFallbackUrl(url: string): string | null {
-    if (!url.startsWith('https://')) {
-      return null;
-    }
+  private mapSeason(cor?: string, liturgia?: string): LiturgicalSeason {
+    const normalizedCor = (cor || '').toLowerCase();
+    const normalizedLiturgia = (liturgia || '').toLowerCase();
 
-    try {
-      const parsed = new URL(url);
-      if (parsed.hostname !== 'calapi.inadiutorium.cz') {
-        return null;
+    switch (normalizedCor) {
+      case 'verde':
+      case 'vermelho':
+        return 'ordinary';
+
+      case 'roxo':
+      case 'rosa':
+        return normalizedLiturgia.includes('advento') ? 'advent' : 'lent';
+
+      case 'branco': {
+        if (normalizedLiturgia.includes('natal')) return 'christmas';
+        if (
+          normalizedLiturgia.includes('páscoa') ||
+          normalizedLiturgia.includes('pascoa') ||
+          normalizedLiturgia.includes('ressurreição') ||
+          normalizedLiturgia.includes('ressurreicao') ||
+          normalizedLiturgia.includes('aleluia')
+        ) return 'easter';
+        return 'ordinary';
       }
 
-      parsed.protocol = 'http:';
-      return parsed.toString();
-    } catch {
-      return null;
-    }
-  }
-
-  private mapSeason(remoteSeason?: string): LiturgicalSeason {
-    const normalized = (remoteSeason || '').toLowerCase();
-
-    switch (normalized) {
-      case 'advent':
-        return 'advent';
-      case 'lent':
-        return 'lent';
-      case 'easter':
-        return 'easter';
-      case 'christmas':
-        return 'christmas';
-      case 'ordinary':
       default:
         return 'ordinary';
     }

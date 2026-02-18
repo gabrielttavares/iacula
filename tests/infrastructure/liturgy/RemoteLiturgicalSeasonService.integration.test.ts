@@ -7,25 +7,20 @@ describeIntegration('RemoteLiturgicalSeasonService Integration (real API)', () =
   jest.setTimeout(15000);
 
   async function assertRealApiSeason(date: Date, expectedSeason: 'lent' | 'christmas' | 'easter'): Promise<void> {
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
     const day = String(date.getUTCDate()).padStart(2, '0');
-    const httpsUrl = `https://calapi.inadiutorium.cz/api/v0/en/calendars/default/${year}/${month}/${day}`;
-    const httpUrl = `http://calapi.inadiutorium.cz/api/v0/en/calendars/default/${year}/${month}/${day}`;
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const url = `https://liturgia.up.railway.app/v2/?dia=${day}&mes=${month}&ano=${year}`;
 
-    let response: Response;
-    try {
-      response = await fetch(httpsUrl);
-    } catch {
-      response = await fetch(httpUrl);
-    }
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(`Liturgical API unavailable: ${response.status} ${response.statusText}`);
     }
 
-    const payload = await response.json() as { season?: string };
-    expect((payload.season || '').toLowerCase()).toBe(expectedSeason);
+    const payload = await response.json() as { cor?: string; liturgia?: string };
+    expect(payload.cor).toBeDefined();
+    expect(payload.liturgia).toBeDefined();
 
     const season = await service.getCurrentSeason(date);
     expect(season).toBe(expectedSeason);

@@ -10,12 +10,15 @@ import { Settings } from '../../domain/entities/Settings';
 export interface TimerCallbacks {
   onPopupInterval: () => void;
   onAngelusTime: () => void;
+  onFirstUnlockOfDay: () => void;
 }
 
 export class TimerManager {
   private popupIntervalTimer: NodeJS.Timeout | null = null;
   private angelusTimer: NodeJS.Timeout | null = null;
   private currentSettings: Settings | null = null;
+  private powerMonitorRegistered = false;
+  private lastUnlockPopupDateKey: string | null = null;
 
   constructor(private readonly callbacks: TimerCallbacks) {}
 
@@ -40,6 +43,10 @@ export class TimerManager {
   destroy(): void {
     this.clearPopupTimer();
     this.clearAngelusTimer();
+  }
+
+  markFirstUnlockPopupShownToday(date: Date = new Date()): void {
+    this.lastUnlockPopupDateKey = this.toLocalDateKey(date);
   }
 
   private setupPopupTimer(): void {
@@ -87,10 +94,40 @@ export class TimerManager {
   }
 
   private setupPowerMonitor(): void {
+    if (this.powerMonitorRegistered) {
+      return;
+    }
+
     powerMonitor.on('resume', () => {
       console.log('System resumed from sleep, resetting Angelus timer');
       this.resetAngelusTimer();
+      this.handleFirstUnlockOfDay('resume');
     });
+
+    powerMonitor.on('unlock-screen', () => {
+      this.handleFirstUnlockOfDay('unlock-screen');
+    });
+
+    this.powerMonitorRegistered = true;
+  }
+
+  private handleFirstUnlockOfDay(source: 'resume' | 'unlock-screen'): void {
+    const todayKey = this.toLocalDateKey(new Date());
+    if (this.lastUnlockPopupDateKey === todayKey) {
+      console.log(`[TimerManager] ${source}: popup already shown today (${todayKey}), skipping.`);
+      return;
+    }
+
+    this.lastUnlockPopupDateKey = todayKey;
+    console.log(`[TimerManager] ${source}: first unlock of day (${todayKey}), showing popup.`);
+    this.callbacks.onFirstUnlockOfDay();
+  }
+
+  private toLocalDateKey(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private clearPopupTimer(): void {
