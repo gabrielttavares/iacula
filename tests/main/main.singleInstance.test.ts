@@ -53,7 +53,28 @@ describe('main single-instance bootstrap', () => {
     expect(on).toHaveBeenCalledWith('second-instance', expect.any(Function));
 
     listeners['second-instance']();
-    expect(handleRelaunchRequest).toHaveBeenCalledTimes(1);
+    expect(handleRelaunchRequest).toHaveBeenCalledWith('second-instance');
+  });
+
+  it('handles activate by forwarding to app relaunch handler', async () => {
+    const listeners: Record<string, () => void> = {};
+    const on = jest.fn((event: string, callback: () => void) => {
+      listeners[event] = callback;
+    });
+    const requestSingleInstanceLock = jest.fn(() => true);
+    const quit = jest.fn();
+    const handleRelaunchRequest = jest.fn(async () => undefined);
+    const appInstance = { handleRelaunchRequest } as unknown as IaculaApp;
+
+    bootstrapSingleInstance(
+      { requestSingleInstanceLock, quit, on } as never,
+      () => appInstance,
+    );
+
+    expect(on).toHaveBeenCalledWith('activate', expect.any(Function));
+
+    listeners['activate']();
+    expect(handleRelaunchRequest).toHaveBeenCalledWith('activate');
   });
 });
 
@@ -68,6 +89,39 @@ describe('IaculaApp relaunch behavior', () => {
 
     const app = new IaculaApp(containerMock as never, false);
     await app.handleRelaunchRequest();
+
+    expect(close).toHaveBeenCalledWith('popup');
+    expect(close).toHaveBeenCalledWith('angelus');
+    expect(close).toHaveBeenCalledWith('reginaCaeli');
+    expect(close).toHaveBeenCalledWith('liturgyReminder');
+    expect(show).toHaveBeenCalledWith('settings');
+  });
+
+  it('ignores activate relaunch during startup stabilization window', async () => {
+    const close = jest.fn(async () => undefined);
+    const show = jest.fn(async () => undefined);
+    const containerMock = {
+      windowService: { close, show },
+    };
+
+    const app = new IaculaApp(containerMock as never, false);
+    await app.handleRelaunchRequest('activate');
+
+    expect(close).not.toHaveBeenCalled();
+    expect(show).not.toHaveBeenCalled();
+  });
+
+  it('handles activate relaunch after startup stabilization window', async () => {
+    const close = jest.fn(async () => undefined);
+    const show = jest.fn(async () => undefined);
+    const containerMock = {
+      windowService: { close, show },
+    };
+
+    const app = new IaculaApp(containerMock as never, false);
+    (app as unknown as { initializedAtMs: number }).initializedAtMs = Date.now() - 3000;
+
+    await app.handleRelaunchRequest('activate');
 
     expect(close).toHaveBeenCalledWith('popup');
     expect(close).toHaveBeenCalledWith('angelus');

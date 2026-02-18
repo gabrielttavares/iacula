@@ -16,6 +16,8 @@ import { buildIbreviaryOfficeUrl } from './liturgyOfficeUrl';
 // Enable remote module
 require('@electron/remote/main').initialize();
 
+const ACTIVATE_RELAUNCH_MIN_DELAY_MS = 1500;
+
 export class IaculaApp {
   private container: Container;
   private trayManager: TrayManager | null = null;
@@ -24,6 +26,7 @@ export class IaculaApp {
   private currentSettings: Settings | null = null;
   private liturgyModuleTimers: Partial<Record<LiturgyHourModule, NodeJS.Timeout>> = {};
   private readonly initializationPromise: Promise<void>;
+  private initializedAtMs: number | null = null;
 
   constructor(container?: Container, autoInitialize = true) {
     this.container = container ?? new Container();
@@ -54,6 +57,7 @@ export class IaculaApp {
     // Show initial popup
     await this.showPopup();
     this.timerManager?.markFirstUnlockPopupShownToday();
+    this.initializedAtMs = Date.now();
 
     // Handle window-all-closed
     app.on('window-all-closed', () => {
@@ -283,9 +287,15 @@ export class IaculaApp {
     await this.container.windowService.show('settings');
   }
 
-  public async handleRelaunchRequest(): Promise<void> {
+  public async handleRelaunchRequest(source: 'second-instance' | 'activate' = 'second-instance'): Promise<void> {
     await this.initializationPromise;
-    console.log('[single-instance] Relaunch request received, opening settings window');
+    if (source === 'activate') {
+      if (!this.shouldHandleActivateRelaunch()) {
+        console.log('[single-instance] activate ignored during startup stabilization window');
+        return;
+      }
+    }
+    console.log(`[single-instance] Relaunch request received via ${source}, opening settings window`);
 
     await Promise.all([
       this.container.windowService.close('popup'),
@@ -295,6 +305,13 @@ export class IaculaApp {
     ]);
 
     await this.showSettings();
+  }
+
+  private shouldHandleActivateRelaunch(): boolean {
+    if (this.initializedAtMs === null) {
+      return false;
+    }
+    return Date.now() - this.initializedAtMs >= ACTIVATE_RELAUNCH_MIN_DELAY_MS;
   }
 }
 
@@ -313,7 +330,11 @@ export function bootstrapSingleInstance(
   const iaculaApp = createApp();
 
   electronApp.on('second-instance', () => {
-    void iaculaApp.handleRelaunchRequest();
+    void iaculaApp.handleRelaunchRequest('second-instance');
+  });
+
+  electronApp.on('activate', () => {
+    void iaculaApp.handleRelaunchRequest('activate');
   });
 
   return iaculaApp;
