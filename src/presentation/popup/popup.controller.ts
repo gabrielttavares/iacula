@@ -50,6 +50,18 @@ class PopupController {
         this.quoteElement.textContent = quote.text;
       }
 
+      const seasonLabel = document.getElementById('season-label');
+      if (seasonLabel) {
+        const seasonMap: Record<string, string> = {
+          ordinary: 'tempo comum',
+          advent: 'tempo do advento',
+          lent: 'tempo da quaresma',
+          easter: 'tempo pascal',
+          christmas: 'tempo do natal',
+        };
+        seasonLabel.textContent = seasonMap[quote.season] ?? '';
+      }
+
       if (this.imageElement && quote.imagePath) {
         this.imageElement.src = quote.imagePath;
       }
