@@ -230,6 +230,20 @@
             color: rgba(255, 255, 255, 0.8);
             margin-top: 0.2rem;
         }
+
+        .season-label {
+            position: absolute;
+            bottom: 8px;
+            left: 1rem;
+            z-index: 3;
+            font-family: 'EB Garamond', serif;
+            font-size: 0.48rem;
+            letter-spacing: 0.08em;
+            text-transform: lowercase;
+            color: rgba(255, 255, 255, 0.28);
+            pointer-events: none;
+            user-select: none;
+        }
     </style>
 </head>
 
@@ -250,6 +264,7 @@
                     X
                 </button>
             </div>
+            <span id="season-label" class="season-label"></span>
         </div>
     </div>
     <script>
