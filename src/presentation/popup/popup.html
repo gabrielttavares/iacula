@@ -35,10 +35,10 @@
         }
 
         .quote-card {
-            width: 220px;
-            height: 300px;
+            width: 190px;
+            height: 190px;
             position: relative;
-            overflow: auto;
+            overflow: hidden;
             border-radius: 12px;
             /* Rounded borders */
             /* box-shadow removed to avoid conflict with window transparency */
@@ -71,6 +71,15 @@
             position: relative;
         }
 
+        .image-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            pointer-events: none;
+            z-index: 1;
+        }
+
         .image-container img {
             width: 100%;
             height: 100%;
@@ -80,30 +89,29 @@
 
         .quote-container {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 2rem 0.8rem 0.5rem;
-            background: linear-gradient(to top,
-                    rgba(0, 0, 0, 1) 0%,
-                    rgba(0, 0, 0, 0.97) 20%,
-                    rgba(0, 0, 0, 0.9) 40%,
-                    rgba(0, 0, 0, 0.75) 60%,
-                    rgba(0, 0, 0, 0.5) 75%,
-                    rgba(0, 0, 0, 0.3) 90%,
-                    rgba(0, 0, 0, 0) 100%);
+            inset: 0;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: left;
+            z-index: 2;
         }
 
         #daily-quote {
             font-family: 'Libre Baskerville', serif;
-            font-size: 0.6rem;
-            line-height: 1.4;
+            font-size: 0.76rem;
+            line-height: 1.45;
             color: #FFFFFF;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
             position: relative;
-            z-index: 1;
-            padding: 0.2rem;
+            z-index: 2;
+            width: 100%;
+            max-width: 100%;
+            display: -webkit-box;
+            -webkit-line-clamp: 8;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .settings-button {
@@ -162,16 +170,12 @@
         /* Media queries for even smaller screens */
         @media (max-width: 320px) {
             .quote-card {
-                width: 200px;
-                height: 280px;
+                width: 175px;
+                height: 175px;
             }
 
             #daily-quote {
-                font-size: 0.75rem;
-            }
-
-            .quote-container {
-                padding-top: 1.8rem;
+                font-size: 0.7rem;
             }
         }
 
@@ -213,10 +217,23 @@
             opacity: 1;
             pointer-events: auto;
         }
+
+        body.loading #daily-image {
+            filter: blur(2px) saturate(0.85);
+            transform: scale(1.02);
+        }
+
+        body.loading #daily-quote::after {
+            content: 'Carregando...';
+            display: block;
+            font-size: 0.56rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.2rem;
+        }
     </style>
 </head>
 
-<body>
+<body class="loading">
     <div class="quote-card">
         <div class="image-container">
             <img id="daily-image" src="/placeholder.svg" alt="Imagem do dia">
@@ -224,7 +241,7 @@
                 <p id="daily-quote"></p>
             </div>
             <div class="settings-button">
-                <button class="control-button settings-control-button" id="settings-button" aria-label="Abrir configuracoes">
+                <button class="control-button settings-control-button" id="settings-button" aria-label="Abrir configurações">
                     ⚙
                 </button>
             </div>

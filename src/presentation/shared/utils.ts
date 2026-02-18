@@ -4,6 +4,7 @@
  */
 
 import path from 'path';
+import { pathToFileURL } from 'url';
 import { ipcRenderer } from 'electron';
 import { IPC_CHANNELS } from '../../shared/types/IpcChannels';
 
@@ -95,4 +96,13 @@ function fadeOutAndRun(onDone: () => void): void {
 
 export function addFadeInEffect(): void {
   document.body.classList.add('fade-in');
+}
+
+export async function playNotificationSound(relativeAssetPath: string, volume: number): Promise<void> {
+  const normalizedVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume)) : 0.35;
+  const absolutePath = getAssetPath(relativeAssetPath);
+  const audioUrl = pathToFileURL(absolutePath).toString();
+  const audio = new Audio(audioUrl);
+  audio.volume = normalizedVolume;
+  await audio.play();
 }

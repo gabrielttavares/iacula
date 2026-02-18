@@ -17,8 +17,8 @@ const FADE_OUT_DURATION_MS = 700;
 
 const WINDOW_CONFIGS: Record<WindowType, WindowConfig> = {
   popup: {
-    width: 220,
-    height: 300,
+    width: 190,
+    height: 190,
     htmlFile: 'popup/popup.html',
   },
   angelus: {
@@ -32,9 +32,14 @@ const WINDOW_CONFIGS: Record<WindowType, WindowConfig> = {
     htmlFile: 'regina-caeli/reginaCaeli.html',
   },
   settings: {
-    width: 440,
-    height: 560,
+    width: 500,
+    height: 720,
     htmlFile: 'settings/settings.html',
+  },
+  liturgyReminder: {
+    width: 240,
+    height: 165,
+    htmlFile: 'liturgy-reminder/liturgyReminder.html',
   },
 };
 
@@ -59,8 +64,8 @@ export class WindowService implements IWindowService {
     const windowWidth = options?.width ?? config.width;
     const windowHeight = options?.height ?? config.height;
 
-    const isPopupType = type !== 'settings';
-    const isFocusableWindow = type === 'settings' || type === 'popup';
+    const isPopupType = type === 'popup' || type === 'angelus' || type === 'reginaCaeli' || type === 'liturgyReminder';
+    const isFocusableWindow = type === 'settings' || type === 'popup' || type === 'liturgyReminder';
 
     const window = new BrowserWindow({
       width: windowWidth,

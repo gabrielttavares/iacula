@@ -3,11 +3,13 @@ import { ISettingsRepository } from '../../../src/application/ports/ISettingsRep
 import { IAssetService } from '../../../src/application/ports/IAssetService';
 import { Settings } from '../../../src/domain/entities/Settings';
 import { PrayerCollection } from '../../../src/domain/entities/Prayer';
+import { ILiturgicalSeasonService } from '../../../src/application/ports/ILiturgicalSeasonService';
 
 describe('GetPrayerUseCase', () => {
   let useCase: GetPrayerUseCase;
   let mockSettingsRepository: jest.Mocked<ISettingsRepository>;
   let mockAssetService: jest.Mocked<IAssetService>;
+  let mockLiturgicalSeasonService: jest.Mocked<ILiturgicalSeasonService>;
 
   const mockPrayerCollection: PrayerCollection = {
     regular: {
@@ -42,12 +44,21 @@ describe('GetPrayerUseCase', () => {
       getReginaCaeliImagePath: jest.fn(),
     };
 
-    useCase = new GetPrayerUseCase(mockSettingsRepository, mockAssetService);
+    mockLiturgicalSeasonService = {
+      getCurrentSeason: jest.fn().mockResolvedValue('ordinary'),
+    };
+
+    useCase = new GetPrayerUseCase(
+      mockSettingsRepository,
+      mockAssetService,
+      mockLiturgicalSeasonService
+    );
   });
 
-  describe('when easterTime is false', () => {
+  describe('when season is not easter', () => {
     it('should return Angelus prayer', async () => {
-      const settings = Settings.create({ easterTime: false, language: 'pt-br' });
+      const settings = Settings.create({ language: 'pt-br' });
+      mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('lent');
       mockSettingsRepository.load.mockResolvedValue(settings);
       mockAssetService.loadPrayers.mockResolvedValue(mockPrayerCollection);
       mockAssetService.getAngelusImagePath.mockResolvedValue('/path/to/angelus.jpg');
@@ -60,7 +71,8 @@ describe('GetPrayerUseCase', () => {
     });
 
     it('should call getAngelusImagePath', async () => {
-      const settings = Settings.create({ easterTime: false });
+      const settings = Settings.create({});
+      mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('advent');
       mockSettingsRepository.load.mockResolvedValue(settings);
       mockAssetService.loadPrayers.mockResolvedValue(mockPrayerCollection);
       mockAssetService.getAngelusImagePath.mockResolvedValue('/path/to/angelus.jpg');
@@ -72,9 +84,10 @@ describe('GetPrayerUseCase', () => {
     });
   });
 
-  describe('when easterTime is true', () => {
+  describe('when season is easter', () => {
     it('should return Regina Caeli prayer', async () => {
-      const settings = Settings.create({ easterTime: true, language: 'pt-br' });
+      const settings = Settings.create({ language: 'pt-br' });
+      mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('easter');
       mockSettingsRepository.load.mockResolvedValue(settings);
       mockAssetService.loadPrayers.mockResolvedValue(mockPrayerCollection);
       mockAssetService.getReginaCaeliImagePath.mockResolvedValue('/path/to/regina.jpg');
@@ -87,7 +100,8 @@ describe('GetPrayerUseCase', () => {
     });
 
     it('should call getReginaCaeliImagePath', async () => {
-      const settings = Settings.create({ easterTime: true });
+      const settings = Settings.create({});
+      mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('easter');
       mockSettingsRepository.load.mockResolvedValue(settings);
       mockAssetService.loadPrayers.mockResolvedValue(mockPrayerCollection);
       mockAssetService.getReginaCaeliImagePath.mockResolvedValue('/path/to/regina.jpg');
@@ -101,7 +115,8 @@ describe('GetPrayerUseCase', () => {
 
   describe('forceEasterTime parameter', () => {
     it('should override settings.easterTime when forceEasterTime is true', async () => {
-      const settings = Settings.create({ easterTime: false });
+      const settings = Settings.create({});
+      mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('ordinary');
       mockSettingsRepository.load.mockResolvedValue(settings);
       mockAssetService.loadPrayers.mockResolvedValue(mockPrayerCollection);
       mockAssetService.getReginaCaeliImagePath.mockResolvedValue('/path/to/regina.jpg');
@@ -112,7 +127,8 @@ describe('GetPrayerUseCase', () => {
     });
 
     it('should override settings.easterTime when forceEasterTime is false', async () => {
-      const settings = Settings.create({ easterTime: true });
+      const settings = Settings.create({});
+      mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('easter');
       mockSettingsRepository.load.mockResolvedValue(settings);
       mockAssetService.loadPrayers.mockResolvedValue(mockPrayerCollection);
       mockAssetService.getAngelusImagePath.mockResolvedValue('/path/to/angelus.jpg');
@@ -124,7 +140,8 @@ describe('GetPrayerUseCase', () => {
   });
 
   it('should load prayers with correct language', async () => {
-    const settings = Settings.create({ language: 'en', easterTime: false });
+    const settings = Settings.create({ language: 'en' });
+    mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('ordinary');
     mockSettingsRepository.load.mockResolvedValue(settings);
     mockAssetService.loadPrayers.mockResolvedValue(mockPrayerCollection);
     mockAssetService.getAngelusImagePath.mockResolvedValue('/path/to/angelus.jpg');
@@ -135,7 +152,8 @@ describe('GetPrayerUseCase', () => {
   });
 
   it('should return complete prayer DTO', async () => {
-    const settings = Settings.create({ easterTime: false });
+    const settings = Settings.create({});
+    mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('ordinary');
     mockSettingsRepository.load.mockResolvedValue(settings);
     mockAssetService.loadPrayers.mockResolvedValue(mockPrayerCollection);
     mockAssetService.getAngelusImagePath.mockResolvedValue('/path/to/angelus.jpg');

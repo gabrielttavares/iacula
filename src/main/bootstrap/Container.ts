@@ -13,6 +13,7 @@ import { IAssetService } from '../../application/ports/IAssetService';
 import { IIndicesRepository } from '../../application/ports/IIndicesRepository';
 import { IAutoStartService } from '../../application/ports/IAutoStartService';
 import { IWindowService } from '../../application/ports/IWindowService';
+import { ILiturgicalSeasonService } from '../../application/ports/ILiturgicalSeasonService';
 
 // Infrastructure implementations
 import { FileSettingsRepository } from '../../infrastructure/storage/FileSettingsRepository';
@@ -20,6 +21,7 @@ import { FileAssetService } from '../../infrastructure/storage/FileAssetService'
 import { FileIndicesRepository } from '../../infrastructure/storage/FileIndicesRepository';
 import { AutoStartService } from '../../infrastructure/electron/AutoStartService';
 import { WindowService } from '../../infrastructure/electron/WindowService';
+import { RemoteLiturgicalSeasonService } from '../../infrastructure/liturgy/RemoteLiturgicalSeasonService';
 
 // Use Cases
 import { GetSettingsUseCase } from '../../application/use-cases/GetSettingsUseCase';
@@ -32,11 +34,15 @@ import { SettingsIpcHandler } from '../ipc/SettingsIpcHandler';
 import { QuoteIpcHandler } from '../ipc/QuoteIpcHandler';
 import { PrayerIpcHandler } from '../ipc/PrayerIpcHandler';
 import { SystemIpcHandler } from '../ipc/SystemIpcHandler';
+import { QuoteDTO } from '../../application/dto/QuoteDTO';
+import { LiturgyHoursIpcHandler } from '../ipc/LiturgyHoursIpcHandler';
+import { LiturgyHourModule, LiturgyReminderDTO } from '../../application/dto/LiturgyHoursDTO';
 
 export interface ContainerCallbacks {
   onSettingsUpdated: (easterTimeChanged: boolean) => void;
   onCloseSettingsAndShowPopup: () => void;
   onOpenSettingsFromContent: () => void;
+  onOpenLiturgyOffice: (module: LiturgyHourModule) => void;
 }
 
 export class Container {
@@ -46,6 +52,7 @@ export class Container {
   private _indicesRepository: IIndicesRepository | null = null;
   private _autoStartService: IAutoStartService | null = null;
   private _windowService: IWindowService | null = null;
+  private _liturgicalSeasonService: ILiturgicalSeasonService | null = null;
 
   // Use Cases
   private _getSettingsUseCase: GetSettingsUseCase | null = null;
@@ -58,6 +65,7 @@ export class Container {
   private _quoteIpcHandler: QuoteIpcHandler | null = null;
   private _prayerIpcHandler: PrayerIpcHandler | null = null;
   private _systemIpcHandler: SystemIpcHandler | null = null;
+  private _liturgyHoursIpcHandler: LiturgyHoursIpcHandler | null = null;
 
   private readonly isDevelopment: boolean;
   private readonly userDataPath: string;
@@ -113,6 +121,13 @@ export class Container {
     return this._windowService;
   }
 
+  get liturgicalSeasonService(): ILiturgicalSeasonService {
+    if (!this._liturgicalSeasonService) {
+      this._liturgicalSeasonService = new RemoteLiturgicalSeasonService();
+    }
+    return this._liturgicalSeasonService;
+  }
+
   // Use Cases
   get getSettingsUseCase(): GetSettingsUseCase {
     if (!this._getSettingsUseCase) {
@@ -136,7 +151,8 @@ export class Container {
       this._getNextQuoteUseCase = new GetNextQuoteUseCase(
         this.settingsRepository,
         this.assetService,
-        this.indicesRepository
+        this.indicesRepository,
+        this.liturgicalSeasonService
       );
     }
     return this._getNextQuoteUseCase;
@@ -146,7 +162,8 @@ export class Container {
     if (!this._getPrayerUseCase) {
       this._getPrayerUseCase = new GetPrayerUseCase(
         this.settingsRepository,
-        this.assetService
+        this.assetService,
+        this.liturgicalSeasonService
       );
     }
     return this._getPrayerUseCase;
@@ -168,6 +185,10 @@ export class Container {
       onCloseSettingsAndShowPopup: callbacks.onCloseSettingsAndShowPopup,
       onOpenSettingsFromContent: callbacks.onOpenSettingsFromContent,
     });
+
+    this._liturgyHoursIpcHandler = new LiturgyHoursIpcHandler({
+      onOpenLiturgyOffice: callbacks.onOpenLiturgyOffice,
+    });
   }
 
   registerIpcHandlers(): void {
@@ -175,6 +196,7 @@ export class Container {
     this._quoteIpcHandler?.register();
     this._prayerIpcHandler?.register();
     this._systemIpcHandler?.register();
+    this._liturgyHoursIpcHandler?.register();
   }
 
   unregisterIpcHandlers(): void {
@@ -182,5 +204,14 @@ export class Container {
     this._quoteIpcHandler?.unregister();
     this._prayerIpcHandler?.unregister();
     this._systemIpcHandler?.unregister();
+    this._liturgyHoursIpcHandler?.unregister();
+  }
+
+  setPreloadedPopupQuote(quote: QuoteDTO): void {
+    this._quoteIpcHandler?.setPreloadedQuote(quote);
+  }
+
+  setPreloadedLiturgyReminder(reminder: LiturgyReminderDTO): void {
+    this._liturgyHoursIpcHandler?.setPreloadedReminder(reminder);
   }
 }

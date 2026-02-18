@@ -124,7 +124,7 @@
 
         .prayer-container {
             padding: 1.4rem 1.6rem;
-            text-align: center;
+            text-align: left;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -156,7 +156,8 @@
             margin-bottom: 1rem;
             letter-spacing: 0.5px;
             position: relative;
-            display: inline-block;
+            display: block;
+            text-align: left;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
@@ -164,11 +165,11 @@
             content: '';
             position: absolute;
             bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 0;
+            transform: none;
             width: 50px;
             height: 2px;
-            background: linear-gradient(to right, transparent, var(--accent-color), transparent);
+            background: linear-gradient(to right, var(--accent-color), transparent);
         }
 
         .verse {
@@ -235,6 +236,23 @@
             pointer-events: auto;
         }
 
+        body.loading .image-container img {
+            filter: blur(2px) saturaté(0.85);
+            transform: scale(1.02);
+        }
+
+        body.loading .prayer-container {
+            opacity: 0.78;
+        }
+
+        body.loading .title::before {
+            content: 'Carregando...';
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+            color: var(--light-text);
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -265,12 +283,12 @@
     </style>
 </head>
 
-<body>
+<body class="loading">
     <div class="prayer-card">
         <div class="image-container">
             <img id="regina-caeli-image" src="/placeholder.svg" alt="Regina Caeli">
             <div class="settings-button">
-                <button class="control-button settings-control-button" id="settings-button" aria-label="Abrir configuracoes">
+                <button class="control-button settings-control-button" id="settings-button" aria-label="Abrir configurações">
                     ⚙
                 </button>
             </div>

@@ -8,10 +8,12 @@ import path from 'path';
 import { IAssetService } from '../../application/ports/IAssetService';
 import { QuotesCollection } from '../../domain/entities/Quote';
 import { PrayerCollection } from '../../domain/entities/Prayer';
+import { LiturgicalSeason } from '../../application/ports/ILiturgicalSeasonService';
 
 export class FileAssetService implements IAssetService {
   private readonly assetsPath: string;
   private readonly isDevelopment: boolean;
+  private seasonalImageIndex: Partial<Record<Exclude<LiturgicalSeason, 'ordinary'>, number>> = {};
 
   constructor(resourcesPath: string, isDevelopment: boolean = false) {
     this.isDevelopment = isDevelopment;
@@ -27,13 +29,32 @@ export class FileAssetService implements IAssetService {
     return path.join(this.assetsPath, relativePath);
   }
 
-  async loadQuotes(language: string): Promise<QuotesCollection> {
+  async loadQuotes(language: string, season: LiturgicalSeason = 'ordinary'): Promise<QuotesCollection> {
     try {
-      const quotesPath = this.getAssetPath(`quotes/${language}/quotes.json`);
+      const seasonalQuoteFiles: Record<Exclude<LiturgicalSeason, 'ordinary'>, string> = {
+        advent: 'advent.json',
+        lent: 'lent.json',
+        easter: 'easter.json',
+        christmas: 'christmas.json',
+      };
+
+      const isSeasonal = season !== 'ordinary';
+      const quotesPath = isSeasonal
+        ? this.getAssetPath(`quotes/pt-br/${seasonalQuoteFiles[season]}`)
+        : this.getAssetPath(`quotes/${language}/quotes.json`);
+
       const data = fs.readFileSync(quotesPath, 'utf-8');
       return JSON.parse(data) as QuotesCollection;
     } catch (error) {
-      console.error(`Error loading quotes for language ${language}:`, error);
+      console.error(`Error loading quotes for language ${language} and season ${season}:`, error);
+
+      // Fallback to ordinary quotes for requested language if seasonal file is missing.
+      if (season !== 'ordinary') {
+        const fallbackPath = this.getAssetPath(`quotes/${language}/quotes.json`);
+        const data = fs.readFileSync(fallbackPath, 'utf-8');
+        return JSON.parse(data) as QuotesCollection;
+      }
+
       throw new Error(`Failed to load quotes: ${error}`);
     }
   }
@@ -49,9 +70,19 @@ export class FileAssetService implements IAssetService {
     }
   }
 
-  async getImagePath(dayOfWeek: number): Promise<string | null> {
+  async getImagePath(dayOfWeek: number, season: LiturgicalSeason = 'ordinary'): Promise<string | null> {
     try {
-      const images = await this.listDayImages(dayOfWeek);
+      if (season !== 'ordinary') {
+        const seasonalImages = this.readSeasonalFlatImages(season);
+        if (seasonalImages.length > 0) {
+          const currentIndex = this.seasonalImageIndex[season] ?? 0;
+          const selectedIndex = currentIndex % seasonalImages.length;
+          this.seasonalImageIndex[season] = currentIndex + 1;
+          return seasonalImages[selectedIndex];
+        }
+      }
+
+      const images = await this.listDayImages(dayOfWeek, season);
       if (images.length === 0) {
         return null;
       }
@@ -62,22 +93,43 @@ export class FileAssetService implements IAssetService {
     }
   }
 
-  async listDayImages(dayOfWeek: number): Promise<string[]> {
+  async listDayImages(dayOfWeek: number, season: LiturgicalSeason = 'ordinary'): Promise<string[]> {
     try {
-      const imagesDir = this.getAssetPath(`images/ordinary/${dayOfWeek}`);
+      if (season !== 'ordinary') {
+        const seasonalImages = this.readSeasonalFlatImages(season);
+        if (seasonalImages.length > 0) {
+          return seasonalImages;
+        }
 
-      if (!fs.existsSync(imagesDir)) {
-        return [];
+        const seasonalLegacyByDay = this.readImageFilesFromDirectory(this.getAssetPath(`images/${season}/${dayOfWeek}`));
+        if (seasonalLegacyByDay.length > 0) {
+          console.warn(`[FileAssetService] Deprecated image layout in use for season=${season}: images/${season}/${dayOfWeek}. Move files to images/${season}/.`);
+          return seasonalLegacyByDay;
+        }
+
+        console.log(`[FileAssetService] No images found for season=${season}, day=${dayOfWeek}. Falling back to ordinary.`);
       }
 
-      const files = fs.readdirSync(imagesDir);
-      return files
-        .filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
-        .map(file => `file://${path.join(imagesDir, file)}`);
+      return this.readImageFilesFromDirectory(this.getAssetPath(`images/ordinary/${dayOfWeek}`));
     } catch (error) {
       console.error(`Error listing images for day ${dayOfWeek}:`, error);
       return [];
     }
+  }
+
+  private readImageFilesFromDirectory(imagesDir: string): string[] {
+    if (!fs.existsSync(imagesDir)) {
+      return [];
+    }
+
+    const files = fs.readdirSync(imagesDir);
+    return files
+      .filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
+      .map(file => `file://${path.join(imagesDir, file)}`);
+  }
+
+  private readSeasonalFlatImages(season: Exclude<LiturgicalSeason, 'ordinary'>): string[] {
+    return this.readImageFilesFromDirectory(this.getAssetPath(`images/${season}`));
   }
 
   async getAngelusImagePath(): Promise<string> {

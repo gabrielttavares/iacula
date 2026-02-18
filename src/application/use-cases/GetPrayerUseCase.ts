@@ -7,11 +7,13 @@ import { ISettingsRepository } from '../ports/ISettingsRepository';
 import { IAssetService } from '../ports/IAssetService';
 import { PrayerDTO } from '../dto/PrayerDTO';
 import { Prayer } from '../../domain/entities/Prayer';
+import { ILiturgicalSeasonService } from '../ports/ILiturgicalSeasonService';
 
 export class GetPrayerUseCase {
   constructor(
     private readonly settingsRepository: ISettingsRepository,
-    private readonly assetService: IAssetService
+    private readonly assetService: IAssetService,
+    private readonly liturgicalSeasonService: ILiturgicalSeasonService
   ) {}
 
   /**
@@ -20,8 +22,9 @@ export class GetPrayerUseCase {
   async execute(forceEasterTime?: boolean): Promise<PrayerDTO> {
     const settings = await this.settingsRepository.load();
     const prayerCollection = await this.assetService.loadPrayers(settings.language);
+    const season = await this.liturgicalSeasonService.getCurrentSeason();
 
-    const isEasterTime = forceEasterTime ?? settings.easterTime;
+    const isEasterTime = forceEasterTime ?? season === 'easter';
     const prayer = Prayer.fromCollection(prayerCollection, isEasterTime);
 
     const imagePath = isEasterTime

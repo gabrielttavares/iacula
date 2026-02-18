@@ -44,13 +44,18 @@ class ReginaCaeliController {
   }
 
   private async loadContent(): Promise<void> {
+    document.body.classList.add('loading');
+
     try {
       const prayer = await ipcRenderer.invoke(IPC_CHANNELS.GET_PRAYER, { forceEasterTime: true }) as PrayerDTO;
 
       this.renderPrayer(prayer);
       addFadeInEffect();
+      document.body.classList.remove('loading');
+      document.body.classList.add('loaded');
     } catch (error) {
       console.error('Error loading Regina Caeli content:', error);
+      document.body.classList.remove('loading');
     }
   }
 
