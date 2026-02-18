@@ -1,0 +1,115 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows
+            os: windows-latest
+            platform: win
+            build_args: --win nsis
+            artifact_name: windows
+          - name: linux
+            os: ubuntu-latest
+            platform: linux
+            build_args: --linux deb
+            artifact_name: linux
+          - name: macos-x64
+            os: macos-latest
+            platform: mac
+            build_args: --mac dmg --x64
+            artifact_name: macos-x64
+          - name: macos-arm64
+            os: macos-latest
+            platform: mac
+            build_args: --mac dmg --arm64
+            artifact_name: macos-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript and renderer assets
+        run: |
+          npm run prebuild
+          npx tsc
+
+      - name: Package Windows/Linux
+        if: matrix.platform != 'mac'
+        run: npx electron-builder ${{ matrix.build_args }} --publish never
+
+      - name: Package macOS (signed if secrets are available)
+        if: matrix.platform == 'mac' && secrets.APPLE_CERTIFICATE != '' && secrets.APPLE_CERTIFICATE_PASSWORD != ''
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          echo "$APPLE_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+          export CSC_LINK="file://$RUNNER_TEMP/certificate.p12"
+          npx electron-builder ${{ matrix.build_args }} --publish never
+
+      - name: Package macOS (unsigned fallback)
+        if: matrix.platform == 'mac' && (secrets.APPLE_CERTIFICATE == '' || secrets.APPLE_CERTIFICATE_PASSWORD == '')
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder ${{ matrix.build_args }} --publish never
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: iacula-${{ matrix.artifact_name }}
+          path: release/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: iacula-*
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: release-artifacts/**/*
+          fail_on_unmatched_files: true
