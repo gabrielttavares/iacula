@@ -15,9 +15,9 @@
         "test:coverage": "jest --coverage",
         "check:ptbr": "node scripts/validate-ptbr-encoding.js",
         "test:liturgy:integration": "cross-env RUN_LITURGY_API_TESTS=1 jest tests/infrastructure/liturgy/RemoteLiturgicalSeasonService.integration.test.ts --runInBand",
-        "release:patch": "npm version patch && npm run build",
-        "release:minor": "npm version minor && npm run build",
-        "release:major": "npm version major && npm run build"
+        "release:patch": "npm version patch && git push origin main --follow-tags",
+        "release:minor": "npm version minor && git push origin main --follow-tags",
+        "release:major": "npm version major && git push origin main --follow-tags"
     },
     "author": {
         "name": "Gabriel Tavares",
