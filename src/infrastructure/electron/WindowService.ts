@@ -65,6 +65,7 @@ export class WindowService implements IWindowService {
     const windowHeight = options?.height ?? config.height;
 
     const isPopupType = type === 'popup' || type === 'angelus' || type === 'reginaCaeli' || type === 'liturgyReminder';
+    const isHiddenFromTaskSwitcher = isPopupType || (this.isMac && type === 'settings');
     const isFocusableWindow = type === 'settings' || type === 'popup' || type === 'liturgyReminder';
 
     const window = new BrowserWindow({
@@ -77,7 +78,7 @@ export class WindowService implements IWindowService {
       alwaysOnTop: isPopupType,
       show: false,
       focusable: isFocusableWindow,
-      skipTaskbar: isPopupType,
+      skipTaskbar: isHiddenFromTaskSwitcher,
       backgroundColor: '#00000000', // Fully transparent
       hasShadow: false, // Disable native shadow
       roundedCorners: true,

@@ -42,6 +42,7 @@ export class IaculaApp {
 
     // Setup managers
     this.setupManagers();
+    this.enforceMacAccessoryMode('initialize');
 
     // Setup IPC handlers
     this.setupIpc();
@@ -284,6 +285,7 @@ export class IaculaApp {
   }
 
   private async showSettings(): Promise<void> {
+    this.enforceMacAccessoryMode('show-settings');
     await this.container.windowService.show('settings');
   }
 
@@ -295,6 +297,7 @@ export class IaculaApp {
         return;
       }
     }
+    this.enforceMacAccessoryMode(`relaunch-${source}`);
     console.log(`[single-instance] Relaunch request received via ${source}, opening settings window`);
 
     await Promise.all([
@@ -305,6 +308,20 @@ export class IaculaApp {
     ]);
 
     await this.showSettings();
+  }
+
+  private enforceMacAccessoryMode(context: string): void {
+    if (process.platform !== 'darwin') {
+      return;
+    }
+
+    try {
+      app.setActivationPolicy('accessory');
+      app.dock.hide();
+      console.log(`[dock] enforced policy=accessory + hidden (${context})`);
+    } catch (error) {
+      console.warn(`[dock] failed to enforce accessory mode (${context})`, error);
+    }
   }
 
   private shouldHandleActivateRelaunch(): boolean {

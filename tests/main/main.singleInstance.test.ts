@@ -4,6 +4,10 @@ jest.mock('electron', () => ({
     on: jest.fn(),
     quit: jest.fn(),
     requestSingleInstanceLock: jest.fn(),
+    setActivationPolicy: jest.fn(),
+    dock: {
+      hide: jest.fn(),
+    },
   },
   shell: {
     openExternal: jest.fn(),
