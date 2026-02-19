@@ -54,7 +54,13 @@ export default function App() {
         className="top-nav"
         aria-label="Navegação principal"
       >
-        <span className="brand-mark">Iacula</span>
+        <img
+          src="/images/icon.png"
+          alt="Iacula"
+          className="brand-icon"
+          width="140"
+          height="42"
+        />
         <a
           href="https://github.com/gabrielttavares/iacula"
           target="_blank"

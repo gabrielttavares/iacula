@@ -33,4 +33,6 @@ test('integra citações como inspiração contextual sem seção dedicada', () 
   expect(screen.queryByRole('heading', { name: /Citações de santos/i })).not.toBeInTheDocument();
   expect(screen.getAllByText(/Acostuma-te a elevar o coração a Deus/i).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/Só Deus basta/i).length).toBeGreaterThan(0);
+  expect(screen.getByText(/Temos esta esperança como âncora da alma/i)).toBeInTheDocument();
+  expect(screen.getByText(/Orai sem cessar/i)).toBeInTheDocument();
 });

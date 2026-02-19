@@ -70,6 +70,13 @@ body {
   text-transform: uppercase;
 }
 
+.brand-icon {
+  width: 2.15rem;
+  height: 2.15rem;
+  object-fit: contain;
+  filter: grayscale(1) contrast(1.05) brightness(0.42);
+}
+
 .top-nav-link {
   display: inline-flex;
   align-items: center;

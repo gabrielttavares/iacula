@@ -10,7 +10,7 @@ export const SAINT_QUOTES: SaintQuote[] = [
   {
     context: 'hero',
     author: 'São Josemaria Escrivá',
-    text: 'Acostuma-te a elevar o coração a Deus, em ação de graças, muitas vezes ao dia.',
+    text: 'Acostuma-te a elevar o coração a Deus, muitas vezes ao dia.',
   },
   {
     context: 'purpose',
@@ -24,7 +24,7 @@ export const SAINT_QUOTES: SaintQuote[] = [
   },
   {
     context: 'footer',
-    author: 'Santa Teresa de Ávila',
-    text: 'Quem tem Deus, nada lhe falta. Só Deus basta.',
+    author: 'Hebreus 6,19',
+    text: 'Temos esta esperança como âncora da alma, firme e segura.',
   },
 ];
