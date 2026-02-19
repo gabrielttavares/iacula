@@ -30,11 +30,16 @@ export default function App() {
   }, []);
 
   const cta = useMemo(() => {
+    const fallbackUrl = manifest?.fallbackUrl || FALLBACK_RELEASES_URL;
+
     if (!manifest) {
-      return DEFAULT_CTA;
+      return {
+        ...DEFAULT_CTA,
+        href: fallbackUrl,
+      };
     }
 
-    return buildDownloadCta(manifest, platform, FALLBACK_RELEASES_URL);
+    return buildDownloadCta(manifest, platform, fallbackUrl);
   }, [manifest, platform]);
 
   return (
