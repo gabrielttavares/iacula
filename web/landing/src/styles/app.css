@@ -1,44 +1,35 @@
-* {
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0c0c0c;
+  --color-surface: #161616;
+  --color-card: #1c1c1c;
+  --color-gold: #c9a96e;
+  --color-gold-strong: #b8924f;
+  --color-gold-dim: rgba(201, 169, 110, 0.15);
+  --color-gold-border: rgba(201, 169, 110, 0.25);
+  --color-text: #f0ece4;
+  --color-muted: #7a7268;
+  --color-muted-light: #9a9488;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-serif: 'Libre Baskerville', Georgia, serif;
+}
+
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.7;
   margin: 0;
-  background: radial-gradient(circle at top left, #ffffff 0%, var(--bg) 60%);
-  color: var(--text);
-  font-family: "Libre Baskerville", Georgia, serif;
-}
-
-main {
-  width: min(960px, 100%);
-  margin: 0 auto;
-  padding: 2.5rem 1rem 4rem;
-  display: grid;
-  gap: 2rem;
-}
-
-section {
-  background: var(--card);
-  border-radius: 14px;
-  padding: 1.25rem;
-  border: 1px solid rgba(47, 91, 79, 0.18);
-}
-
-h1,
-h2 {
-  margin: 0 0 0.75rem;
-}
-
-.cta-primary {
-  display: inline-block;
-  text-decoration: none;
-  background: var(--accent);
-  color: #fff;
-  padding: 0.75rem 1.1rem;
-  border-radius: 10px;
-  font-weight: 600;
-}
-
-.cta-primary:hover {
-  background: var(--accent-strong);
+  -webkit-font-smoothing: antialiased;
 }

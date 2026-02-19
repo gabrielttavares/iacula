@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { expect, test, vi } from 'vitest';
 import App from '../App';
 
-test('CTA principal é visível e possui estilo primário', async () => {
+test('CTA principal é visível e acessível', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
     ok: true,
     json: async () => ({
@@ -14,5 +14,5 @@ test('CTA principal é visível e possui estilo primário', async () => {
   render(<App />);
   const ctaLink = screen.getByRole('link', { name: /Baixar|Ver downloads/i });
   expect(ctaLink).toBeVisible();
-  expect(ctaLink).toHaveClass('cta-primary');
+  expect(ctaLink).toHaveAttribute('href');
 });

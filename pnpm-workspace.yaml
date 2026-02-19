@@ -1,2 +1,8 @@
+packages:
+  - web/landing
+
 onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
   - electron
+  - esbuild
+  - lightningcss
