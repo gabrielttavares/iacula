@@ -9,8 +9,8 @@ export interface SaintQuote {
 export const SAINT_QUOTES: SaintQuote[] = [
   {
     context: 'hero',
-    author: 'São Josemaria Escrivá',
-    text: 'Acostuma-te a elevar o coração a Deus, muitas vezes ao dia.',
+    author: 'Salmos 16,8',
+    text: '“Tenho sempre o Senhor diante dos meus olhos.”',
   },
   {
     context: 'purpose',
