@@ -79,6 +79,7 @@
             "target": [
                 "AppImage"
             ],
+            "executableArgs": ["--no-sandbox"],
             "category": "Utility",
             "maintainer": "Gabriel Tavares <gabrieltxtavares@gmail.com>",
             "compression": null,
