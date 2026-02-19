@@ -1,4 +1,4 @@
-### iacula
+### Iacula
 
 ## Landing page module
 
@@ -19,5 +19,3 @@ Changes to `web/landing/**` pushed to `main` automatically trigger a Vercel **pr
 | `VERCEL_TOKEN` | Personal access token from [Vercel Settings](https://vercel.com/account/tokens) |
 | `VERCEL_ORG_ID` | Team/org ID (run `vercel link` in `web/landing` then check `.vercel/project.json`) |
 | `VERCEL_PROJECT_ID` | Project ID (same file as above) |
-
-Add these in GitHub repo Settings > Secrets and variables > Actions.
