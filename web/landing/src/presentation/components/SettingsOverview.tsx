@@ -1,3 +1,6 @@
+import { SaintQuote } from '../../content/quotes';
+import { InspirationalQuote } from './SaintQuotes';
+
 const FEATURES = [
   {
     title: 'Intervalo entre popups',
@@ -52,69 +55,58 @@ const FEATURES = [
     ),
   },
   {
-    title: 'Discreto e leve',
-    description: 'Roda silenciosamente na bandeja do sistema, sem interferir no seu trabalho.',
+    title: 'Angelus ao meio-dia',
+    description: 'Popup automático do Angelus (ou Regina Caeli no Tempo Pascal) às 12h.',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        <path d="M12 2v4" />
+        <path d="M12 18v4" />
+        <path d="M4.93 4.93l2.83 2.83" />
+        <path d="M16.24 16.24l2.83 2.83" />
+        <path d="M2 12h4" />
+        <path d="M18 12h4" />
+        <path d="M4.93 19.07l2.83-2.83" />
+        <path d="M16.24 7.76l2.83-2.83" />
+        <circle cx="12" cy="12" r="4" />
       </svg>
     ),
   },
 ];
 
-export function SettingsOverview() {
+interface SettingsOverviewProps {
+  quote: SaintQuote;
+}
+
+export function SettingsOverview({ quote }: SettingsOverviewProps) {
   return (
     <section
       aria-label="Configurações"
-      style={{ background: 'var(--color-bg)' }}
-      className="py-24 px-6"
+      className="section-shell section-shell--tint"
     >
-      <div className="max-w-5xl mx-auto">
-        {/* section header */}
-        <div className="flex flex-col items-center text-center mb-16 gap-4">
-          <p
-            className="text-xs tracking-[0.35em] uppercase"
-            style={{ color: 'var(--color-gold)' }}
-          >
+      <div className="section-inner">
+        <div className="section-heading">
+          <p className="eyebrow">
             Personalize sua experiência
           </p>
-          <h2
-            className="text-4xl md:text-5xl font-light"
-            style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
-          >
+          <h2 className="section-title">
             Configurações
           </h2>
-          <div
-            className="w-12 h-px"
-            style={{ background: 'var(--color-gold)' }}
-            aria-hidden="true"
-          />
+          <div className="ornament" aria-hidden="true" />
         </div>
 
-        {/* feature cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <InspirationalQuote quote={quote} />
+
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {FEATURES.map((feature) => (
             <div
               key={feature.title}
-              className="group p-7 border flex flex-col gap-4 transition-all duration-300"
-              style={{
-                background: 'var(--color-card)',
-                borderColor: 'var(--color-gold-border)',
-              }}
+              className="editorial-card"
             >
-              <div style={{ color: 'var(--color-gold)' }}>
-                {feature.icon}
-              </div>
-              <h3
-                className="text-lg font-semibold"
-                style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
-              >
+              <div className="card-icon">{feature.icon}</div>
+              <h3 className="card-title">
                 {feature.title}
               </h3>
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: 'var(--color-muted-light)' }}
-              >
+              <p className="card-copy">
                 {feature.description}
               </p>
             </div>

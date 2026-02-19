@@ -5,8 +5,9 @@ import { DownloadManifest } from './domain/download/types';
 import { fetchManifest } from './infrastructure/manifest/fetchManifest';
 import { DownloadCtaModel } from './presentation/components/DownloadCTA';
 import { Hero } from './presentation/components/Hero';
-import { SaintQuotes } from './presentation/components/SaintQuotes';
+import { InspirationalQuote } from './presentation/components/SaintQuotes';
 import { SettingsOverview } from './presentation/components/SettingsOverview';
+import { SAINT_QUOTES } from './content/quotes';
 
 const FALLBACK_RELEASES_URL = 'https://github.com/gabrielttavares/iacula/releases';
 const DEFAULT_CTA: DownloadCtaModel = {
@@ -42,30 +43,23 @@ export default function App() {
     return buildDownloadCta(manifest, platform, fallbackUrl);
   }, [manifest, platform]);
 
+  const heroQuote = SAINT_QUOTES.find((quote) => quote.context === 'hero') || SAINT_QUOTES[0];
+  const purposeQuote = SAINT_QUOTES.find((quote) => quote.context === 'purpose') || SAINT_QUOTES[1];
+  const settingsQuote = SAINT_QUOTES.find((quote) => quote.context === 'settings') || SAINT_QUOTES[2];
+  const footerQuote = SAINT_QUOTES.find((quote) => quote.context === 'footer') || SAINT_QUOTES[3];
+
   return (
-    <div style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
-      {/* NAV */}
+    <div className="app-shell">
       <nav
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5"
-        style={{
-          background: 'rgba(12,12,12,0.85)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid var(--color-gold-border)',
-        }}
+        className="top-nav"
         aria-label="Navegação principal"
       >
-        <span
-          className="text-xl font-light tracking-widest uppercase"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--color-gold)' }}
-        >
-          Iacula
-        </span>
+        <span className="brand-mark">Iacula</span>
         <a
           href="https://github.com/gabrielttavares/iacula"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-xs tracking-widest uppercase transition-colors duration-200"
-          style={{ color: 'var(--color-muted-light)' }}
+          className="top-nav-link"
           aria-label="Ver no GitHub"
         >
           <svg
@@ -82,102 +76,62 @@ export default function App() {
         </a>
       </nav>
 
-      {/* HERO */}
-      <Hero cta={cta} />
+      <Hero cta={cta} quote={heroQuote} />
 
-      {/* PROPÓSITO */}
       <section
         aria-label="Propósito do app"
-        style={{ background: 'var(--color-bg)' }}
-        className="py-24 px-6"
+        className="section-shell"
       >
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="flex flex-col gap-6">
-            <p
-              className="text-xs tracking-[0.35em] uppercase"
-              style={{ color: 'var(--color-gold)' }}
-            >
+        <div className="section-inner grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-14">
+          <div className="flex flex-col gap-5">
+            <p className="eyebrow">
               Por que o Iacula?
             </p>
-            <h2
-              className="text-4xl md:text-5xl font-light leading-tight"
-              style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
-            >
+            <h2 className="section-title">
               Presença de Deus no cotidiano
             </h2>
-            <div
-              className="w-12 h-px"
-              style={{ background: 'var(--color-gold)' }}
-              aria-hidden="true"
-            />
-            <p
-              className="text-base leading-relaxed"
-              style={{ color: 'var(--color-muted-light)' }}
-            >
+            <div className="ornament" aria-hidden="true" />
+            <p className="section-copy">
               O Iacula foi pensado para ajudar você a manter viva a oração breve no meio
               das tarefas normais do dia. Uma jaculatória, um versículo, um lembrete discreto
               — e o coração se volta a Deus sem interromper o trabalho.
             </p>
-            <p
-              className="text-base leading-relaxed"
-              style={{ color: 'var(--color-muted-light)' }}
-            >
+            <p className="section-copy">
               Inspirado na espiritualidade do trabalho santificado, o aplicativo roda
               silenciosamente na bandeja do sistema e aparece nos momentos certos.
             </p>
+            <InspirationalQuote quote={purposeQuote} />
           </div>
 
-          <div className="relative">
-            <div
-              className="absolute -inset-3 -z-10"
-              style={{ background: 'var(--color-gold-dim)' }}
-              aria-hidden="true"
-            />
+          <div className="relative mt-2 lg:mt-0">
             <img
               src="/images/purpose.jpg"
               alt="Imagem de oração e contemplação"
               className="w-full object-cover"
-              style={{
-                border: '1px solid var(--color-gold-border)',
-                aspectRatio: '4/3',
-              }}
+              style={{ border: '1px solid var(--color-line)', aspectRatio: '4/3' }}
             />
           </div>
         </div>
       </section>
 
-      {/* CITAÇÕES */}
-      <SaintQuotes />
+      <SettingsOverview quote={settingsQuote} />
 
-      {/* CONFIGURAÇÕES */}
-      <SettingsOverview />
-
-      {/* FOOTER */}
       <footer
-        className="py-12 px-6 text-center flex flex-col items-center gap-4"
-        style={{ borderTop: '1px solid var(--color-gold-border)' }}
+        className="footer-shell"
       >
-        <span
-          className="text-2xl font-light tracking-widest uppercase"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--color-gold)' }}
-        >
-          Iacula
-        </span>
-        <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+        <span className="brand-mark">Iacula</span>
+        <p className="meta-line">
           Gratuito e de código aberto.{' '}
           <a
             href="https://github.com/gabrielttavares/iacula"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline underline-offset-4 transition-colors duration-200"
-            style={{ color: 'var(--color-muted-light)' }}
+            className="footer-link"
           >
             Ver no GitHub
           </a>
         </p>
-        <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
-          &ldquo;Quem tem Deus, nada lhe falta. Só Deus basta.&rdquo; — Santa Teresa de Ávila
-        </p>
+        <InspirationalQuote quote={footerQuote} compact />
       </footer>
     </div>
   );

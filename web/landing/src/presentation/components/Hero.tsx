@@ -1,98 +1,50 @@
 import { DownloadCTA, DownloadCtaModel } from './DownloadCTA';
+import { SaintQuote } from '../../content/quotes';
+import { InspirationalQuote } from './SaintQuotes';
 
 interface HeroProps {
   cta: DownloadCtaModel;
+  quote: SaintQuote;
 }
 
-export function Hero({ cta }: HeroProps) {
+export function Hero({ cta, quote }: HeroProps) {
   return (
     <section
       aria-label="Apresentação do Iacula"
-      className="relative flex flex-col items-center justify-center min-h-screen text-center px-6 overflow-hidden"
+      className="hero-shell relative overflow-hidden px-4 pb-16 pt-28 sm:px-6 sm:pb-20 sm:pt-32"
     >
-      {/* background image */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="hero-backdrop"
         style={{ backgroundImage: "url('/images/hero.jpg')" }}
         aria-hidden="true"
       />
+      <div className="hero-overlay" aria-hidden="true" />
 
-      {/* dark overlay with gradient */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(to bottom, rgba(12,12,12,0.55) 0%, rgba(12,12,12,0.75) 60%, rgba(12,12,12,0.95) 100%)',
-        }}
-        aria-hidden="true"
-      />
-
-      {/* gold top line */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'var(--color-gold)' }}
-        aria-hidden="true"
-      />
-
-      {/* content */}
-      <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center gap-6">
-        <p
-          className="text-xs tracking-[0.35em] uppercase"
-          style={{ color: 'var(--color-gold)' }}
-        >
+      <div className="hero-content relative z-10 mx-auto mt-10 flex max-w-4xl flex-col items-start gap-6">
+        <p className="eyebrow">
           Jaculatórias · Presença de Deus
         </p>
 
-        <h1
-          className="text-6xl md:text-8xl font-light leading-none tracking-tight"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
-        >
+        <h1 className="hero-title">
           Iacula
         </h1>
 
-        <div
-          className="w-16 h-px"
-          style={{ background: 'var(--color-gold)' }}
-          aria-hidden="true"
-        />
+        <div className="ornament" aria-hidden="true" />
 
-        <p
-          className="text-lg md:text-xl font-light max-w-xl leading-relaxed"
-          style={{ color: 'var(--color-muted-light)', fontFamily: 'var(--font-display)' }}
-        >
+        <p className="hero-subtitle">
           Um auxílio simples para cultivar a presença de Deus no cotidiano,
           com jaculatórias e lembretes discretos ao longo do dia.
         </p>
 
-        <div className="mt-2">
+        <InspirationalQuote quote={quote} compact />
+
+        <div className="mt-1">
           <DownloadCTA cta={cta} size="lg" />
         </div>
 
-        <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+        <p className="meta-line">
           Windows · macOS · Linux — gratuito
         </p>
-      </div>
-
-      {/* scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
-        <span className="text-xs tracking-widest uppercase" style={{ color: 'var(--color-muted)' }}>
-          Rolar
-        </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          style={{ color: 'var(--color-muted)' }}
-          aria-hidden="true"
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
       </div>
     </section>
   );

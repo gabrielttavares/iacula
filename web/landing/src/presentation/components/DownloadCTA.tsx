@@ -11,15 +11,15 @@ interface DownloadCTAProps {
 
 export function DownloadCTA({ cta, size = 'lg' }: DownloadCTAProps) {
   const base =
-    'inline-flex items-center gap-2 font-serif font-bold tracking-wide uppercase transition-all duration-300 border';
+    'inline-flex items-center justify-center gap-2 font-serif font-semibold tracking-[0.18em] uppercase transition-colors duration-200 border';
 
   const sizes =
     size === 'lg'
-      ? 'px-8 py-4 text-sm'
-      : 'px-5 py-2.5 text-xs';
+      ? 'min-h-11 px-6 py-3 text-[0.68rem] sm:px-8'
+      : 'min-h-10 px-4 py-2 text-[0.64rem]';
 
   const style =
-    'border-[var(--color-gold)] text-[var(--color-gold)] hover:bg-[var(--color-gold)] hover:text-[var(--color-bg)]';
+    'border-[var(--color-accent)] bg-[var(--color-accent)] text-[#fffaf0] hover:bg-[var(--color-accent-strong)] hover:border-[var(--color-accent-strong)]';
 
   return (
     <a
