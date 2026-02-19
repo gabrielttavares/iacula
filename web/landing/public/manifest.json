@@ -1,0 +1,8 @@
+{
+  "version": "2.0.7",
+  "assets": {
+    "windows": "https://github.com/gabrielttavares/iacula/releases/download/v2.0.7/Iacula-Setup-2.0.7.exe",
+    "linux": "https://github.com/gabrielttavares/iacula/releases/download/v2.0.7/Iacula-2.0.7.AppImage"
+  },
+  "fallbackUrl": "https://github.com/gabrielttavares/iacula/releases"
+}
