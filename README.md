@@ -17,7 +17,7 @@ Changes to `web/landing/**` pushed to `main` automatically trigger a Vercel **pr
 | Secret | Description |
 |---|---|
 | `VERCEL_TOKEN` | Personal access token from [Vercel Settings](https://vercel.com/account/tokens) |
-| `VERCEL_ORG_ID` | Team/org ID (`team_dkmiIFvJlLjV7YFcPAlwHo8L`) |
-| `VERCEL_PROJECT_ID` | Project ID (`prj_14mAUOGsGFYiU2IlWJjKCJg9hift`) |
+| `VERCEL_ORG_ID` | Team/org ID (run `vercel link` in `web/landing` then check `.vercel/project.json`) |
+| `VERCEL_PROJECT_ID` | Project ID (same file as above) |
 
 Add these in GitHub repo Settings > Secrets and variables > Actions.
