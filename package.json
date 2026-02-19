@@ -1,6 +1,6 @@
 {
     "name": "iacula",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "description": "Cultivar Presença de Deus",
     "main": "dist/main/main.js",
     "scripts": {
@@ -79,7 +79,9 @@
             "target": [
                 "AppImage"
             ],
-            "executableArgs": ["--no-sandbox"],
+            "executableArgs": [
+                "--no-sandbox"
+            ],
             "category": "Utility",
             "maintainer": "Gabriel Tavares <gabrieltxtavares@gmail.com>",
             "compression": null,
