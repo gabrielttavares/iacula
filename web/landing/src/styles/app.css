@@ -1,0 +1,44 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top left, #ffffff 0%, var(--bg) 60%);
+  color: var(--text);
+  font-family: "Libre Baskerville", Georgia, serif;
+}
+
+main {
+  width: min(960px, 100%);
+  margin: 0 auto;
+  padding: 2.5rem 1rem 4rem;
+  display: grid;
+  gap: 2rem;
+}
+
+section {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 1.25rem;
+  border: 1px solid rgba(47, 91, 79, 0.18);
+}
+
+h1,
+h2 {
+  margin: 0 0 0.75rem;
+}
+
+.cta-primary {
+  display: inline-block;
+  text-decoration: none;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.75rem 1.1rem;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.cta-primary:hover {
+  background: var(--accent-strong);
+}
