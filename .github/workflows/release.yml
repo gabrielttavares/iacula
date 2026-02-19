@@ -76,6 +76,23 @@ jobs:
           path: release-artifacts
           merge-multiple: true
 
+      - name: Generate landing manifest
+        id: generate-landing-manifest
+        run: |
+          node scripts/generate-landing-manifest.js \
+            --artifacts-dir release-artifacts \
+            --output web/landing/public/manifest.json \
+            --version "${{ github.ref_name }}" \
+            --fallback-url "https://github.com/gabrielttavares/iacula/releases"
+
+      - name: Upload landing manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: landing-manifest
+          path: web/landing/public/manifest.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Publish release assets
         uses: softprops/action-gh-release@v2
         env:
