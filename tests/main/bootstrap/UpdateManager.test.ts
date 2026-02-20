@@ -87,7 +87,7 @@ describe('UpdateManager', () => {
 
     expect(dialog.showMessageBox).toHaveBeenCalledWith(expect.objectContaining({
       title: 'Atualização disponível',
-      message: 'Uma nova versão do Iacula está disponível. Deseja baixar agora?',
+      message: 'A versão v1.2.0 do Iacula está disponível. Deseja baixar agora?',
       buttons: ['Baixar agora', 'Depois'],
     }));
     expect(autoUpdater.downloadUpdate).toHaveBeenCalledTimes(1);
@@ -109,12 +109,12 @@ describe('UpdateManager', () => {
     const manager = new UpdateManager({ isPackaged: true, checkIntervalMs: sixHoursMs });
     manager.start();
 
-    (autoUpdater as unknown as EventEmitter).emit('update-downloaded');
+    (autoUpdater as unknown as EventEmitter).emit('update-downloaded', { version: '1.2.0' });
     await flushMicrotasks();
 
     expect(dialog.showMessageBox).toHaveBeenCalledWith(expect.objectContaining({
       title: 'Atualização pronta para instalar',
-      message: 'A atualização foi baixada com sucesso. Deseja instalar agora?',
+      message: 'A versão v1.2.0 foi baixada com sucesso. Deseja instalar agora?',
       buttons: ['Instalar agora', 'Depois'],
     }));
     expect(autoUpdater.quitAndInstall).toHaveBeenCalledTimes(1);
@@ -125,7 +125,7 @@ describe('UpdateManager', () => {
     const manager = new UpdateManager({ isPackaged: true, checkIntervalMs: sixHoursMs });
     manager.start();
 
-    (autoUpdater as unknown as EventEmitter).emit('update-downloaded');
+    (autoUpdater as unknown as EventEmitter).emit('update-downloaded', { version: '1.2.0' });
     await flushMicrotasks();
 
     expect(autoUpdater.quitAndInstall).not.toHaveBeenCalled();

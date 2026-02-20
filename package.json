@@ -7,6 +7,8 @@
         "start": "electron .",
         "dev": "cross-env NODE_ENV=development concurrently \"npm run watch\" \"npm run copy-renderer\" \"npm run start\"",
         "build": "npm run prebuild && tsc && electron-builder",
+        "build:intel": "npm run prebuild && tsc && electron-builder --x64",
+        "build:arm": "npm run prebuild && tsc && electron-builder --arm64",
         "watch": "tsc -w",
         "prebuild": "npm run copy-renderer",
         "copy-renderer": "node scripts/copy-assets.js",

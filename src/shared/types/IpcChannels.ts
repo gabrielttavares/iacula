@@ -30,6 +30,7 @@ export const IPC_CHANNELS = {
 
   // System
   GET_USER_DATA_PATH: 'get-user-data-path',
+  GET_APP_VERSION: 'get-app-version',
 } as const;
 
 // Type-safe IPC request/response types
@@ -44,6 +45,7 @@ export interface IpcRequestMap {
   [IPC_CHANNELS.OPEN_SETTINGS_FROM_CONTENT]: void;
   [IPC_CHANNELS.OPEN_LITURGY_OFFICE]: { module: LiturgyHourModule };
   [IPC_CHANNELS.GET_USER_DATA_PATH]: void;
+  [IPC_CHANNELS.GET_APP_VERSION]: void;
 }
 
 export interface IpcResponseMap {
@@ -57,4 +59,5 @@ export interface IpcResponseMap {
   [IPC_CHANNELS.OPEN_SETTINGS_FROM_CONTENT]: void;
   [IPC_CHANNELS.OPEN_LITURGY_OFFICE]: void;
   [IPC_CHANNELS.GET_USER_DATA_PATH]: string;
+  [IPC_CHANNELS.GET_APP_VERSION]: string;
 }

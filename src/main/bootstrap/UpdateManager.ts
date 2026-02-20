@@ -14,6 +14,10 @@ interface UpdaterLike {
   removeListener?: (event: string, listener: (...args: unknown[]) => void) => void;
 }
 
+interface UpdateInfo {
+  version: string;
+}
+
 interface UpdateManagerOptions {
   isPackaged?: boolean;
   checkIntervalMs?: number;
@@ -27,12 +31,14 @@ export class UpdateManager {
   private checkTimer: NodeJS.Timeout | null = null;
   private started = false;
 
-  private readonly onUpdateAvailableHandler = () => {
-    this.handleUpdateAvailable();
+  private readonly onUpdateAvailableHandler = (...args: unknown[]) => {
+    const info = args[0] as UpdateInfo | undefined;
+    this.handleUpdateAvailable(info?.version);
   };
 
-  private readonly onUpdateDownloadedHandler = () => {
-    this.handleUpdateDownloaded();
+  private readonly onUpdateDownloadedHandler = (...args: unknown[]) => {
+    const info = args[0] as UpdateInfo | undefined;
+    this.handleUpdateDownloaded(info?.version);
   };
 
   private readonly onErrorHandler = () => {
@@ -97,13 +103,14 @@ export class UpdateManager {
     }
   }
 
-  private async handleUpdateAvailable(): Promise<void> {
-    this.notify('Atualização disponível', 'Uma nova versão do Iacula está disponível.');
+  private async handleUpdateAvailable(version?: string): Promise<void> {
+    const versionLabel = version ? `v${version}` : 'Uma nova versão';
+    this.notify('Atualização disponível', `A versão ${versionLabel} do Iacula está disponível.`);
 
     const shouldDownload = await this.ask({
       type: 'info',
       title: 'Atualização disponível',
-      message: 'Uma nova versão do Iacula está disponível. Deseja baixar agora?',
+      message: `A versão ${versionLabel} do Iacula está disponível. Deseja baixar agora?`,
       buttons: ['Baixar agora', 'Depois'],
       defaultId: 0,
       cancelId: 1,
@@ -121,11 +128,12 @@ export class UpdateManager {
     }
   }
 
-  private async handleUpdateDownloaded(): Promise<void> {
+  private async handleUpdateDownloaded(version?: string): Promise<void> {
+    const versionLabel = version ? `v${version}` : 'A atualização';
     const shouldInstallNow = await this.ask({
       type: 'info',
       title: 'Atualização pronta para instalar',
-      message: 'A atualização foi baixada com sucesso. Deseja instalar agora?',
+      message: `A versão ${versionLabel} foi baixada com sucesso. Deseja instalar agora?`,
       buttons: ['Instalar agora', 'Depois'],
       defaultId: 0,
       cancelId: 1,

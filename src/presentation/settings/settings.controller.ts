@@ -28,10 +28,12 @@ class SettingsController {
   private complineTimeInput: HTMLInputElement | null = null;
   private oraMediaTimeInput: HTMLInputElement | null = null;
   private statusElement: HTMLElement | null = null;
+  private versionElement: HTMLElement | null = null;
 
   async initialize(): Promise<void> {
     this.bindElements();
     this.bindEvents();
+    this.loadVersion();
     await this.loadSettings();
   }
 
@@ -53,6 +55,7 @@ class SettingsController {
     this.complineTimeInput = document.getElementById('compline-time') as HTMLInputElement;
     this.oraMediaTimeInput = document.getElementById('ora-media-time') as HTMLInputElement;
     this.statusElement = document.getElementById('status');
+    this.versionElement = document.getElementById('app-version');
   }
 
   private bindEvents(): void {
@@ -63,6 +66,17 @@ class SettingsController {
     ipcRenderer.on(IPC_CHANNELS.SETTINGS_SAVED, (_event, success: boolean) => {
       this.handleSaveResponse(success);
     });
+  }
+
+  private loadVersion(): void {
+    try {
+      const version = ipcRenderer.sendSync(IPC_CHANNELS.GET_APP_VERSION) as string;
+      if (this.versionElement && version) {
+        this.versionElement.textContent = `v${version}`;
+      }
+    } catch (error) {
+      console.error('Error loading app version:', error);
+    }
   }
 
   private async loadSettings(): Promise<void> {

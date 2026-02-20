@@ -136,6 +136,7 @@ export class WindowService implements IWindowService {
 
     const window = this.windows.get(type);
     if (window && !window.isDestroyed()) {
+      window.hide();
       window.destroy();
     }
     this.windows.delete(type);
