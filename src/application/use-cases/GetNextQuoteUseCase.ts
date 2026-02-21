@@ -9,7 +9,7 @@ import { IIndicesRepository } from '../ports/IIndicesRepository';
 import { QuoteDTO } from '../dto/QuoteDTO';
 import { QuoteSelector } from '../../domain/services/QuoteSelector';
 import { PrayerScheduler } from '../../domain/services/PrayerScheduler';
-import { DayOfWeek } from '../../domain/entities/Quote';
+import { DayOfWeek, QuotesCollection } from '../../domain/entities/Quote';
 import { ILiturgicalSeasonService } from '../ports/ILiturgicalSeasonService';
 
 export class GetNextQuoteUseCase {
@@ -23,20 +23,38 @@ export class GetNextQuoteUseCase {
   async execute(): Promise<QuoteDTO> {
     const settings = await this.settingsRepository.load();
     const indices = await this.indicesRepository.load();
-    const season = await this.liturgicalSeasonService.getCurrentSeason();
+    const context = await this.liturgicalSeasonService.getCurrentContext();
 
     const dayOfWeek = PrayerScheduler.getDayOfWeek() as DayOfWeek;
-    const quotes = await this.assetService.loadQuotes(settings.language, season);
-    const images = await this.assetService.listDayImages(dayOfWeek, season);
+    const seasonalQuotes = await this.assetService.loadQuotes(settings.language, context.season);
 
-    console.log(`[GetNextQuoteUseCase] Day: ${dayOfWeek}, Quotes found: ${quotes[dayOfWeek.toString()]?.quotes?.length}, Images found: ${images.length}`);
+    const feastQuotes = context.feast
+      ? await this.assetService.loadFeastQuotes(context.feast)
+      : null;
 
-    const dayData = quotes[dayOfWeek.toString()];
+    const mergedFeastQuotes = this.mergeDedup(feastQuotes ?? [], context.apiQuotes);
+    const shouldUseFeastQuotes = mergedFeastQuotes.length > 0;
+
+    const quotePool: QuotesCollection = shouldUseFeastQuotes
+      ? {
+          [dayOfWeek.toString()]: {
+            day: seasonalQuotes[dayOfWeek.toString()]?.day ?? 'Dia',
+            theme: context.feastName ?? seasonalQuotes[dayOfWeek.toString()]?.theme ?? 'Festa',
+            quotes: mergedFeastQuotes,
+          },
+        }
+      : seasonalQuotes;
+
+    const seasonalImages = await this.assetService.listDayImages(dayOfWeek, context.season);
+    const feastImagePath = context.feast ? await this.assetService.getFeastImagePath(context.feast) : null;
+
+    console.log(`[GetNextQuoteUseCase] Day: ${dayOfWeek}, Feast: ${context.feast ?? 'none'}, Feast quotes: ${mergedFeastQuotes.length}, Seasonal images: ${seasonalImages.length}`);
+
+    const dayData = quotePool[dayOfWeek.toString()];
     if (!dayData || !dayData.quotes || dayData.quotes.length === 0) {
       throw new Error(`No quotes found for day ${dayOfWeek}`);
     }
 
-    // Get current quote index
     const currentQuoteIndex = indices.quoteIndices[dayOfWeek] ?? 0;
     const { nextIndex: nextQuoteIndex } = QuoteSelector.getNextQuoteIndex(
       dayOfWeek,
@@ -44,28 +62,25 @@ export class GetNextQuoteUseCase {
       currentQuoteIndex
     );
 
-    // Get current image index
     const currentImageIndex = indices.imageIndices[dayOfWeek] ?? 0;
-    let imagePath: string | null = null;
+    let imagePath: string | null = feastImagePath;
     let nextImageIndex = 0;
 
-    if (images.length > 0) {
+    if (!imagePath && seasonalImages.length > 0) {
       const imageResult = QuoteSelector.getNextImageIndex(
         dayOfWeek,
-        images.length,
+        seasonalImages.length,
         currentImageIndex
       );
-      imagePath = images[imageResult.currentIndex];
+      imagePath = seasonalImages[imageResult.currentIndex];
       nextImageIndex = imageResult.nextIndex;
     }
 
-    // Get the quote text
-    const quoteText = QuoteSelector.selectQuote(quotes, dayOfWeek, currentQuoteIndex);
+    const quoteText = QuoteSelector.selectQuote(quotePool, dayOfWeek, currentQuoteIndex);
     if (!quoteText) {
       throw new Error(`Failed to select quote for day ${dayOfWeek}`);
     }
 
-    // Update indices for next time
     const updatedIndices = {
       ...indices,
       quoteIndices: {
@@ -85,7 +100,34 @@ export class GetNextQuoteUseCase {
       imagePath,
       dayOfWeek,
       theme: dayData.theme,
-      season,
+      season: context.season,
+      feast: shouldUseFeastQuotes ? context.feast : undefined,
+      feastName: shouldUseFeastQuotes ? context.feastName : undefined,
     };
+  }
+
+  private mergeDedup(curated: string[], apiQuotes: string[]): string[] {
+    const merged = [...curated, ...apiQuotes];
+    const seen = new Set<string>();
+    const deduped: string[] = [];
+
+    for (const quote of merged) {
+      const normalized = quote
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (!normalized || seen.has(normalized)) {
+        continue;
+      }
+
+      seen.add(normalized);
+      deduped.push(quote);
+    }
+
+    return deduped;
   }
 }

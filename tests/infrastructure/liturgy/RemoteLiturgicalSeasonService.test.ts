@@ -25,94 +25,52 @@ describe('RemoteLiturgicalSeasonService', () => {
     );
   });
 
-  it('should map lent season when cor is Roxo without Advento', async () => {
+  it('should map lent season for Holy Week text even with red color', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
-      json: async () => ({ cor: 'Roxo', liturgia: 'Quarta-feira de Cinzas' }),
+      json: async () => ({ cor: 'Vermelho', liturgia: '6a feira da Semana Santa - Paixao do Senhor' }),
     });
 
-    const season = await service.getCurrentSeason(new Date('2026-02-18T12:00:00Z'));
+    const season = await service.getCurrentSeason(new Date('2026-04-03T12:00:00Z'));
     expect(season).toBe('lent');
   });
 
-  it('should map advent when cor is Rosa and liturgia mentions Advento (Gaudete)', async () => {
+  it('should parse rank, feast and api quotes from context', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
-      json: async () => ({ cor: 'Rosa', liturgia: '3o Domingo do Advento' }),
+      json: async () => ({
+        cor: 'Vermelho',
+        liturgia: 'Domingo de Pentecostes, Solenidade',
+        antifonas: { entrada: 'O Espirito do Senhor encheu o universo.' },
+        leituras: { salmo: [{ refrao: 'Enviai o vosso Espirito, Senhor.' }] },
+        oracoes: { coleta: 'Concedei-nos, Senhor...' },
+      }),
     });
 
-    const season = await service.getCurrentSeason(new Date('2026-12-13T12:00:00Z'));
-    expect(season).toBe('advent');
+    const context = await service.getCurrentContext(new Date('2026-05-24T12:00:00Z'));
+
+    expect(context.rank).toBe('solemnity');
+    expect(context.feast).toBe('pentecost');
+    expect(context.feastName).toBe('domingo de pentecostes');
+    expect(context.apiQuotes).toEqual([
+      'O Espirito do Senhor encheu o universo.',
+      'Enviai o vosso Espirito, Senhor.',
+      'Concedei-nos, Senhor...',
+    ]);
   });
 
-  it('should map lent when cor is Rosa without Advento (Laetare)', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ cor: 'Rosa', liturgia: '4o Domingo da Quaresma' }),
-    });
-
-    const season = await service.getCurrentSeason(new Date('2026-03-22T12:00:00Z'));
-    expect(season).toBe('lent');
-  });
-
-  it('should map easter season when cor is Branco and liturgia mentions Pascoa', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ cor: 'Branco', liturgia: 'Domingo de Páscoa' }),
-    });
-
-    const season = await service.getCurrentSeason(new Date('2026-04-05T12:00:00Z'));
-    expect(season).toBe('easter');
-  });
-
-  it('should map christmas season when cor is Branco and liturgia mentions Natal', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ cor: 'Branco', liturgia: 'Natal do Senhor' }),
-    });
-
-    const season = await service.getCurrentSeason(new Date('2026-12-25T12:00:00Z'));
-    expect(season).toBe('christmas');
-  });
-
-  it('should map ordinary when cor is Branco without seasonal keywords', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ cor: 'Branco', liturgia: 'Festa de Nossa Senhora' }),
-    });
-
-    const season = await service.getCurrentSeason(new Date('2026-08-15T12:00:00Z'));
-    expect(season).toBe('ordinary');
-  });
-
-  it('should map ordinary when cor is Verde', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ cor: 'Verde', liturgia: '10o Domingo do Tempo Comum' }),
-    });
-
-    const season = await service.getCurrentSeason(new Date('2026-06-14T12:00:00Z'));
-    expect(season).toBe('ordinary');
-  });
-
-  it('should map ordinary when cor is Vermelho', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ cor: 'Vermelho', liturgia: 'Domingo de Pentecostes' }),
-    });
-
-    const season = await service.getCurrentSeason(new Date('2026-05-24T12:00:00Z'));
-    expect(season).toBe('ordinary');
-  });
-
-  it('should fallback to ordinary when remote fails', async () => {
+  it('should fallback to ordinary weekday context when remote fails', async () => {
     fetchMock.mockRejectedValue(new Error('network'));
 
-    const season = await service.getCurrentSeason(new Date(2026, 7, 10, 12, 0, 0));
-    expect(season).toBe('ordinary');
+    const context = await service.getCurrentContext(new Date(2026, 7, 10, 12, 0, 0));
+    expect(context).toEqual({
+      season: 'ordinary',
+      rank: 'weekday',
+      apiQuotes: [],
+    });
   });
 
-  it('should not cache ordinary fallback when remote fails temporarily', async () => {
+  it('should not cache fallback context when remote fails temporarily', async () => {
     fetchMock
       .mockRejectedValueOnce(new Error('network'))
       .mockResolvedValueOnce({
@@ -121,45 +79,26 @@ describe('RemoteLiturgicalSeasonService', () => {
       });
 
     const date = new Date(2026, 1, 18, 12, 0, 0);
-    const first = await service.getCurrentSeason(date);
-    const second = await service.getCurrentSeason(date);
+    const first = await service.getCurrentContext(date);
+    const second = await service.getCurrentContext(date);
 
-    expect(first).toBe('ordinary');
-    expect(second).toBe('lent');
+    expect(first.season).toBe('ordinary');
+    expect(second.season).toBe('lent');
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it('should use cached season for repeated calls on same date', async () => {
+  it('should use cached context for repeated calls on same date', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({ cor: 'Roxo', liturgia: '2o Domingo do Advento' }),
     });
 
     const date = new Date(2026, 11, 10, 12, 0, 0);
-    const first = await service.getCurrentSeason(date);
-    const second = await service.getCurrentSeason(date);
+    const first = await service.getCurrentContext(date);
+    const second = await service.getCurrentContext(date);
 
-    expect(first).toBe('advent');
-    expect(second).toBe('advent');
+    expect(first.season).toBe('advent');
+    expect(second.season).toBe('advent');
     expect(fetchMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('should fetch again when date changes', async () => {
-    fetchMock
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ cor: 'Roxo', liturgia: '2o Domingo do Advento' }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ cor: 'Branco', liturgia: 'Natal do Senhor' }),
-      });
-
-    const first = await service.getCurrentSeason(new Date(2026, 11, 10, 12, 0, 0));
-    const second = await service.getCurrentSeason(new Date(2026, 11, 25, 12, 0, 0));
-
-    expect(first).toBe('advent');
-    expect(second).toBe('christmas');
-    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

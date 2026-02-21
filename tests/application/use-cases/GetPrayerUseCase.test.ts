@@ -40,12 +40,19 @@ describe('GetPrayerUseCase', () => {
       loadPrayers: jest.fn(),
       getImagePath: jest.fn(),
       listDayImages: jest.fn(),
+      loadFeastQuotes: jest.fn(),
+      getFeastImagePath: jest.fn(),
       getAngelusImagePath: jest.fn(),
       getReginaCaeliImagePath: jest.fn(),
     };
 
     mockLiturgicalSeasonService = {
       getCurrentSeason: jest.fn().mockResolvedValue('ordinary'),
+      getCurrentContext: jest.fn().mockResolvedValue({
+        season: 'ordinary',
+        rank: 'weekday',
+        apiQuotes: [],
+      }),
     };
 
     useCase = new GetPrayerUseCase(

@@ -59,7 +59,7 @@ class PopupController {
           easter: 'tempo pascal',
           christmas: 'tempo do natal',
         };
-        seasonLabel.textContent = seasonMap[quote.season] ?? '';
+        seasonLabel.textContent = quote.feastName ?? seasonMap[quote.season] ?? '';
       }
 
       if (this.imageElement && quote.imagePath) {

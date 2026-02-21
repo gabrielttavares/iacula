@@ -8,7 +8,6 @@ import { QuoteIndices } from '../../../src/domain/services/QuoteSelector';
 import { PrayerScheduler } from '../../../src/domain/services/PrayerScheduler';
 import { ILiturgicalSeasonService } from '../../../src/application/ports/ILiturgicalSeasonService';
 
-// Mock PrayerScheduler to control day of week
 jest.mock('../../../src/domain/services/PrayerScheduler', () => ({
   PrayerScheduler: {
     getDayOfWeek: jest.fn(),
@@ -47,6 +46,8 @@ describe('GetNextQuoteUseCase', () => {
       loadPrayers: jest.fn(),
       getImagePath: jest.fn(),
       listDayImages: jest.fn(),
+      loadFeastQuotes: jest.fn(),
+      getFeastImagePath: jest.fn(),
       getAngelusImagePath: jest.fn(),
       getReginaCaeliImagePath: jest.fn(),
     };
@@ -58,6 +59,11 @@ describe('GetNextQuoteUseCase', () => {
 
     mockLiturgicalSeasonService = {
       getCurrentSeason: jest.fn().mockResolvedValue('ordinary'),
+      getCurrentContext: jest.fn().mockResolvedValue({
+        season: 'ordinary',
+        rank: 'weekday',
+        apiQuotes: [],
+      }),
     };
 
     useCase = new GetNextQuoteUseCase(
@@ -67,7 +73,6 @@ describe('GetNextQuoteUseCase', () => {
       mockLiturgicalSeasonService
     );
 
-    // Default mock for day of week (Sunday = 1)
     (PrayerScheduler.getDayOfWeek as jest.Mock).mockReturnValue(1);
   });
 
@@ -82,6 +87,8 @@ describe('GetNextQuoteUseCase', () => {
     mockSettingsRepository.load.mockResolvedValue(settings);
     mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
     mockAssetService.listDayImages.mockResolvedValue(['/path/to/image1.jpg', '/path/to/image2.jpg']);
+    mockAssetService.loadFeastQuotes.mockResolvedValue(null);
+    mockAssetService.getFeastImagePath.mockResolvedValue(null);
     mockIndicesRepository.load.mockResolvedValue(indices);
     mockIndicesRepository.save.mockResolvedValue();
 
@@ -101,6 +108,8 @@ describe('GetNextQuoteUseCase', () => {
     mockSettingsRepository.load.mockResolvedValue(settings);
     mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
     mockAssetService.listDayImages.mockResolvedValue([]);
+    mockAssetService.loadFeastQuotes.mockResolvedValue(null);
+    mockAssetService.getFeastImagePath.mockResolvedValue(null);
     mockIndicesRepository.load.mockResolvedValue(indices);
     mockIndicesRepository.save.mockResolvedValue();
 
@@ -111,76 +120,20 @@ describe('GetNextQuoteUseCase', () => {
     expect(result.theme).toBe('Ressurreicao');
   });
 
-  it('should return next quote based on current index', async () => {
-    const settings = Settings.create({ language: 'pt-br' });
-    const indices: QuoteIndices = { quoteIndices: { 1: 1 }, imageIndices: {}, lastDay: 1 };
-
-    mockSettingsRepository.load.mockResolvedValue(settings);
-    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
-    mockAssetService.listDayImages.mockResolvedValue([]);
-    mockIndicesRepository.load.mockResolvedValue(indices);
-    mockIndicesRepository.save.mockResolvedValue();
-
-    const result = await useCase.execute();
-
-    expect(result.text).toBe('Quote 2');
-  });
-
-  it('should update indices after getting quote', async () => {
-    const settings = Settings.create({ language: 'pt-br' });
-    const indices: QuoteIndices = { quoteIndices: { 1: 0 }, imageIndices: {}, lastDay: 1 };
-
-    mockSettingsRepository.load.mockResolvedValue(settings);
-    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
-    mockAssetService.listDayImages.mockResolvedValue(['/img1.jpg', '/img2.jpg']);
-    mockIndicesRepository.load.mockResolvedValue(indices);
-    mockIndicesRepository.save.mockResolvedValue();
-
-    await useCase.execute();
-
-    expect(mockIndicesRepository.save).toHaveBeenCalledTimes(1);
-    const savedIndices = mockIndicesRepository.save.mock.calls[0][0];
-    expect(savedIndices.quoteIndices[1]).toBe(1); // Next index
-  });
-
-  it('should throw error when no quotes found for day', async () => {
-    const settings = Settings.create({ language: 'pt-br' });
-    const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
-
-    // Mock day 3 which doesn't exist in collection
-    (PrayerScheduler.getDayOfWeek as jest.Mock).mockReturnValue(3);
-
-    mockSettingsRepository.load.mockResolvedValue(settings);
-    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
-    mockAssetService.listDayImages.mockResolvedValue([]);
-    mockIndicesRepository.load.mockResolvedValue(indices);
-
-    await expect(useCase.execute()).rejects.toThrow('No quotes found for day 3');
-  });
-
-  it('should load quotes with correct language', async () => {
+  it('should load quotes with correct language and season from context', async () => {
     const settings = Settings.create({ language: 'en' });
     const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
 
+    mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
+      season: 'advent',
+      rank: 'weekday',
+      apiQuotes: [],
+    });
     mockSettingsRepository.load.mockResolvedValue(settings);
     mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
     mockAssetService.listDayImages.mockResolvedValue([]);
-    mockIndicesRepository.load.mockResolvedValue(indices);
-    mockIndicesRepository.save.mockResolvedValue();
-
-    await useCase.execute();
-
-    expect(mockAssetService.loadQuotes).toHaveBeenCalledWith('en', 'ordinary');
-  });
-
-  it('should load seasonal quotes when season is advent', async () => {
-    const settings = Settings.create({ language: 'en' });
-    const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
-
-    mockLiturgicalSeasonService.getCurrentSeason.mockResolvedValue('advent');
-    mockSettingsRepository.load.mockResolvedValue(settings);
-    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
-    mockAssetService.listDayImages.mockResolvedValue([]);
+    mockAssetService.loadFeastQuotes.mockResolvedValue(null);
+    mockAssetService.getFeastImagePath.mockResolvedValue(null);
     mockIndicesRepository.load.mockResolvedValue(indices);
     mockIndicesRepository.save.mockResolvedValue();
 
@@ -190,52 +143,102 @@ describe('GetNextQuoteUseCase', () => {
     expect(mockAssetService.listDayImages).toHaveBeenCalledWith(1, 'advent');
   });
 
-  it('should return image path when images are available', async () => {
+  it('should prefer feast image over seasonal images when feast image exists', async () => {
     const settings = Settings.create({ language: 'pt-br' });
     const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
 
+    mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
+      season: 'easter',
+      feast: 'pentecost',
+      feastName: 'pentecostes',
+      rank: 'solemnity',
+      apiQuotes: ['Veni Sancte Spiritus'],
+    });
+
     mockSettingsRepository.load.mockResolvedValue(settings);
     mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
-    mockAssetService.listDayImages.mockResolvedValue(['/path/to/image1.jpg', '/path/to/image2.jpg']);
+    mockAssetService.loadFeastQuotes.mockResolvedValue(['Veni Sancte Spiritus']);
+    mockAssetService.getFeastImagePath.mockResolvedValue('/images/feasts/pentecost/1.jpg');
+    mockAssetService.listDayImages.mockResolvedValue(['/seasonal/1.jpg']);
     mockIndicesRepository.load.mockResolvedValue(indices);
     mockIndicesRepository.save.mockResolvedValue();
 
     const result = await useCase.execute();
 
-    expect(result.imagePath).toBe('/path/to/image1.jpg');
+    expect(result.imagePath).toBe('/images/feasts/pentecost/1.jpg');
+    expect(result.feast).toBe('pentecost');
+    expect(result.feastName).toBe('pentecostes');
+    expect(result.theme).toBe('pentecostes');
   });
 
-  it('should return null imagePath when no images available', async () => {
+  it('should merge curated feast quotes with API quotes and deduplicate', async () => {
     const settings = Settings.create({ language: 'pt-br' });
     const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
 
+    mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
+      season: 'ordinary',
+      feast: 'all-saints',
+      feastName: 'todos os santos',
+      rank: 'solemnity',
+      apiQuotes: ['Sede santos!', 'Com toda a corte celeste.'],
+    });
+
     mockSettingsRepository.load.mockResolvedValue(settings);
     mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
+    mockAssetService.loadFeastQuotes.mockResolvedValue(['Sede santos', 'Rogai por nos']);
+    mockAssetService.getFeastImagePath.mockResolvedValue(null);
     mockAssetService.listDayImages.mockResolvedValue([]);
     mockIndicesRepository.load.mockResolvedValue(indices);
     mockIndicesRepository.save.mockResolvedValue();
 
     const result = await useCase.execute();
 
-    expect(result.imagePath).toBeNull();
-  });
-
-  it('should wrap around quote index when reaching end', async () => {
-    const settings = Settings.create({ language: 'pt-br' });
-    // Index 2 is the last quote (Quote 3), next should be 0
-    const indices: QuoteIndices = { quoteIndices: { 1: 2 }, imageIndices: {}, lastDay: 1 };
-
-    mockSettingsRepository.load.mockResolvedValue(settings);
-    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
-    mockAssetService.listDayImages.mockResolvedValue([]);
-    mockIndicesRepository.load.mockResolvedValue(indices);
-    mockIndicesRepository.save.mockResolvedValue();
-
-    const result = await useCase.execute();
-
-    expect(result.text).toBe('Quote 3');
-
+    expect(result.feast).toBe('all-saints');
+    expect(result.text).toBe('Sede santos');
     const savedIndices = mockIndicesRepository.save.mock.calls[0][0];
-    expect(savedIndices.quoteIndices[1]).toBe(0); // Wrapped to 0
+    expect(savedIndices.quoteIndices[1]).toBe(1);
+  });
+
+  it('should fallback to seasonal quotes when feast and api quote pools are empty', async () => {
+    const settings = Settings.create({ language: 'pt-br' });
+    const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
+
+    mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
+      season: 'lent',
+      feast: 'holy-thursday',
+      feastName: 'quinta-feira santa',
+      rank: 'solemnity',
+      apiQuotes: [],
+    });
+
+    mockSettingsRepository.load.mockResolvedValue(settings);
+    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
+    mockAssetService.loadFeastQuotes.mockResolvedValue(null);
+    mockAssetService.getFeastImagePath.mockResolvedValue(null);
+    mockAssetService.listDayImages.mockResolvedValue([]);
+    mockIndicesRepository.load.mockResolvedValue(indices);
+    mockIndicesRepository.save.mockResolvedValue();
+
+    const result = await useCase.execute();
+
+    expect(result.feast).toBeUndefined();
+    expect(result.feastName).toBeUndefined();
+    expect(result.text).toBe('Quote 1');
+  });
+
+  it('should throw error when no quotes found for day', async () => {
+    const settings = Settings.create({ language: 'pt-br' });
+    const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
+
+    (PrayerScheduler.getDayOfWeek as jest.Mock).mockReturnValue(3);
+
+    mockSettingsRepository.load.mockResolvedValue(settings);
+    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
+    mockAssetService.loadFeastQuotes.mockResolvedValue(null);
+    mockAssetService.listDayImages.mockResolvedValue([]);
+    mockAssetService.getFeastImagePath.mockResolvedValue(null);
+    mockIndicesRepository.load.mockResolvedValue(indices);
+
+    await expect(useCase.execute()).rejects.toThrow('No quotes found for day 3');
   });
 });

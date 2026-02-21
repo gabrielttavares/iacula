@@ -30,6 +30,16 @@ export interface IAssetService {
   listDayImages(dayOfWeek: number, season?: LiturgicalSeason): Promise<string[]>;
 
   /**
+   * Carrega citações específicas de uma festa.
+   */
+  loadFeastQuotes(slug: string): Promise<string[] | null>;
+
+  /**
+   * Obtém o próximo caminho de imagem para uma festa.
+   */
+  getFeastImagePath(slug: string): Promise<string | null>;
+
+  /**
    * Obtém o caminho da imagem do Angelus.
    */
   getAngelusImagePath(): Promise<string>;

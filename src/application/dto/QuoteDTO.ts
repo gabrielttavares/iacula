@@ -10,4 +10,6 @@ export interface QuoteDTO {
   dayOfWeek: number;
   theme: string;
   season: LiturgicalSeason;
+  feast?: string;
+  feastName?: string;
 }

@@ -14,6 +14,7 @@ export class FileAssetService implements IAssetService {
   private readonly assetsPath: string;
   private readonly isDevelopment: boolean;
   private seasonalImageIndex: Partial<Record<Exclude<LiturgicalSeason, 'ordinary'>, number>> = {};
+  private feastImageIndex: Record<string, number> = {};
 
   constructor(resourcesPath: string, isDevelopment: boolean = false) {
     this.isDevelopment = isDevelopment;
@@ -114,6 +115,47 @@ export class FileAssetService implements IAssetService {
     } catch (error) {
       console.error(`Error listing images for day ${dayOfWeek}:`, error);
       return [];
+    }
+  }
+
+  async loadFeastQuotes(slug: string): Promise<string[] | null> {
+    try {
+      const feastQuotesPath = this.getAssetPath(`quotes/pt-br/feasts/${slug}.json`);
+      if (!fs.existsSync(feastQuotesPath)) {
+        return null;
+      }
+
+      const data = fs.readFileSync(feastQuotesPath, 'utf-8');
+      const parsed = JSON.parse(data) as { quotes?: string[] };
+      if (!Array.isArray(parsed.quotes)) {
+        return null;
+      }
+
+      const quotes = parsed.quotes
+        .filter((quote): quote is string => typeof quote === 'string' && quote.trim().length > 0)
+        .map(quote => quote.trim());
+
+      return quotes.length > 0 ? quotes : null;
+    } catch (error) {
+      console.error(`Error loading feast quotes for ${slug}:`, error);
+      return null;
+    }
+  }
+
+  async getFeastImagePath(slug: string): Promise<string | null> {
+    try {
+      const feastImages = this.readImageFilesFromDirectory(this.getAssetPath(`images/feasts/${slug}`));
+      if (feastImages.length === 0) {
+        return null;
+      }
+
+      const currentIndex = this.feastImageIndex[slug] ?? 0;
+      const selectedIndex = currentIndex % feastImages.length;
+      this.feastImageIndex[slug] = currentIndex + 1;
+      return feastImages[selectedIndex];
+    } catch (error) {
+      console.error(`Error getting feast image for ${slug}:`, error);
+      return null;
     }
   }
 
