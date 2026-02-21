@@ -1,0 +1,317 @@
+[
+  {
+    "date": "2026-01-01",
+    "slug": "santa-maria-mae-de-deus",
+    "canonicalSlug": "santa-maria-mae-de-deus",
+    "liturgia": "Santa Maria, Mãe de Deus, Solenidade",
+    "feastName": "Santa Maria, Mãe de Deus",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-01-04",
+    "slug": "epifania-do-senhor",
+    "canonicalSlug": "epifania-do-senhor",
+    "liturgia": "Epifania do Senhor, Solenidade",
+    "feastName": "Epifania do Senhor",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-01-11",
+    "slug": "batismo-do-senhor",
+    "canonicalSlug": "batismo-do-senhor",
+    "liturgia": "Batismo do Senhor, Festa",
+    "feastName": "Batismo do Senhor",
+    "rank": "feast",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-02-02",
+    "slug": "apresentacao-do-senhor",
+    "canonicalSlug": "apresentacao-do-senhor",
+    "liturgia": "Apresentação do Senhor, Festa",
+    "feastName": "Apresentação do Senhor",
+    "rank": "feast",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-03-19",
+    "slug": "sao-jose-esposo-da-bem-aventurada-virgem-maria",
+    "canonicalSlug": "st-joseph",
+    "liturgia": "São José, Esposo da Bem-Aventurada Virgem Maria, Solenidade",
+    "feastName": "São José, Esposo da Bem-Aventurada Virgem Maria",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-03-25",
+    "slug": "anunciacao-do-senhor",
+    "canonicalSlug": "anunciacao-do-senhor",
+    "liturgia": "Anunciação do Senhor, Solenidade",
+    "feastName": "Anunciação do Senhor",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-04-25",
+    "slug": "sao-marcos-evangelista",
+    "canonicalSlug": "sao-marcos-evangelista",
+    "liturgia": "São Marcos, Evangelista, Festa",
+    "feastName": "São Marcos, Evangelista",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-05-14",
+    "slug": "sao-matias-apostolo",
+    "canonicalSlug": "sao-matias-apostolo",
+    "liturgia": "São Matias, Apóstolo, Festa",
+    "feastName": "São Matias, Apóstolo",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-05-17",
+    "slug": "ascensao-do-senhor",
+    "canonicalSlug": "ascensao-do-senhor",
+    "liturgia": "Ascensão do Senhor, Solenidade",
+    "feastName": "Ascensão do Senhor",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-05-24",
+    "slug": "domingo-de-pentecostes",
+    "canonicalSlug": "pentecost",
+    "liturgia": "Domingo de Pentecostes, Solenidade",
+    "feastName": "Domingo de Pentecostes",
+    "rank": "solemnity",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-05-31",
+    "slug": "santissima-trindade",
+    "canonicalSlug": "holy-trinity",
+    "liturgia": "Santíssima Trindade, Solenidade",
+    "feastName": "Santíssima Trindade",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-06-04",
+    "slug": "santissimo-corpo-e-sangue-de-cristo",
+    "canonicalSlug": "corpus-christi",
+    "liturgia": "Santíssimo Corpo e Sangue de Cristo, Solenidade",
+    "feastName": "Santíssimo Corpo e Sangue de Cristo",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-06-12",
+    "slug": "sagrado-coracao-de-jesus",
+    "canonicalSlug": "sagrado-coracao-de-jesus",
+    "liturgia": "Sagrado Coração de Jesus, Solenidade",
+    "feastName": "Sagrado Coração de Jesus",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-06-24",
+    "slug": "natividade-de-sao-joao-batista",
+    "canonicalSlug": "natividade-de-sao-joao-batista",
+    "liturgia": "Natividade de São João Batista, Solenidade",
+    "feastName": "Natividade de São João Batista",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-06-28",
+    "slug": "santos-pedro-e-paulo-apostolos",
+    "canonicalSlug": "sts-peter-paul",
+    "liturgia": "Santos Pedro e Paulo Apóstolos, Solenidade",
+    "feastName": "Santos Pedro e Paulo Apóstolos",
+    "rank": "solemnity",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-07-03",
+    "slug": "sao-tome-apostolo",
+    "canonicalSlug": "sao-tome-apostolo",
+    "liturgia": "São Tomé, Apóstolo, Festa",
+    "feastName": "São Tomé, Apóstolo",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-07-16",
+    "slug": "bem-aventurada-virgem-maria-do-monte-carmelo",
+    "canonicalSlug": "bem-aventurada-virgem-maria-do-monte-carmelo",
+    "liturgia": "Bem-aventurada Virgem Maria do Monte Carmelo, Festa",
+    "feastName": "Bem-aventurada Virgem Maria do Monte Carmelo",
+    "rank": "feast",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-07-22",
+    "slug": "santa-maria-madalena",
+    "canonicalSlug": "santa-maria-madalena",
+    "liturgia": "Santa Maria Madalena, Festa",
+    "feastName": "Santa Maria Madalena",
+    "rank": "feast",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-07-25",
+    "slug": "sao-tiago-apostolo",
+    "canonicalSlug": "sao-tiago-apostolo",
+    "liturgia": "São Tiago, Apóstolo, Festa",
+    "feastName": "São Tiago, Apóstolo",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-08-06",
+    "slug": "transfiguracao-do-senhor",
+    "canonicalSlug": "transfiguracao-do-senhor",
+    "liturgia": "Transfiguração do Senhor, Festa",
+    "feastName": "Transfiguração do Senhor",
+    "rank": "feast",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-08-10",
+    "slug": "sao-lourenco-diacono-e-martir",
+    "canonicalSlug": "sao-lourenco-diacono-e-martir",
+    "liturgia": "São Lourenço, diácono e mártir, Festa",
+    "feastName": "São Lourenço, diácono e mártir",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-08-16",
+    "slug": "assuncao-da-bem-aventurada-virgem-maria",
+    "canonicalSlug": "assumption",
+    "liturgia": "Assunção da Bem-aventurada Virgem Maria, Solenidade",
+    "feastName": "Assunção da Bem-aventurada Virgem Maria",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-08-24",
+    "slug": "sao-bartolomeu-apostolo",
+    "canonicalSlug": "sao-bartolomeu-apostolo",
+    "liturgia": "São Bartolomeu, Apóstolo, Festa",
+    "feastName": "São Bartolomeu, Apóstolo",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-09-08",
+    "slug": "natividade-da-bem-aventurada-virgem-maria",
+    "canonicalSlug": "natividade-da-bem-aventurada-virgem-maria",
+    "liturgia": "Natividade da Bem-aventurada Virgem Maria, Festa",
+    "feastName": "Natividade da Bem-aventurada Virgem Maria",
+    "rank": "feast",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-09-14",
+    "slug": "exaltacao-da-santa-cruz",
+    "canonicalSlug": "exaltacao-da-santa-cruz",
+    "liturgia": "Exaltação da Santa Cruz, Festa",
+    "feastName": "Exaltação da Santa Cruz",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-09-21",
+    "slug": "sao-mateus-apostolo-e-evangelista",
+    "canonicalSlug": "sao-mateus-apostolo-e-evangelista",
+    "liturgia": "São Mateus, Apóstolo e Evangelista, Festa",
+    "feastName": "São Mateus, Apóstolo e Evangelista",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-09-29",
+    "slug": "santos-miguel-gabriel-e-rafael-arcanjos",
+    "canonicalSlug": "santos-miguel-gabriel-e-rafael-arcanjos",
+    "liturgia": "Santos Miguel, Gabriel e Rafael, Arcanjos, Festa",
+    "feastName": "Santos Miguel, Gabriel e Rafael, Arcanjos",
+    "rank": "feast",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-10-12",
+    "slug": "bem-aventurada-virgem-maria-da-conceicao-aparecida-padroeira-do-brasil",
+    "canonicalSlug": "our-lady-aparecida",
+    "liturgia": "Bem-Aventurada Virgem Maria da Conceição Aparecida, Padroeira do Brasil, Solenidade",
+    "feastName": "Bem-Aventurada Virgem Maria da Conceição Aparecida, Padroeira do Brasil",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-10-28",
+    "slug": "santos-simao-e-judas-apostolos",
+    "canonicalSlug": "santos-simao-e-judas-apostolos",
+    "liturgia": "Santos Simão e Judas, Apóstolos, Festa",
+    "feastName": "Santos Simão e Judas, Apóstolos",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-11-01",
+    "slug": "todos-os-santos",
+    "canonicalSlug": "all-saints",
+    "liturgia": "Todos os Santos, Solenidade",
+    "feastName": "Todos os Santos",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-11-09",
+    "slug": "dedicacao-da-basilica-do-latrao-catedral-de-roma",
+    "canonicalSlug": "dedicacao-da-basilica-do-latrao-catedral-de-roma",
+    "liturgia": "Dedicação da Basílica do Latrão (Catedral de Roma), Festa",
+    "feastName": "Dedicação da Basílica do Latrão (Catedral de Roma)",
+    "rank": "feast",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-11-22",
+    "slug": "nosso-senhor-jesus-cristo-rei-do-universo",
+    "canonicalSlug": "nosso-senhor-jesus-cristo-rei-do-universo",
+    "liturgia": "Nosso Senhor Jesus Cristo, Rei do Universo, Solenidade",
+    "feastName": "Nosso Senhor Jesus Cristo, Rei do Universo",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-11-30",
+    "slug": "santo-andre-apostolo",
+    "canonicalSlug": "santo-andre-apostolo",
+    "liturgia": "Santo André, Apóstolo, Festa",
+    "feastName": "Santo André, Apóstolo",
+    "rank": "feast",
+    "cor": "Vermelho"
+  },
+  {
+    "date": "2026-12-08",
+    "slug": "imaculada-conceicao-da-bem-aventurada-virgem-maria",
+    "canonicalSlug": "immaculate-conception",
+    "liturgia": "Imaculada Conceição da Bem-aventurada Virgem Maria, Solenidade",
+    "feastName": "Imaculada Conceição da Bem-aventurada Virgem Maria",
+    "rank": "solemnity",
+    "cor": "Branco"
+  },
+  {
+    "date": "2026-12-12",
+    "slug": "bem-aventurada-virgem-maria-de-guadalupe-padroeira-principal-da-america",
+    "canonicalSlug": "bem-aventurada-virgem-maria-de-guadalupe-padroeira-principal-da-america",
+    "liturgia": "Bem-aventurada Virgem Maria de Guadalupe, Padroeira principal da América, Festa",
+    "feastName": "Bem-aventurada Virgem Maria de Guadalupe, Padroeira principal da América",
+    "rank": "feast",
+    "cor": "Branco"
+  }
+]

@@ -8,7 +8,20 @@ const YEAR = Number(process.argv[2] || '2026');
 const DELAY_MS = Number(process.argv[3] || '120');
 const ROOT = process.cwd();
 const IMAGES_FEASTS_DIR = path.join(ROOT, 'assets', 'images', 'feasts');
+const QUOTES_FEASTS_DIR = path.join(ROOT, 'assets', 'quotes', 'pt-br', 'feasts');
 const OUTPUT = path.join(ROOT, 'docs', 'feasts-manifest-' + YEAR + '.json');
+
+const FEAST_SLUG_ALIASES = {
+  'domingo-de-pentecostes': 'pentecost',
+  'santissima-trindade': 'holy-trinity',
+  'santissimo-corpo-e-sangue-de-cristo': 'corpus-christi',
+  'todos-os-santos': 'all-saints',
+  'imaculada-conceicao-da-bem-aventurada-virgem-maria': 'immaculate-conception',
+  'assuncao-da-bem-aventurada-virgem-maria': 'assumption',
+  'sao-jose-esposo-da-bem-aventurada-virgem-maria': 'st-joseph',
+  'santos-pedro-e-paulo-apostolos': 'sts-peter-paul',
+  'bem-aventurada-virgem-maria-da-conceicao-aparecida-padroeira-do-brasil': 'our-lady-aparecida',
+};
 
 function normalize(value) {
   return (value || '')
@@ -38,6 +51,10 @@ function stripRank(liturgia) {
   return (liturgia || '').replace(/,\s*(Solenidade|Festa|Memoria|Memória)$/i, '').trim();
 }
 
+function toCanonicalSlug(rawSlug) {
+  return FEAST_SLUG_ALIASES[rawSlug] || rawSlug;
+}
+
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -48,12 +65,31 @@ async function fetchJson(url) {
   return response.json();
 }
 
+function ensureQuoteStub(canonicalSlug, feastName) {
+  const quotePath = path.join(QUOTES_FEASTS_DIR, `${canonicalSlug}.json`);
+  if (fs.existsSync(quotePath)) {
+    return;
+  }
+
+  const theme = normalize(feastName);
+  const stub = {
+    theme,
+    quotes: [
+      `Senhor, conduzi-nos no misterio de ${theme}.`,
+      `Fazei-nos viver esta festa com fe e caridade.`,
+    ],
+  };
+
+  fs.writeFileSync(quotePath, JSON.stringify(stub, null, 2) + '\n');
+}
+
 (async () => {
   const manifest = [];
   const start = new Date(Date.UTC(YEAR, 0, 1));
   const end = new Date(Date.UTC(YEAR, 11, 31));
 
   fs.mkdirSync(IMAGES_FEASTS_DIR, { recursive: true });
+  fs.mkdirSync(QUOTES_FEASTS_DIR, { recursive: true });
 
   for (let cursor = new Date(start); cursor <= end; cursor.setUTCDate(cursor.getUTCDate() + 1)) {
     const day = String(cursor.getUTCDate()).padStart(2, '0');
@@ -68,18 +104,21 @@ async function fetchJson(url) {
 
       if (rank === 'solemnity' || rank === 'feast') {
         const feastName = stripRank(liturgia);
-        const slug = slugify(feastName);
+        const rawSlug = slugify(feastName);
+        const canonicalSlug = toCanonicalSlug(rawSlug);
 
         manifest.push({
           date: `${year}-${month}-${day}`,
-          slug,
+          slug: rawSlug,
+          canonicalSlug,
           liturgia,
           feastName,
           rank,
           cor: payload.cor || null,
         });
 
-        fs.mkdirSync(path.join(IMAGES_FEASTS_DIR, slug), { recursive: true });
+        fs.mkdirSync(path.join(IMAGES_FEASTS_DIR, canonicalSlug), { recursive: true });
+        ensureQuoteStub(canonicalSlug, feastName);
       }
     } catch (error) {
       console.warn(`[scan-feasts] Failed ${year}-${month}-${day}: ${String(error)}`);

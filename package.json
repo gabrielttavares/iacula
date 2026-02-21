@@ -19,6 +19,7 @@
         "landing:build": "pnpm --dir web/landing build",
         "landing:test": "pnpm --dir web/landing test",
         "scan:feasts": "node scripts/scan-feasts-2026.js 2026 120",
+        "check:feasts-manifest": "jest tests/scripts/FeastManifestSmoke.test.ts --runInBand",
         "check:ptbr": "node scripts/validate-ptbr-encoding.js",
         "test:liturgy:integration": "cross-env RUN_LITURGY_API_TESTS=1 jest tests/infrastructure/liturgy/RemoteLiturgicalSeasonService.integration.test.ts --runInBand",
         "release:patch": "node scripts/release.js patch",

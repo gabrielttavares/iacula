@@ -33,8 +33,21 @@ interface ContextResolution {
   cacheable: boolean;
 }
 
+type FeastAliasMap = Record<string, string>;
+
 export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
   private static readonly REQUEST_TIMEOUT_MS = 3000;
+  private static readonly FEAST_SLUG_ALIASES: FeastAliasMap = {
+    'domingo-de-pentecostes': 'pentecost',
+    'santissima-trindade': 'holy-trinity',
+    'santissimo-corpo-e-sangue-de-cristo': 'corpus-christi',
+    'todos-os-santos': 'all-saints',
+    'imaculada-conceicao-da-bem-aventurada-virgem-maria': 'immaculate-conception',
+    'assuncao-da-bem-aventurada-virgem-maria': 'assumption',
+    'sao-jose-esposo-da-bem-aventurada-virgem-maria': 'st-joseph',
+    'santos-pedro-e-paulo-apostolos': 'sts-peter-paul',
+    'bem-aventurada-virgem-maria-da-conceicao-aparecida-padroeira-do-brasil': 'our-lady-aparecida',
+  };
   private static readonly FEAST_PATTERNS: Array<{ keywords: string[]; slug: string }> = [
     { keywords: ['domingo de ramos'], slug: 'palm-sunday' },
     { keywords: ['semana santa', 'ceia do senhor'], slug: 'holy-thursday' },
@@ -163,7 +176,8 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     }
 
     if (rank === 'solemnity' || rank === 'feast') {
-      return this.slugify(this.extractFeastName(normalizedLiturgia));
+      const rawSlug = this.slugify(this.extractFeastName(normalizedLiturgia));
+      return this.toCanonicalFeastSlug(rawSlug);
     }
 
     return undefined;
@@ -261,5 +275,9 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     return this.normalizeText(value)
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
+  }
+
+  private toCanonicalFeastSlug(rawSlug: string): string {
+    return RemoteLiturgicalSeasonService.FEAST_SLUG_ALIASES[rawSlug] ?? rawSlug;
   }
 }

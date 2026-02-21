@@ -165,6 +165,8 @@ describe('GetNextQuoteUseCase', () => {
 
     const result = await useCase.execute();
 
+    expect(mockAssetService.loadFeastQuotes).toHaveBeenCalledWith('pentecost');
+    expect(mockAssetService.getFeastImagePath).toHaveBeenCalledWith('pentecost');
     expect(result.imagePath).toBe('/images/feasts/pentecost/1.jpg');
     expect(result.feast).toBe('pentecost');
     expect(result.feastName).toBe('pentecostes');

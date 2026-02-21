@@ -59,6 +59,32 @@ describe('RemoteLiturgicalSeasonService', () => {
     ]);
   });
 
+  it('should normalize manifest slug to canonical slug for pentecost', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        cor: 'Vermelho',
+        liturgia: 'Domingo de Pentecostes, Solenidade',
+      }),
+    });
+
+    const context = await service.getCurrentContext(new Date('2026-05-24T12:00:00Z'));
+    expect(context.feast).toBe('pentecost');
+  });
+
+  it('should normalize long Sao Jose feast slug to canonical st-joseph', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        cor: 'Branco',
+        liturgia: 'São José, Esposo da Bem-Aventurada Virgem Maria, Solenidade',
+      }),
+    });
+
+    const context = await service.getCurrentContext(new Date('2026-03-19T12:00:00Z'));
+    expect(context.feast).toBe('st-joseph');
+  });
+
   it('should fallback to ordinary weekday context when remote fails', async () => {
     fetchMock.mockRejectedValue(new Error('network'));
 
