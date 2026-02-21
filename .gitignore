@@ -5,6 +5,7 @@ __pycache__/
 
 # Distribution / packaging
 dist/
+.worktrees/
 build/
 *.egg-info/
 
@@ -70,4 +71,3 @@ release/
 
 # TypeScript
 *.tsbuildinfo
-
