@@ -8,7 +8,7 @@ import { pathToFileURL } from 'url';
 import { ipcRenderer } from 'electron';
 import { IPC_CHANNELS } from '../../shared/types/IpcChannels';
 
-const CLOSE_FALLBACK_DELAY_MS = 800;
+const CLOSE_FALLBACK_DELAY_MS = 700;
 let isClosingWindow = false;
 
 export function getAssetPath(relativePath: string): string {
