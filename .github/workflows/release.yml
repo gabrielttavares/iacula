@@ -1,5 +1,4 @@
 name: Build and Release
-# TODO: Re-enable macOS build/sign/notarization when Apple credentials are available.
 
 on:
   push:
@@ -32,6 +31,16 @@ jobs:
             platform: linux
             build_args: --linux AppImage
             artifact_name: linux
+          - name: macos
+            os: macos-latest
+            platform: mac
+            build_args: --mac dmg
+            artifact_name: macos
+
+    env:
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
     steps:
       - name: Checkout
@@ -115,6 +124,9 @@ jobs:
             release-artifacts/*.exe
             release-artifacts/*.exe.blockmap
             release-artifacts/*.AppImage
+            release-artifacts/*.dmg
+            release-artifacts/*.dmg.blockmap
             release-artifacts/latest.yml
             release-artifacts/latest-linux.yml
+            release-artifacts/latest-mac.yml
           fail_on_unmatched_files: true
