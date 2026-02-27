@@ -22,6 +22,11 @@ export class TrayManager {
     const iconPath = this.getIconPath();
     const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
 
+    // macOS: use template image for proper menu bar appearance
+    if (process.platform === 'darwin') {
+      trayIcon.setTemplateImage(true);
+    }
+
     this.tray = new Tray(trayIcon);
     this.tray.setToolTip('Iacula');
     this.tray.setContextMenu(this.createContextMenu());
@@ -41,7 +46,7 @@ export class TrayManager {
     if (platform === 'win32') {
       return path.join(basePath, 'icon.ico');
     } else if (platform === 'darwin') {
-      return path.join(basePath, 'icon.icns');
+      return path.join(basePath, 'iconTemplate.png');
     }
     return path.join(basePath, 'icon.png');
   }
