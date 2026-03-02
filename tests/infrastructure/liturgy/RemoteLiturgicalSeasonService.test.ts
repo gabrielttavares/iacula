@@ -35,15 +35,12 @@ describe('RemoteLiturgicalSeasonService', () => {
     expect(season).toBe('lent');
   });
 
-  it('should parse rank, feast and api quotes from context', async () => {
+  it('should parse rank and feast from context', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
         cor: 'Vermelho',
         liturgia: 'Domingo de Pentecostes, Solenidade',
-        antifonas: { entrada: 'O Espirito do Senhor encheu o universo.' },
-        leituras: { salmo: [{ refrao: 'Enviai o vosso Espirito, Senhor.' }] },
-        oracoes: { coleta: 'Concedei-nos, Senhor...' },
       }),
     });
 
@@ -52,11 +49,6 @@ describe('RemoteLiturgicalSeasonService', () => {
     expect(context.rank).toBe('solemnity');
     expect(context.feast).toBe('pentecost');
     expect(context.feastName).toBe('domingo de pentecostes');
-    expect(context.apiQuotes).toEqual([
-      'O Espirito do Senhor encheu o universo.',
-      'Enviai o vosso Espirito, Senhor.',
-      'Concedei-nos, Senhor...',
-    ]);
   });
 
   it('should normalize manifest slug to canonical slug for pentecost', async () => {
@@ -92,7 +84,6 @@ describe('RemoteLiturgicalSeasonService', () => {
     expect(context).toEqual({
       season: 'ordinary',
       rank: 'weekday',
-      apiQuotes: [],
     });
   });
 

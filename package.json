@@ -41,6 +41,7 @@
         "dotenv": "^16.5.0",
         "electron": "^28.2.0",
         "electron-builder": "^24.9.1",
+        "electron-builder-sandbox-fix": "^1.1.1",
         "jest": "^30.2.0",
         "ts-jest": "^29.4.6",
         "typescript": "^5.3.3"
@@ -100,6 +101,7 @@
             "gatekeeperAssess": false
         },
         "afterSign": "./scripts/notarize.js",
+        "afterPack": "electron-builder-sandbox-fix",
         "publish": {
             "provider": "github",
             "releaseType": "release"

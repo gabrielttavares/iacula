@@ -32,15 +32,15 @@ export class GetNextQuoteUseCase {
       ? await this.assetService.loadFeastQuotes(context.feast)
       : null;
 
-    const mergedFeastQuotes = this.mergeDedup(feastQuotes ?? [], context.apiQuotes);
-    const shouldUseFeastQuotes = mergedFeastQuotes.length > 0;
+    const feastQuotePool = feastQuotes ?? [];
+    const shouldUseFeastQuotes = feastQuotePool.length > 0;
 
     const quotePool: QuotesCollection = shouldUseFeastQuotes
       ? {
           [dayOfWeek.toString()]: {
             day: seasonalQuotes[dayOfWeek.toString()]?.day ?? 'Dia',
             theme: context.feastName ?? seasonalQuotes[dayOfWeek.toString()]?.theme ?? 'Festa',
-            quotes: mergedFeastQuotes,
+            quotes: feastQuotePool,
           },
         }
       : seasonalQuotes;
@@ -48,7 +48,7 @@ export class GetNextQuoteUseCase {
     const seasonalImages = await this.assetService.listDayImages(dayOfWeek, context.season);
     const feastImagePath = context.feast ? await this.assetService.getFeastImagePath(context.feast) : null;
 
-    console.log(`[GetNextQuoteUseCase] Day: ${dayOfWeek}, Feast: ${context.feast ?? 'none'}, Feast quotes: ${mergedFeastQuotes.length}, Seasonal images: ${seasonalImages.length}`);
+    console.log(`[GetNextQuoteUseCase] Day: ${dayOfWeek}, Feast: ${context.feast ?? 'none'}, Feast quotes: ${feastQuotePool.length}, Seasonal images: ${seasonalImages.length}`);
 
     const dayData = quotePool[dayOfWeek.toString()];
     if (!dayData || !dayData.quotes || dayData.quotes.length === 0) {
@@ -104,30 +104,5 @@ export class GetNextQuoteUseCase {
       feast: shouldUseFeastQuotes ? context.feast : undefined,
       feastName: shouldUseFeastQuotes ? context.feastName : undefined,
     };
-  }
-
-  private mergeDedup(curated: string[], apiQuotes: string[]): string[] {
-    const merged = [...curated, ...apiQuotes];
-    const seen = new Set<string>();
-    const deduped: string[] = [];
-
-    for (const quote of merged) {
-      const normalized = quote
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9\s]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-      if (!normalized || seen.has(normalized)) {
-        continue;
-      }
-
-      seen.add(normalized);
-      deduped.push(quote);
-    }
-
-    return deduped;
   }
 }

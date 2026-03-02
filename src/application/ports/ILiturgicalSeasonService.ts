@@ -11,7 +11,6 @@ export interface LiturgicalContext {
   feast?: string;
   feastName?: string;
   rank: LiturgicalRank;
-  apiQuotes: string[];
 }
 
 export interface ILiturgicalSeasonService {

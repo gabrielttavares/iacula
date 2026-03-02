@@ -51,7 +51,6 @@ describe('GetPrayerUseCase', () => {
       getCurrentContext: jest.fn().mockResolvedValue({
         season: 'ordinary',
         rank: 'weekday',
-        apiQuotes: [],
       }),
     };
 

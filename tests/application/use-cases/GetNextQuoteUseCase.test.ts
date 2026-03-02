@@ -62,7 +62,6 @@ describe('GetNextQuoteUseCase', () => {
       getCurrentContext: jest.fn().mockResolvedValue({
         season: 'ordinary',
         rank: 'weekday',
-        apiQuotes: [],
       }),
     };
 
@@ -127,7 +126,6 @@ describe('GetNextQuoteUseCase', () => {
     mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
       season: 'advent',
       rank: 'weekday',
-      apiQuotes: [],
     });
     mockSettingsRepository.load.mockResolvedValue(settings);
     mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
@@ -152,7 +150,6 @@ describe('GetNextQuoteUseCase', () => {
       feast: 'pentecost',
       feastName: 'pentecostes',
       rank: 'solemnity',
-      apiQuotes: ['Veni Sancte Spiritus'],
     });
 
     mockSettingsRepository.load.mockResolvedValue(settings);
@@ -173,7 +170,7 @@ describe('GetNextQuoteUseCase', () => {
     expect(result.theme).toBe('pentecostes');
   });
 
-  it('should merge curated feast quotes with API quotes and deduplicate', async () => {
+  it('should use only curated feast quotes when feast has asset quotes', async () => {
     const settings = Settings.create({ language: 'pt-br' });
     const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
 
@@ -182,7 +179,6 @@ describe('GetNextQuoteUseCase', () => {
       feast: 'all-saints',
       feastName: 'todos os santos',
       rank: 'solemnity',
-      apiQuotes: ['Sede santos!', 'Com toda a corte celeste.'],
     });
 
     mockSettingsRepository.load.mockResolvedValue(settings);
@@ -210,7 +206,6 @@ describe('GetNextQuoteUseCase', () => {
       feast: 'holy-thursday',
       feastName: 'quinta-feira santa',
       rank: 'solemnity',
-      apiQuotes: [],
     });
 
     mockSettingsRepository.load.mockResolvedValue(settings);

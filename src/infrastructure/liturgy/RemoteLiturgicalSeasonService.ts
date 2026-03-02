@@ -14,18 +14,6 @@ import {
 interface LiturgiaDiariaResponse {
   cor?: string;
   liturgia?: string;
-  antifonas?: {
-    entrada?: string;
-    comunhao?: string;
-  };
-  leituras?: {
-    salmo?: Array<{ refrao?: string }>;
-  };
-  oracoes?: {
-    coleta?: string;
-    oferendas?: string;
-    comunhao?: string;
-  };
 }
 
 interface ContextResolution {
@@ -120,7 +108,6 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
           context: {
             season: 'ordinary',
             rank: 'weekday',
-            apiQuotes: [],
           },
           cacheable: false,
         };
@@ -136,7 +123,6 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
         context: {
           season: 'ordinary',
           rank: 'weekday',
-          apiQuotes: [],
         },
         cacheable: false,
       };
@@ -157,7 +143,6 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
       feast,
       feastName,
       rank,
-      apiQuotes: this.extractApiQuotes(data),
     };
   }
 
@@ -192,21 +177,6 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
       .trim();
 
     return normalized;
-  }
-
-  private extractApiQuotes(data: LiturgiaDiariaResponse): string[] {
-    const candidates = [
-      data.antifonas?.entrada,
-      data.antifonas?.comunhao,
-      data.leituras?.salmo?.[0]?.refrao,
-      data.oracoes?.coleta,
-      data.oracoes?.oferendas,
-      data.oracoes?.comunhao,
-    ];
-
-    return candidates
-      .filter((value): value is string => Boolean(value && value.trim()))
-      .map(value => value.trim());
   }
 
   private toDateKey(date: Date): string {
