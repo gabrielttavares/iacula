@@ -55,6 +55,7 @@ jobs:
           if [ -z "${BUILD_CERTIFICATE_BASE64:-}" ]; then
             echo "No BUILD_CERTIFICATE_BASE64 secret; macOS build will be unsigned."
             echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
+            echo "SKIP_NOTARIZE=true" >> "$GITHUB_ENV"
             exit 0
           fi
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
