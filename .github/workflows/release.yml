@@ -47,11 +47,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Import Apple certificate
-        if: ${{ matrix.platform == 'mac' && secrets.BUILD_CERTIFICATE_BASE64 != '' }}
+        if: matrix.platform == 'mac'
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
         run: |
+          if [ -z "${BUILD_CERTIFICATE_BASE64:-}" ]; then
+            echo "No BUILD_CERTIFICATE_BASE64 secret; macOS build will be unsigned."
+            echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
@@ -76,13 +81,6 @@ jobs:
         run: |
           npm run prebuild
           npx tsc
-
-      - name: Use unsigned macOS build when no code-signing identity is present
-        if: matrix.platform == 'mac'
-        run: |
-          if ! security find-identity -v -p codesigning 2>/dev/null | grep -q 'Developer ID Application'; then
-            echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
-          fi
 
       - name: Package
         run: npx electron-builder ${{ matrix.build_args }} --publish never
