@@ -20,6 +20,8 @@ export interface SettingsProps {
   vespersTime: string;
   complineTime: string;
   oraMediaTime: string;
+  /** Quando true, jaculatórias e imagens seguem estação litúrgica e festas da API. Default false = Tempo Comum por dia da semana. */
+  useLiturgicalSeasonForQuotes: boolean;
 }
 
 export class Settings {
@@ -53,6 +55,10 @@ export class Settings {
       vespersTime: props.vespersTime !== undefined ? props.vespersTime : defaults.vespersTime,
       complineTime: props.complineTime !== undefined ? props.complineTime : defaults.complineTime,
       oraMediaTime: props.oraMediaTime !== undefined ? props.oraMediaTime : defaults.oraMediaTime,
+      useLiturgicalSeasonForQuotes:
+        props.useLiturgicalSeasonForQuotes !== undefined
+          ? props.useLiturgicalSeasonForQuotes
+          : defaults.useLiturgicalSeasonForQuotes,
     });
     return new Settings(validated);
   }
@@ -74,6 +80,7 @@ export class Settings {
       vespersTime: '18:00',
       complineTime: '21:00',
       oraMediaTime: '12:30',
+      useLiturgicalSeasonForQuotes: false,
     };
   }
 
@@ -175,6 +182,10 @@ export class Settings {
 
   get oraMediaTime(): string {
     return this.props.oraMediaTime;
+  }
+
+  get useLiturgicalSeasonForQuotes(): boolean {
+    return this.props.useLiturgicalSeasonForQuotes;
   }
 
   get intervalInMs(): number {

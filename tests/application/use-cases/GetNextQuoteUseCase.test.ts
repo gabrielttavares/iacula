@@ -120,7 +120,7 @@ describe('GetNextQuoteUseCase', () => {
   });
 
   it('should load quotes with correct language and season from context', async () => {
-    const settings = Settings.create({ language: 'en' });
+    const settings = Settings.create({ language: 'en', useLiturgicalSeasonForQuotes: true });
     const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
 
     mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
@@ -142,7 +142,7 @@ describe('GetNextQuoteUseCase', () => {
   });
 
   it('should prefer feast image over seasonal images when feast image exists', async () => {
-    const settings = Settings.create({ language: 'pt-br' });
+    const settings = Settings.create({ language: 'pt-br', useLiturgicalSeasonForQuotes: true });
     const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
 
     mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
@@ -171,7 +171,7 @@ describe('GetNextQuoteUseCase', () => {
   });
 
   it('should use only curated feast quotes when feast has asset quotes', async () => {
-    const settings = Settings.create({ language: 'pt-br' });
+    const settings = Settings.create({ language: 'pt-br', useLiturgicalSeasonForQuotes: true });
     const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
 
     mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
@@ -198,7 +198,7 @@ describe('GetNextQuoteUseCase', () => {
   });
 
   it('should fallback to seasonal quotes when feast and api quote pools are empty', async () => {
-    const settings = Settings.create({ language: 'pt-br' });
+    const settings = Settings.create({ language: 'pt-br', useLiturgicalSeasonForQuotes: true });
     const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
 
     mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
@@ -218,8 +218,67 @@ describe('GetNextQuoteUseCase', () => {
 
     const result = await useCase.execute();
 
-    expect(result.feast).toBeUndefined();
-    expect(result.feastName).toBeUndefined();
+    expect(result.feast).toBe('holy-thursday');
+    expect(result.feastName).toBe('quinta-feira santa');
+    expect(result.season).toBe('lent');
+    expect(result.text).toBe('Quote 1');
+  });
+
+  it('when useLiturgicalSeasonForQuotes is false, loads ordinary quotes and images but DTO season follows calendar', async () => {
+    const settings = Settings.create({ language: 'en', useLiturgicalSeasonForQuotes: false });
+    const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
+
+    mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
+      season: 'lent',
+      rank: 'weekday',
+    });
+
+    mockSettingsRepository.load.mockResolvedValue(settings);
+    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
+    mockAssetService.listDayImages.mockResolvedValue(['/ord/1.jpg']);
+    mockAssetService.loadFeastQuotes.mockResolvedValue(null);
+    mockAssetService.getFeastImagePath.mockResolvedValue(null);
+    mockIndicesRepository.load.mockResolvedValue(indices);
+    mockIndicesRepository.save.mockResolvedValue();
+
+    const result = await useCase.execute();
+
+    expect(mockLiturgicalSeasonService.getCurrentContext).toHaveBeenCalledTimes(1);
+    expect(mockAssetService.loadQuotes).toHaveBeenCalledWith('en', 'ordinary');
+    expect(mockAssetService.listDayImages).toHaveBeenCalledWith(1, 'ordinary');
+    expect(mockAssetService.loadFeastQuotes).not.toHaveBeenCalled();
+    expect(result.season).toBe('lent');
+    expect(result.text).toBe('Quote 1');
+  });
+
+  it('when useLiturgicalSeasonForQuotes is false, skips feast assets but keeps calendar feast labels', async () => {
+    const settings = Settings.create({ language: 'pt-br', useLiturgicalSeasonForQuotes: false });
+    const indices: QuoteIndices = { quoteIndices: {}, imageIndices: {}, lastDay: 1 };
+
+    mockLiturgicalSeasonService.getCurrentContext.mockResolvedValue({
+      season: 'easter',
+      feast: 'pentecost',
+      feastName: 'pentecostes',
+      rank: 'solemnity',
+    });
+
+    mockSettingsRepository.load.mockResolvedValue(settings);
+    mockAssetService.loadQuotes.mockResolvedValue(mockQuotesCollection);
+    mockAssetService.loadFeastQuotes.mockResolvedValue(['Veni Sancte Spiritus']);
+    mockAssetService.getFeastImagePath.mockResolvedValue('/images/feasts/pentecost/1.jpg');
+    mockAssetService.listDayImages.mockResolvedValue(['/ord/a.jpg']);
+    mockIndicesRepository.load.mockResolvedValue(indices);
+    mockIndicesRepository.save.mockResolvedValue();
+
+    const result = await useCase.execute();
+
+    expect(mockAssetService.loadQuotes).toHaveBeenCalledWith('pt-br', 'ordinary');
+    expect(mockAssetService.loadFeastQuotes).not.toHaveBeenCalled();
+    expect(mockAssetService.getFeastImagePath).not.toHaveBeenCalled();
+    expect(result.imagePath).toBe('/ord/a.jpg');
+    expect(result.season).toBe('easter');
+    expect(result.feast).toBe('pentecost');
+    expect(result.feastName).toBe('pentecostes');
     expect(result.text).toBe('Quote 1');
   });
 

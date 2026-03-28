@@ -13,6 +13,12 @@ export interface LiturgicalContext {
   rank: LiturgicalRank;
 }
 
+/** Igual ao contexto temporário quando a API litúrgica falha (Tempo Comum, dia da semana). */
+export const ORDINARY_WEEKDAY_FALLBACK_CONTEXT: LiturgicalContext = {
+  season: 'ordinary',
+  rank: 'weekday',
+};
+
 export interface ILiturgicalSeasonService {
   getCurrentSeason(date?: Date): Promise<LiturgicalSeason>;
   getCurrentContext(date?: Date): Promise<LiturgicalContext>;

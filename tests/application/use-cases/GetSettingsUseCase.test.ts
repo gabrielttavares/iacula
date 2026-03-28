@@ -33,6 +33,7 @@ describe('GetSettingsUseCase', () => {
       vespersTime: '18:30',
       complineTime: '21:00',
       oraMediaTime: '12:00',
+      useLiturgicalSeasonForQuotes: true,
     });
 
     mockSettingsRepository.load.mockResolvedValue(settings);
@@ -55,6 +56,7 @@ describe('GetSettingsUseCase', () => {
       vespersTime: '18:30',
       complineTime: '21:00',
       oraMediaTime: '12:00',
+      useLiturgicalSeasonForQuotes: true,
     });
   });
 
@@ -80,6 +82,7 @@ describe('GetSettingsUseCase', () => {
       vespersTime: '18:00',
       complineTime: '21:00',
       oraMediaTime: '12:30',
+      useLiturgicalSeasonForQuotes: false,
     });
   });
 

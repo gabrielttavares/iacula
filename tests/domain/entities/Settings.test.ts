@@ -20,6 +20,7 @@ describe('Settings Entity', () => {
       expect(settings.vespersTime).toBe('18:00');
       expect(settings.complineTime).toBe('21:00');
       expect(settings.oraMediaTime).toBe('12:30');
+      expect(settings.useLiturgicalSeasonForQuotes).toBe(false);
     });
 
     it('should create settings with provided values', () => {
@@ -39,6 +40,7 @@ describe('Settings Entity', () => {
         vespersTime: '18:30',
         complineTime: '21:30',
         oraMediaTime: '12:15',
+        useLiturgicalSeasonForQuotes: true,
       });
 
       expect(settings.interval).toBe(30);
@@ -56,6 +58,7 @@ describe('Settings Entity', () => {
       expect(settings.vespersTime).toBe('18:30');
       expect(settings.complineTime).toBe('21:30');
       expect(settings.oraMediaTime).toBe('12:15');
+      expect(settings.useLiturgicalSeasonForQuotes).toBe(true);
     });
 
     it('should merge partial props with defaults', () => {
@@ -79,6 +82,7 @@ describe('Settings Entity', () => {
       expect(settings.vespersTime).toBe('18:00'); // default
       expect(settings.complineTime).toBe('21:00'); // default
       expect(settings.oraMediaTime).toBe('12:30'); // default
+      expect(settings.useLiturgicalSeasonForQuotes).toBe(false); // default
     });
   });
 
@@ -176,6 +180,7 @@ describe('Settings Entity', () => {
         vespersTime: '18:30',
         complineTime: '21:30',
         oraMediaTime: '12:00',
+        useLiturgicalSeasonForQuotes: true,
       });
 
       const plain = settings.toPlainObject();
@@ -196,6 +201,7 @@ describe('Settings Entity', () => {
         vespersTime: '18:30',
         complineTime: '21:30',
         oraMediaTime: '12:00',
+        useLiturgicalSeasonForQuotes: true,
       });
     });
 
@@ -229,6 +235,7 @@ describe('Settings Entity', () => {
         vespersTime: '18:00',
         complineTime: '21:00',
         oraMediaTime: '12:30',
+        useLiturgicalSeasonForQuotes: false,
       });
     });
   });

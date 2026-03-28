@@ -20,6 +20,7 @@ export interface SettingsDTO {
   vespersTime: string;
   complineTime: string;
   oraMediaTime: string;
+  useLiturgicalSeasonForQuotes: boolean;
 }
 
 export interface UpdateSettingsDTO {
@@ -38,4 +39,5 @@ export interface UpdateSettingsDTO {
   vespersTime?: string;
   complineTime?: string;
   oraMediaTime?: string;
+  useLiturgicalSeasonForQuotes?: boolean;
 }

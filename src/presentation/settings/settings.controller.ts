@@ -16,6 +16,7 @@ class SettingsController {
   private durationInput: HTMLInputElement | null = null;
   private autostartCheckbox: HTMLInputElement | null = null;
   private languageSelect: HTMLSelectElement | null = null;
+  private useLiturgicalSeasonQuotesCheckbox: HTMLInputElement | null = null;
   private liturgyReminderSoundEnabledCheckbox: HTMLInputElement | null = null;
   private liturgyReminderSoundVolumeInput: HTMLInputElement | null = null;
   private liturgyReminderSoundVolumeValue: HTMLElement | null = null;
@@ -43,6 +44,7 @@ class SettingsController {
     this.durationInput = document.getElementById('duration') as HTMLInputElement;
     this.autostartCheckbox = document.getElementById('autostart') as HTMLInputElement;
     this.languageSelect = document.getElementById('language-select') as HTMLSelectElement;
+    this.useLiturgicalSeasonQuotesCheckbox = document.getElementById('use-liturgical-season-quotes') as HTMLInputElement;
     this.liturgyReminderSoundEnabledCheckbox = document.getElementById('liturgy-reminder-sound-enabled') as HTMLInputElement;
     this.liturgyReminderSoundVolumeInput = document.getElementById('liturgy-reminder-sound-volume') as HTMLInputElement;
     this.liturgyReminderSoundVolumeValue = document.getElementById('liturgy-reminder-sound-volume-value');
@@ -101,11 +103,15 @@ class SettingsController {
         const vespersTime = settings.vespersTime || '18:00';
         const complineTime = settings.complineTime || '21:00';
         const oraMediaTime = settings.oraMediaTime || '12:30';
+        const useLiturgicalSeasonForQuotes = settings.useLiturgicalSeasonForQuotes === true;
 
         if (this.intervalInput) this.intervalInput.value = interval.toString();
         if (this.durationInput) this.durationInput.value = duration.toString();
         if (this.autostartCheckbox) this.autostartCheckbox.checked = autostart;
         if (this.languageSelect) this.languageSelect.value = language;
+        if (this.useLiturgicalSeasonQuotesCheckbox) {
+          this.useLiturgicalSeasonQuotesCheckbox.checked = useLiturgicalSeasonForQuotes;
+        }
         if (this.liturgyReminderSoundEnabledCheckbox) this.liturgyReminderSoundEnabledCheckbox.checked = liturgyReminderSoundEnabled;
         if (this.liturgyReminderSoundVolumeInput) {
           this.liturgyReminderSoundVolumeInput.value = Math.round(liturgyReminderSoundVolume * 100).toString();
@@ -135,6 +141,7 @@ class SettingsController {
     if (this.durationInput) this.durationInput.value = '10';
     if (this.autostartCheckbox) this.autostartCheckbox.checked = true;
     if (this.languageSelect) this.languageSelect.value = 'pt-br';
+    if (this.useLiturgicalSeasonQuotesCheckbox) this.useLiturgicalSeasonQuotesCheckbox.checked = false;
     if (this.liturgyReminderSoundEnabledCheckbox) this.liturgyReminderSoundEnabledCheckbox.checked = true;
     if (this.liturgyReminderSoundVolumeInput) this.liturgyReminderSoundVolumeInput.value = '35';
     if (this.laudesEnabledCheckbox) this.laudesEnabledCheckbox.checked = false;
@@ -157,6 +164,7 @@ class SettingsController {
       duration: parseInt(this.durationInput?.value || '10', 10),
       autostart: this.autostartCheckbox?.checked ?? true,
       language: this.languageSelect?.value || 'pt-br',
+      useLiturgicalSeasonForQuotes: this.useLiturgicalSeasonQuotesCheckbox?.checked ?? false,
       liturgyReminderSoundEnabled: this.liturgyReminderSoundEnabledCheckbox?.checked ?? true,
       liturgyReminderSoundVolume: (parseInt(this.liturgyReminderSoundVolumeInput?.value || '35', 10) / 100),
       laudesEnabled: this.laudesEnabledCheckbox?.checked ?? false,

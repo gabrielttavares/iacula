@@ -28,6 +28,7 @@ export class GetSettingsUseCase {
       vespersTime: settings.vespersTime,
       complineTime: settings.complineTime,
       oraMediaTime: settings.oraMediaTime,
+      useLiturgicalSeasonForQuotes: settings.useLiturgicalSeasonForQuotes,
     };
   }
 }

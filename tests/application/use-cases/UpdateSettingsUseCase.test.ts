@@ -136,6 +136,7 @@ describe('UpdateSettingsUseCase', () => {
       vespersTime: '18:00',
       complineTime: '21:00',
       oraMediaTime: '12:30',
+      useLiturgicalSeasonForQuotes: false,
     });
   });
 

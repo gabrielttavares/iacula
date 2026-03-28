@@ -9,6 +9,7 @@ import {
   LiturgicalContext,
   LiturgicalRank,
   LiturgicalSeason,
+  ORDINARY_WEEKDAY_FALLBACK_CONTEXT,
 } from '../../application/ports/ILiturgicalSeasonService';
 
 interface LiturgiaDiariaResponse {
@@ -105,10 +106,7 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
       if (!response.ok) {
         console.warn(`[LiturgicalSeason] API status ${response.status} for ${url}. Temporary fallback to ordinary (not cached).`);
         return {
-          context: {
-            season: 'ordinary',
-            rank: 'weekday',
-          },
+          context: { ...ORDINARY_WEEKDAY_FALLBACK_CONTEXT },
           cacheable: false,
         };
       }
@@ -120,10 +118,7 @@ export class RemoteLiturgicalSeasonService implements ILiturgicalSeasonService {
     } catch {
       console.warn(`[LiturgicalSeason] API request failed for ${url}. Temporary fallback to ordinary (not cached).`);
       return {
-        context: {
-          season: 'ordinary',
-          rank: 'weekday',
-        },
+        context: { ...ORDINARY_WEEKDAY_FALLBACK_CONTEXT },
         cacheable: false,
       };
     }

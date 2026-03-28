@@ -10,7 +10,10 @@ import { QuoteDTO } from '../dto/QuoteDTO';
 import { QuoteSelector } from '../../domain/services/QuoteSelector';
 import { PrayerScheduler } from '../../domain/services/PrayerScheduler';
 import { DayOfWeek, QuotesCollection } from '../../domain/entities/Quote';
-import { ILiturgicalSeasonService } from '../ports/ILiturgicalSeasonService';
+import {
+  ILiturgicalSeasonService,
+  ORDINARY_WEEKDAY_FALLBACK_CONTEXT,
+} from '../ports/ILiturgicalSeasonService';
 
 export class GetNextQuoteUseCase {
   constructor(
@@ -23,13 +26,16 @@ export class GetNextQuoteUseCase {
   async execute(): Promise<QuoteDTO> {
     const settings = await this.settingsRepository.load();
     const indices = await this.indicesRepository.load();
-    const context = await this.liturgicalSeasonService.getCurrentContext();
+    const calendarContext = await this.liturgicalSeasonService.getCurrentContext();
+    const contentContext = settings.useLiturgicalSeasonForQuotes
+      ? calendarContext
+      : ORDINARY_WEEKDAY_FALLBACK_CONTEXT;
 
     const dayOfWeek = PrayerScheduler.getDayOfWeek() as DayOfWeek;
-    const seasonalQuotes = await this.assetService.loadQuotes(settings.language, context.season);
+    const seasonalQuotes = await this.assetService.loadQuotes(settings.language, contentContext.season);
 
-    const feastQuotes = context.feast
-      ? await this.assetService.loadFeastQuotes(context.feast)
+    const feastQuotes = contentContext.feast
+      ? await this.assetService.loadFeastQuotes(contentContext.feast)
       : null;
 
     const feastQuotePool = feastQuotes ?? [];
@@ -39,16 +45,20 @@ export class GetNextQuoteUseCase {
       ? {
           [dayOfWeek.toString()]: {
             day: seasonalQuotes[dayOfWeek.toString()]?.day ?? 'Dia',
-            theme: context.feastName ?? seasonalQuotes[dayOfWeek.toString()]?.theme ?? 'Festa',
+            theme: contentContext.feastName ?? seasonalQuotes[dayOfWeek.toString()]?.theme ?? 'Festa',
             quotes: feastQuotePool,
           },
         }
       : seasonalQuotes;
 
-    const seasonalImages = await this.assetService.listDayImages(dayOfWeek, context.season);
-    const feastImagePath = context.feast ? await this.assetService.getFeastImagePath(context.feast) : null;
+    const seasonalImages = await this.assetService.listDayImages(dayOfWeek, contentContext.season);
+    const feastImagePath = contentContext.feast
+      ? await this.assetService.getFeastImagePath(contentContext.feast)
+      : null;
 
-    console.log(`[GetNextQuoteUseCase] Day: ${dayOfWeek}, Feast: ${context.feast ?? 'none'}, Feast quotes: ${feastQuotePool.length}, Seasonal images: ${seasonalImages.length}`);
+    console.log(
+      `[GetNextQuoteUseCase] Day: ${dayOfWeek}, Feast: ${contentContext.feast ?? 'none'}, Feast quotes: ${feastQuotePool.length}, Seasonal images: ${seasonalImages.length}`
+    );
 
     const dayData = quotePool[dayOfWeek.toString()];
     if (!dayData || !dayData.quotes || dayData.quotes.length === 0) {
@@ -100,9 +110,9 @@ export class GetNextQuoteUseCase {
       imagePath,
       dayOfWeek,
       theme: dayData.theme,
-      season: context.season,
-      feast: shouldUseFeastQuotes ? context.feast : undefined,
-      feastName: shouldUseFeastQuotes ? context.feastName : undefined,
+      season: calendarContext.season,
+      feast: calendarContext.feast,
+      feastName: calendarContext.feastName,
     };
   }
 }
