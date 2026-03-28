@@ -77,13 +77,15 @@ jobs:
           npm run prebuild
           npx tsc
 
-      - name: Package
-        shell: bash
+      - name: Use unsigned macOS build when no code-signing identity is present
+        if: matrix.platform == 'mac'
         run: |
-          if [ "${{ matrix.platform }}" = "mac" ] && [ -z "${{ secrets.BUILD_CERTIFICATE_BASE64 }}" ]; then
-            export CSC_IDENTITY_AUTO_DISCOVERY=false
+          if ! security find-identity -v -p codesigning 2>/dev/null | grep -q 'Developer ID Application'; then
+            echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
           fi
-          npx electron-builder ${{ matrix.build_args }} --publish never
+
+      - name: Package
+        run: npx electron-builder ${{ matrix.build_args }} --publish never
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
