@@ -36,11 +36,6 @@ const WINDOW_CONFIGS: Record<WindowType, WindowConfig> = {
     height: 720,
     htmlFile: 'settings/settings.html',
   },
-  liturgyReminder: {
-    width: 240,
-    height: 165,
-    htmlFile: 'liturgy-reminder/liturgyReminder.html',
-  },
 };
 
 export class WindowService implements IWindowService {
@@ -64,9 +59,9 @@ export class WindowService implements IWindowService {
     const windowWidth = options?.width ?? config.width;
     const windowHeight = options?.height ?? config.height;
 
-    const isPopupType = type === 'popup' || type === 'angelus' || type === 'reginaCaeli' || type === 'liturgyReminder';
+    const isPopupType = type === 'popup' || type === 'angelus' || type === 'reginaCaeli';
     const isHiddenFromTaskSwitcher = isPopupType || (this.isMac && type === 'settings');
-    const isFocusableWindow = type === 'settings' || type === 'popup' || type === 'liturgyReminder';
+    const isFocusableWindow = type === 'settings' || type === 'popup';
 
     const window = new BrowserWindow({
       width: windowWidth,

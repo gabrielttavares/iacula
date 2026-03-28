@@ -194,28 +194,6 @@
             margin-top: 0.25rem;
         }
 
-        .liturgy-modules {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .liturgy-module {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .liturgy-module .checkbox-group {
-            margin-top: 0;
-        }
-
-        .liturgy-module input[type="time"] {
-            margin-bottom: 0;
-            min-width: 108px;
-        }
-
         .checkbox-row {
             display: flex;
             justify-content: space-between;
@@ -276,25 +254,6 @@
             transform: translateY(0);
         }
 
-        .sound-controls {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 0.6rem;
-            align-items: center;
-        }
-
-        .sound-controls input[type="range"] {
-            width: 100%;
-            accent-color: var(--primary-color);
-        }
-
-        .sound-volume-value {
-            font-size: 0.85rem;
-            color: var(--light-text);
-            min-width: 42px;
-            text-align: right;
-        }
-
         .status {
             margin-top: 0.5rem;
             padding: 0.55rem;
@@ -340,11 +299,6 @@
             option,
             .checkbox-group label {
                 font-size: 0.95rem;
-            }
-
-            .liturgy-module {
-                grid-template-columns: 1fr;
-                gap: 0.45rem;
             }
         }
 
@@ -396,49 +350,6 @@
                     <div class="checkbox-group">
                         <input type="checkbox" id="use-liturgical-season-quotes" name="use-liturgical-season-quotes">
                         <label for="use-liturgical-season-quotes">Usar estação litúrgica e festas nas jaculatórias e imagens</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="liturgy-reminder-sound-enabled" name="liturgy-reminder-sound-enabled">
-                        <label for="liturgy-reminder-sound-enabled">Som no lembrete de Liturgia das Horas</label>
-                    </div>
-                    <div class="sound-controls">
-                        <input type="range" id="liturgy-reminder-sound-volume" name="liturgy-reminder-sound-volume" min="0" max="100" step="1" value="35">
-                        <span id="liturgy-reminder-sound-volume-value" class="sound-volume-value">35%</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Liturgia das Horas (modulos opcionais)</label>
-                    <div class="liturgy-modules">
-                        <div class="liturgy-module">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="laudes-enabled" name="laudes-enabled">
-                                <label for="laudes-enabled">Laudes</label>
-                            </div>
-                            <input type="time" id="laudes-time" name="laudes-time" value="06:00">
-                        </div>
-                        <div class="liturgy-module">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="vespers-enabled" name="vespers-enabled">
-                                <label for="vespers-enabled">Vésperas</label>
-                            </div>
-                            <input type="time" id="vespers-time" name="vespers-time" value="18:00">
-                        </div>
-                        <div class="liturgy-module">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="compline-enabled" name="compline-enabled">
-                                <label for="compline-enabled">Completas</label>
-                            </div>
-                            <input type="time" id="compline-time" name="compline-time" value="21:00">
-                        </div>
-                        <div class="liturgy-module">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="ora-media-enabled" name="ora-media-enabled">
-                                <label for="ora-media-enabled">Ora Media</label>
-                            </div>
-                            <input type="time" id="ora-media-time" name="ora-media-time" value="12:30">
-                        </div>
                     </div>
                 </div>
                 <div class="form-group checkbox-row">

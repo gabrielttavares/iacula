@@ -97,7 +97,6 @@ describe('IaculaApp relaunch behavior', () => {
     expect(close).toHaveBeenCalledWith('popup');
     expect(close).toHaveBeenCalledWith('angelus');
     expect(close).toHaveBeenCalledWith('reginaCaeli');
-    expect(close).toHaveBeenCalledWith('liturgyReminder');
     expect(show).toHaveBeenCalledWith('settings');
   });
 
@@ -130,7 +129,6 @@ describe('IaculaApp relaunch behavior', () => {
     expect(close).toHaveBeenCalledWith('popup');
     expect(close).toHaveBeenCalledWith('angelus');
     expect(close).toHaveBeenCalledWith('reginaCaeli');
-    expect(close).toHaveBeenCalledWith('liturgyReminder');
     expect(show).toHaveBeenCalledWith('settings');
   });
 });

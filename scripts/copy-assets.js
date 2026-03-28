@@ -33,7 +33,6 @@ ensureDirExists('dist/presentation/popup');
 ensureDirExists('dist/presentation/angelus');
 ensureDirExists('dist/presentation/regina-caeli');
 ensureDirExists('dist/presentation/settings');
-ensureDirExists('dist/presentation/liturgy-reminder');
 ensureDirExists('dist/assets');
 
 // Copy presentation layer HTML files
@@ -42,7 +41,6 @@ const presentationDirs = [
     { src: 'src/presentation/angelus', dest: 'dist/presentation/angelus' },
     { src: 'src/presentation/regina-caeli', dest: 'dist/presentation/regina-caeli' },
     { src: 'src/presentation/settings', dest: 'dist/presentation/settings' },
-    { src: 'src/presentation/liturgy-reminder', dest: 'dist/presentation/liturgy-reminder' },
 ];
 
 presentationDirs.forEach(({ src, dest }) => {

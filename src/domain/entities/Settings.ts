@@ -10,16 +10,6 @@ export interface SettingsProps {
   autostart: boolean;
   easterTime: boolean;
   language: string;
-  liturgyReminderSoundEnabled: boolean;
-  liturgyReminderSoundVolume: number;
-  laudesEnabled: boolean;
-  vespersEnabled: boolean;
-  complineEnabled: boolean;
-  oraMediaEnabled: boolean;
-  laudesTime: string;
-  vespersTime: string;
-  complineTime: string;
-  oraMediaTime: string;
   /** Quando true, jaculatórias e imagens seguem estação litúrgica e festas da API. Default false = Tempo Comum por dia da semana. */
   useLiturgicalSeasonForQuotes: boolean;
 }
@@ -39,22 +29,6 @@ export class Settings {
       autostart: props.autostart !== undefined ? props.autostart : defaults.autostart,
       easterTime: props.easterTime !== undefined ? props.easterTime : defaults.easterTime,
       language: props.language !== undefined ? props.language : defaults.language,
-      liturgyReminderSoundEnabled:
-        props.liturgyReminderSoundEnabled !== undefined
-          ? props.liturgyReminderSoundEnabled
-          : defaults.liturgyReminderSoundEnabled,
-      liturgyReminderSoundVolume:
-        props.liturgyReminderSoundVolume !== undefined
-          ? props.liturgyReminderSoundVolume
-          : defaults.liturgyReminderSoundVolume,
-      laudesEnabled: props.laudesEnabled !== undefined ? props.laudesEnabled : defaults.laudesEnabled,
-      vespersEnabled: props.vespersEnabled !== undefined ? props.vespersEnabled : defaults.vespersEnabled,
-      complineEnabled: props.complineEnabled !== undefined ? props.complineEnabled : defaults.complineEnabled,
-      oraMediaEnabled: props.oraMediaEnabled !== undefined ? props.oraMediaEnabled : defaults.oraMediaEnabled,
-      laudesTime: props.laudesTime !== undefined ? props.laudesTime : defaults.laudesTime,
-      vespersTime: props.vespersTime !== undefined ? props.vespersTime : defaults.vespersTime,
-      complineTime: props.complineTime !== undefined ? props.complineTime : defaults.complineTime,
-      oraMediaTime: props.oraMediaTime !== undefined ? props.oraMediaTime : defaults.oraMediaTime,
       useLiturgicalSeasonForQuotes:
         props.useLiturgicalSeasonForQuotes !== undefined
           ? props.useLiturgicalSeasonForQuotes
@@ -70,16 +44,6 @@ export class Settings {
       autostart: true,
       easterTime: false,
       language: 'pt-br',
-      liturgyReminderSoundEnabled: true,
-      liturgyReminderSoundVolume: 0.35,
-      laudesEnabled: false,
-      vespersEnabled: false,
-      complineEnabled: false,
-      oraMediaEnabled: false,
-      laudesTime: '06:00',
-      vespersTime: '18:00',
-      complineTime: '21:00',
-      oraMediaTime: '12:30',
       useLiturgicalSeasonForQuotes: false,
     };
   }
@@ -98,23 +62,6 @@ export class Settings {
     const supportedLanguages = ['pt-br', 'en', 'la'];
     if (!supportedLanguages.includes(props.language)) {
       errors.push(`Language must be one of: ${supportedLanguages.join(', ')}`);
-    }
-    if (props.liturgyReminderSoundVolume < 0 || props.liturgyReminderSoundVolume > 1) {
-      errors.push('Liturgy reminder sound volume must be between 0 and 1');
-    }
-
-    const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
-    if (!timePattern.test(props.laudesTime)) {
-      errors.push('Laudes time must be in HH:MM format');
-    }
-    if (!timePattern.test(props.vespersTime)) {
-      errors.push('Vespers time must be in HH:MM format');
-    }
-    if (!timePattern.test(props.complineTime)) {
-      errors.push('Compline time must be in HH:MM format');
-    }
-    if (!timePattern.test(props.oraMediaTime)) {
-      errors.push('Ora Media time must be in HH:MM format');
     }
 
     if (errors.length > 0) {
@@ -142,46 +89,6 @@ export class Settings {
 
   get language(): string {
     return this.props.language;
-  }
-
-  get liturgyReminderSoundEnabled(): boolean {
-    return this.props.liturgyReminderSoundEnabled;
-  }
-
-  get liturgyReminderSoundVolume(): number {
-    return this.props.liturgyReminderSoundVolume;
-  }
-
-  get laudesEnabled(): boolean {
-    return this.props.laudesEnabled;
-  }
-
-  get vespersEnabled(): boolean {
-    return this.props.vespersEnabled;
-  }
-
-  get complineEnabled(): boolean {
-    return this.props.complineEnabled;
-  }
-
-  get oraMediaEnabled(): boolean {
-    return this.props.oraMediaEnabled;
-  }
-
-  get laudesTime(): string {
-    return this.props.laudesTime;
-  }
-
-  get vespersTime(): string {
-    return this.props.vespersTime;
-  }
-
-  get complineTime(): string {
-    return this.props.complineTime;
-  }
-
-  get oraMediaTime(): string {
-    return this.props.oraMediaTime;
   }
 
   get useLiturgicalSeasonForQuotes(): boolean {

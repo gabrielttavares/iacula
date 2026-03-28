@@ -10,8 +10,6 @@ const FILES = [
   'assets/quotes/pt-br/easter.json',
   'src/presentation/settings/settings.html',
   'src/presentation/settings/settings.controller.ts',
-  'src/presentation/liturgy-reminder/liturgyReminder.html',
-  'src/presentation/liturgy-reminder/liturgyReminder.controller.ts',
   'src/presentation/popup/popup.html',
   'src/presentation/angelus/angelus.html',
   'src/presentation/regina-caeli/reginaCaeli.html',

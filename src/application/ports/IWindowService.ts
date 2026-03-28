@@ -4,7 +4,7 @@
  * Abstrai as operações de criação/exibição de janelas.
  */
 
-export type WindowType = 'popup' | 'angelus' | 'reginaCaeli' | 'settings' | 'liturgyReminder';
+export type WindowType = 'popup' | 'angelus' | 'reginaCaeli' | 'settings';
 
 export interface WindowOptions {
   width?: number;
