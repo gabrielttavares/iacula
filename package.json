@@ -82,7 +82,8 @@
         },
         "linux": {
             "target": [
-                "AppImage"
+                "AppImage",
+                "rpm"
             ],
             "executableArgs": [
                 "--no-sandbox"
@@ -90,7 +91,7 @@
             "category": "Utility",
             "maintainer": "Gabriel Tavares <gabrieltxtavares@gmail.com>",
             "compression": null,
-            "icon": "assets/images/icon.png"
+            "icon": "assets/images/icon.icns"
         },
         "mac": {
             "target": "dmg",

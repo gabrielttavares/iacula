@@ -12,18 +12,13 @@ describe('package build config for updater', () => {
     expect(pkg.dependencies?.['electron-updater']).toBeDefined();
   });
 
-  it('should use AppImage-only target on linux', () => {
+  it('should build AppImage and rpm targets on linux (no deb)', () => {
     const packagePath = path.join(process.cwd(), 'package.json');
     const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8')) as {
       build?: { linux?: { target?: string | string[] } };
     };
 
     const linuxTarget = pkg.build?.linux?.target;
-    if (Array.isArray(linuxTarget)) {
-      expect(linuxTarget).toEqual(['AppImage']);
-      return;
-    }
-
-    expect(linuxTarget).toBe('AppImage');
+    expect(linuxTarget).toEqual(['AppImage', 'rpm']);
   });
 });
