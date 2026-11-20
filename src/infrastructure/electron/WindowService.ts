@@ -61,7 +61,9 @@ export class WindowService implements IWindowService {
 
     const isPopupType = type === 'popup' || type === 'angelus' || type === 'reginaCaeli';
     const isHiddenFromTaskSwitcher = isPopupType || (this.isMac && type === 'settings');
-    const isFocusableWindow = type === 'settings' || type === 'popup';
+    // Popups must never take focus away from the app the user is working in.
+    // Their buttons still receive clicks while non-focusable.
+    const isFocusableWindow = !isPopupType;
 
     const window = new BrowserWindow({
       width: windowWidth,
